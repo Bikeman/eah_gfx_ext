@@ -1,15 +1,26 @@
 # point this to where you installed BOINC (--prefix you gave to configure, defaults to $BOINC_PREFIX)
 BOINC_PREFIX ?= /home/oliver/development/aei/boinc/bin
-
-LIBS= -L${BOINC_PREFIX}/lib -lSDL -lGL -lGLU
-CPPFLAGS=-I/usr/include
-DEPS=Makefile starsphere.h 
-OBJS=starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o
-
 CXX ?= g++
 
+# variables
+LIBS = -L${BOINC_PREFIX}/lib -Bdynamic -lGL -lGLU -Bstatic -lSDL
+CPPFLAGS = -I/usr/include
+DEPS = Makefile starsphere.h 
+OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o
+DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
+
+# primary role based tagets
+debug: clean starsphere
+release:  clean starsphere
+
+# target specific options
+debug: CPPFLAGS += $(DEBUGFLAGSCPP)
+release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
+release: LDFLAGS += -s
+
+# file based targets
 starsphere: $(DEPS) main.C $(OBJS)
-	$(CXX) -g ${CPPFLAGS} main.C -o starsphere ${OBJS} ${LIBS}
+	$(CXX) -g ${CPPFLAGS} ${LDFLAGS} main.C -o starsphere ${OBJS} ${LIBS}
 
 starsphere.o: $(DEPS) starsphere.C
 	$(CXX) -g ${CPPFLAGS} -I/usr/X11R6/include -c starsphere.C
@@ -30,5 +41,5 @@ search_info.o: $(DEPS) search_info.C
 	$(CXX) -g ${CPPFLAGS} -c search_info.C
 
 clean:
-	rm ${OBJS} starsphere
+	rm -f ${OBJS} starsphere
 
