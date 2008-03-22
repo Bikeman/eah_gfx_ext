@@ -61,7 +61,7 @@ Uint32 timerCallback( Uint32 interval, void *param )
 
 void eventLoop()
 {
-	SDL_AddTimer(25, timerCallback, NULL);
+	SDL_AddTimer(40, timerCallback, NULL);
 	
 	//SDL_EventState( SDL_QUIT, SDL_IGNORE);
 	SDL_EventState( SDL_ACTIVEEVENT, SDL_IGNORE);
@@ -81,13 +81,13 @@ void eventLoop()
 
 	SDL_Event event;
 	
-	static int i = 1;
+	static double i = 0.0;
 
 	while ( SDL_WaitEvent(&event) )
 	{
 		if( event.type == SDL_USEREVENT )
 		{
-			app_graphics_render(500, 500, i++);
+			app_graphics_render(500, 500, i+=0.025);
 		}
 		else if( event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) )
 		{
@@ -96,7 +96,7 @@ void eventLoop()
 		else if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN )
 		{
 			SDL_WM_ToggleFullScreen( m_DisplaySurface );
-			app_graphics_render(500, 500, i++);
+			app_graphics_render(500, 500, i);
 		}
 	}
 }
