@@ -304,6 +304,8 @@ void make_obs() {
   gmt_offset = obs_gmt_dtime - obs_dtime_drawn;   // save for GMT display
 
   radius = 1.0*sphRadius;       // radius of sphere on which they are drawn
+  
+  float lineSize = 4.0;
 
   /**
    * LIGO Livingston Observatory:
@@ -317,16 +319,20 @@ void make_obs() {
 
   if (!LLOmarker) LLOmarker = glGenLists(1);
   glNewList(LLOmarker, GL_COMPILE);
-  glColor3f(0.0, 1.0, 0.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINES);            // draws lines between *pairs* of vertices
-     //  North/South arm:
-    sphVertex3D(RAdeg, DEdeg,radius);
-    sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
-    // East/West arm:
-    sphVertex3D(RAdeg, DEdeg,radius);
-    sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
-  glEnd();
+	  glColor3f(0.0, 1.0, 0.0);
+	  glLineWidth(lineSize);
+	  glBegin(GL_LINE_STRIP);
+	    //  North/South arm:
+	    sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
+	    sphVertex3D(RAdeg, DEdeg,radius);
+	    // East/West arm:
+	    sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+	  glEnd();
+	  // arm joint H2
+	  glPointSize((GLfloat) lineSize);
+	  glBegin(GL_POINTS);    
+	  	sphVertex3D(RAdeg, DEdeg, radius);
+	  glEnd();
   glEndList();
 
   /**
@@ -341,23 +347,32 @@ void make_obs() {
   
   if (!LHOmarker) LHOmarker = glGenLists(1);
   glNewList(LHOmarker, GL_COMPILE);
-  glColor3f(0.0, 0.0, 1.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINES);            // draws lines between *pairs* of vertices
-     //  North/South arm:
-    sphVertex3D(RAdeg, DEdeg, radius);
-    sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-    // East/West arm:
-    sphVertex3D(RAdeg, DEdeg, radius);
-    sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
-
-     //  North/South arm, H2:
-    sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
-    sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
-    // East/West arm, H2;
-    sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
-    sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
-  glEnd();
+	  glColor3f(0.0, 0.0, 1.0);
+	  glLineWidth(lineSize);
+	  glBegin(GL_LINE_STRIP);
+	    // North/South arm:
+	    sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+	    sphVertex3D(RAdeg, DEdeg, radius);
+	    // East/West arm:
+	    sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+	  glEnd();
+	  glBegin(GL_LINE_STRIP);
+	    // North/South arm, H2:
+	    sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
+	    sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+	    // East/West arm, H2;
+	    sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
+	  glEnd();
+	  // arm joint H1
+	  glPointSize((GLfloat) lineSize);
+	  glBegin(GL_POINTS);    
+	  	sphVertex3D(RAdeg, DEdeg, radius);
+	  glEnd();
+	  // arm joint H2
+	  glPointSize((GLfloat) lineSize);
+	  glBegin(GL_POINTS);    
+	  	sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+	  glEnd();
   glEndList();
   
   /**
@@ -374,15 +389,19 @@ void make_obs() {
   if (!GEOmarker) GEOmarker = glGenLists(1);
   glNewList(GEOmarker, GL_COMPILE);
   glColor3f(1.0, 0.0, 0.0);
-  glLineWidth(4.0);
-  glBegin(GL_LINES);            // draws lines between *pairs* of vertices
-     //  North/South arm:
-    sphVertex3D(RAdeg, DEdeg, radius);
-    sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-    // West/East arm:
-    sphVertex3D(RAdeg, DEdeg, radius);
-    sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
-  glEnd();
+	  glLineWidth(lineSize);
+	  glBegin(GL_LINE_STRIP);
+	    // North/South arm:
+	    sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+	    sphVertex3D(RAdeg, DEdeg, radius);
+	    // West/East arm:
+	    sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
+	  glEnd();
+	  // arm joint
+	  glPointSize((GLfloat) lineSize);
+	  glBegin(GL_POINTS);    
+	  	sphVertex3D(RAdeg, DEdeg, radius);
+	  glEnd();
   glEndList();
 
   return;
