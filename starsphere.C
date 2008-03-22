@@ -140,8 +140,8 @@ void sphVertex(GLfloat RAdeg, GLfloat DEdeg) {
  * Makes a marker for one star at a given position and angular size.  
  */
 void star_marker(float RAdeg, float DEdeg, float size) {
-  glBegin(GL_POINTS);
-    glPointSize((GLfloat) size);
+  glPointSize((GLfloat) size);
+  glBegin(GL_POINTS);    
     sphVertex((GLfloat) RAdeg, (GLfloat) DEdeg);
   glEnd();
   return;
@@ -159,8 +159,6 @@ void make_stars(){
 
   if (!Stars) Stars = glGenLists(1);
   glNewList(Stars, GL_COMPILE);
-      glLineWidth(3.0);
-      glPointSize(3.5);
       glColor3f(1.0, 1.0, 1.0); 
 
      /**
@@ -180,7 +178,7 @@ void make_stars(){
        }
        if(!is_dupe) {
          // mag_size = 0.05 + 0.50*rand()/RAND_MAX;
-         mag_size = 3.5;
+         mag_size = 4.0;
          star_marker(star_info[i][0],star_info[i][1], mag_size);
        }
      }
@@ -193,7 +191,7 @@ void make_stars(){
  *  Pulsar Markers:
  */
 void make_pulsars(){
-  GLfloat mag_size=3.5;
+  GLfloat mag_size=3.0;
   int i;
   
   if (!Pulsars) Pulsars = glGenLists(1);
@@ -211,7 +209,7 @@ void make_pulsars(){
  * Super Novae Remenants (SNRs):
  */
 void make_snrs(){
-  GLfloat mag_size=3.5;
+  GLfloat mag_size=3.0;
   int i;
 
   if (!SNRs) SNRs = glGenLists(1);
@@ -510,6 +508,9 @@ void app_graphics_init() {
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glHint(GL_FOG_HINT, GL_DONT_CARE);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+  
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   /* Enable depth buffering for 3D graphics */
   glClearDepth(1.0f);
