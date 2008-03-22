@@ -103,6 +103,39 @@ void eventLoop()
 			SDL_WM_ToggleFullScreen( m_DisplaySurface );
 			app_graphics_render(desktopWidth, desktopHeight, i);
 		}
+		else if( event.type == SDL_KEYDOWN )
+		{
+			switch(event.key.keysym.sym)
+			{
+			case SDLK_s:
+				setFeature(STARS, isFeature(STARS) ? false : true);
+				break;
+			case SDLK_c:
+				setFeature(CONSTELLATIONS, isFeature(CONSTELLATIONS) ? false : true);
+				break;
+			case SDLK_o:
+				setFeature(OBSERVATORIES, isFeature(OBSERVATORIES) ? false : true);
+				break;
+			case SDLK_x:
+				setFeature(XRAYS, isFeature(XRAYS) ? false : true);
+				break;
+			case SDLK_p:
+				setFeature(PULSARS, isFeature(PULSARS) ? false : true);
+				break;
+			case SDLK_r:
+				setFeature(SNRS, isFeature(SNRS) ? false : true);
+				break;
+			case SDLK_g:
+				setFeature(GLOBE, isFeature(GLOBE) ? false : true);
+				break;
+			case SDLK_a:
+				setFeature(AXES, isFeature(AXES) ? false : true);
+				break;
+			case SDLK_i:
+				setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
+				break;
+			}			
+		}
 	}
 }
 
@@ -179,12 +212,14 @@ int main(int argc, char **argv) {
 
 	SDL_WM_SetCaption("Einstein@Home", "Icon");
 	//SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL); 
-	
+
+#ifndef DEBUG
 	SDL_WM_ToggleFullScreen( m_DisplaySurface );
+#endif
 
 	app_graphics_resize(desktopWidth, desktopHeight);
 	app_graphics_init();
-	app_graphics_render(desktopWidth, desktopHeight, 22);
+	app_graphics_render(desktopWidth, desktopHeight, 0);
 	
 	eventLoop();
 

@@ -64,11 +64,8 @@ GLuint Axes=0, Stars=0, Constellations=0, Pulsars=0;
 GLuint LLOmarker=0, LHOmarker=0, GEOmarker=0;
 GLuint sphGrid=0, SNRs=0;
 
-bool show_stars=true, show_constellations=true, show_obs=true;
-bool show_xrays=true, show_pulsars=true, show_snrs=true;
-bool show_globe=false, show_axes=false;
-
-bool show_search_info=false;    // not unless search_pos is set
+// feature bitmap
+int featureFlags = 0;
 
 /* Search position and time */ 
 extern float  search_RAdeg;     // search_info.C
@@ -434,8 +431,8 @@ void make_globe(){
 
   for(hr=0; hr<24; hr++) {
     RAdeg=hr*15.0;
-	glColor3f(0.6, 0.6, 0.0);
-	if(hr==0)   glColor3f(0.9, 0.9, 0.0);
+	glColor3f(0.25, 0.25, 0.25);
+	if(hr==0)   glColor3f(0.55, 0.55, 0.55);
     glBegin(GL_LINE_STRIP);  
       for(i=0; i<=iMax; i++) {
         DEdeg = i*180.0/iMax - 90.0;
@@ -537,6 +534,12 @@ void app_graphics_init() {
   make_axes();
   make_globe();
   make_obs();
+  
+  setFeature(STARS, true);
+  setFeature(CONSTELLATIONS, true);
+  setFeature(PULSARS, true);
+  setFeature(OBSERVATORIES, true);
+  setFeature(SNRS, true);
 
   glDisable(GL_CLIP_PLANE0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -582,7 +585,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   // First, write user text to screen,  from user_text.C
 
   annotate_screen();
-  if(show_search_info) display_search_info(time_of_day);
+  if(isFeature(SEARCHINFO)) display_search_info(time_of_day);
 
 
   // Now draw the scene...
@@ -608,7 +611,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 
 
   // Draw axes before any rotation so they stay put
-  if(show_axes) glCallList(Axes);
+  if(isFeature(AXES)) glCallList(Axes);
 
 
   // Draw the sky sphere, with rotation:
@@ -618,11 +621,11 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 
     /* stars, pulsars, supernovae */
 
-    if(show_stars)          glCallList(Stars);
-    if(show_pulsars)        glCallList(Pulsars);
-    if(show_snrs)           glCallList(SNRs);
-    if(show_constellations) glCallList(Constellations);
-    if(show_globe)          glCallList(sphGrid);
+    if(isFeature(STARS))          glCallList(Stars);
+    if(isFeature(PULSARS))        glCallList(Pulsars);
+    if(isFeature(SNRS))           glCallList(SNRs);
+    if(isFeature(CONSTELLATIONS)) glCallList(Constellations);
+    if(isFeature(GLOBE))          glCallList(sphGrid);
 
     /* search position marker */
 
@@ -637,7 +640,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 
     /* Observatories move an extra 15 degrees/hr since they were drawn */
 
-    if(show_obs) {
+    if(isFeature(OBSERVATORIES)) {
       glPushMatrix();
         Zobs = (time_of_day-obs_dtime_drawn) * 15.0/3600.0;
         glRotatef(Zobs, 0.0, 1.0, 0.0);            
@@ -737,7 +740,19 @@ void boinc_app_mouse_button(int x, int y, int button, int state) {
 bool shift_is_down=false;
 bool ctrl_is_down=false;
 
-
 void boinc_app_key_press(int key, int state ) {}
 
 void boinc_app_key_release(int, int) {}
+
+/**
+ * Feature control
+ */
+void setFeature(const FEATURES feature, const bool enable)
+{
+	featureFlags = enable ? (featureFlags | feature) : (featureFlags & ~feature);
+}
+
+bool isFeature(const FEATURES feature)
+{
+	return ((featureFlags & feature) == feature ? true : false);
+}

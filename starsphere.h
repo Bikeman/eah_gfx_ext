@@ -56,6 +56,22 @@ void boinc_app_mouse_move(int x, int y, int left, int middle, int right);
 void boinc_app_key_press(int, int);
 void boinc_app_key_release(int, int);
 
-//#endif
+// features
+typedef enum Features {
+	STARS=1,
+	CONSTELLATIONS=2,
+	OBSERVATORIES=4,
+	XRAYS=8,
+	PULSARS=16,
+	SNRS=32,
+	GLOBE=64,
+	AXES=128,
+	SEARCHINFO=256
+} FEATURES;
+
+// feature control API
+void setFeature(const FEATURES features, const bool enable);
+bool isFeature(const FEATURES features);
+
 
 #endif

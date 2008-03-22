@@ -155,14 +155,13 @@ void make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size) {
 
 extern int  show_markers;
 int  marker_status=MARKER_NONE;
-extern bool show_search_info;
 
 void set_search_pos(float RAdeg, float DEdeg) {
   search_RAdeg = RAdeg;
   search_DEdeg = DEdeg;
   show_markers=MARKER_NEW; // change this back to bool on/off soon. -EAM
   marker_status=MARKER_NEW;// flag that we should make a new marker
-  show_search_info=true;
+  setFeature(SEARCHINFO, true);
   Nsearched++;
 }
 
