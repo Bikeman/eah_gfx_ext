@@ -5,6 +5,7 @@
  *
  * Copyright (C) 2004 David Hammer, Eric Myers, Bruce Allen
  * Copyright (C) 2008 Bernd Machenschalk
+ * Copyright (C) 2008 Oliver Bock
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +23,6 @@
 // or for Unix 
 #include <cmath>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
 #include <GL/gl.h>

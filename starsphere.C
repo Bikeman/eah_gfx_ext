@@ -11,6 +11,7 @@ static volatile const char *CVSfileVersion= "$Id$";
 /***********************************************************************
  * Copyright (C) 2004 David Hammer, Eric Myers, Bruce Allen
  * Copyright (C) 2008 Bernd Machenschalk
+ * Copyright (C) 2008 Oliver Bock
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -466,9 +467,7 @@ void make_globe(){
  */
 
 // Graphics state info:
-int Npixels_x = 640;
-int Npixels_y = 480;
-float aspect = (float) Npixels_x / (float) Npixels_y;
+float aspect = 4 / 3;
 
 /**
  * Window resize/remap
@@ -476,25 +475,21 @@ float aspect = (float) Npixels_x / (float) Npixels_y;
  * when window is first mapped)
  */
 void app_graphics_resize(int width, int height) {
-  glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 
-  gfx_width = (float)width;
-  gfx_height = (float)height;  
-  aspect = gfx_width / gfx_height;
+	/* Adjust aspect ratio and projection */
+	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 
-  /* Adjust aspect ratio and projection */
-
-  Npixels_x = width;
-  Npixels_y = height;
-
- 
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(95.0, aspect, 0.50, 25.0);
-  glMatrixMode(GL_MODELVIEW);
-
-  // Update in case time (zone?) change
-  gmt_offset = 2; //FIXME: gmt_dtime() - dtime(); 
+	gfx_width = (float)width;
+	gfx_height = (float)height;  
+	aspect = gfx_width / gfx_height;
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(95.0, aspect, 0.50, 25.0);
+	glMatrixMode(GL_MODELVIEW);
+	
+	// Update in case time (zone?) change
+	gmt_offset = 2; //FIXME: gmt_dtime() - dtime(); 
 }
 
 
@@ -505,7 +500,16 @@ void app_graphics_init() {
 
   // Drawing setup:
   glClearColor(0.0, 0.0, 0.0, 0.0);	// background is black
-  glShadeModel (GL_FLAT);
+
+  // some polishing
+  glShadeModel(GL_SMOOTH);
+  glEnable(GL_POINT_SMOOTH);
+  glEnable(GL_LINE_SMOOTH);
+  
+  glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+  glHint(GL_FOG_HINT, GL_DONT_CARE);
+  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
   /* Enable depth buffering for 3D graphics */
   glClearDepth(1.0f);
@@ -515,7 +519,7 @@ void app_graphics_init() {
   /* Fog aids depth perception */
   glEnable(GL_FOG);
   glFogi(GL_FOG_MODE, GL_EXP2);
-  glFogf(GL_FOG_DENSITY, 0.070);
+  glFogf(GL_FOG_DENSITY, 0.085);
 
   
   /* Set initial perspective projection */

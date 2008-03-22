@@ -32,7 +32,12 @@
 
 #include "starsphere.h" 
 
-SDL_Surface *m_DisplaySurface;
+// ugly globals, will eventually factored out into private members
+SDL_Surface *m_DisplaySurface = 0;
+int desktopWidth = 800;
+int desktopHeight = 600;
+int desktopBitsPerPixel = 16;
+
 
 using namespace std;
 
@@ -87,7 +92,7 @@ void eventLoop()
 	{
 		if( event.type == SDL_USEREVENT )
 		{
-			app_graphics_render(500, 500, i+=0.025);
+			app_graphics_render(desktopWidth, desktopHeight, i+=0.025);
 		}
 		else if( event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) )
 		{
@@ -96,7 +101,7 @@ void eventLoop()
 		else if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN )
 		{
 			SDL_WM_ToggleFullScreen( m_DisplaySurface );
-			app_graphics_render(500, 500, i);
+			app_graphics_render(desktopWidth, desktopHeight, i);
 		}
 	}
 }
@@ -108,25 +113,23 @@ int main(int argc, char **argv) {
 		throw runtime_error( SDL_GetError() );
 	}
 
+    // retrieve current video settings
 	const SDL_VideoInfo *videoInfo = SDL_GetVideoInfo();
-
-	SDL_Rect **videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-
-	if (videoModes == (SDL_Rect **)0) {
-		cerr << "Es sind keine Auflösungen verfügbar!" << endl;
-		exit(-1);
+	
+	if (videoInfo->current_w != 0) {
+		desktopWidth = videoInfo->current_w;
 	}
 
-	if (videoModes == (SDL_Rect **)-1) {
-		cout << "Alle Auflösungen sind verfügbar!" << endl;
+	if (videoInfo->current_h != 0) {
+		desktopHeight = videoInfo->current_h;
 	}
+	
+	if (videoInfo->vfmt->BitsPerPixel != 0) {
+		desktopBitsPerPixel = videoInfo->vfmt->BitsPerPixel;
+	}
+	
 #ifdef DEBUG
-	else {
-		for (int i=0; videoModes[i]; ++i) {
-			cout << "Die Auflösung " << videoModes[i]->w << "x"
-					<< videoModes[i]->h << " ist verfügbar" << endl;
-		}
-	}
+	cout << "Using resolution: " << desktopWidth << "/" << desktopHeight << "/" << desktopBitsPerPixel << endl;
 #endif
 
 	/*
@@ -147,10 +150,10 @@ int main(int argc, char **argv) {
 	 * SDL_PREALLOC - Surface nutzt vorher allokierten Speicher
 	 */
 
-	Uint32 bitPerPixel = SDL_VideoModeOK( 800, 600, 16, SDL_OPENGL);
+	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL);
 
 	if ( !bitPerPixel) {
-		cerr << "Video mode nicht unterstützt: " << SDL_GetError() << endl;
+		cerr << "Video mode not supported: " << SDL_GetError() << endl;
 		exit(1);
 	}
 
@@ -163,19 +166,25 @@ int main(int argc, char **argv) {
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	// 4x FSAA :-)
+	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
 
-	m_DisplaySurface = SDL_SetVideoMode( 1024, 768, NULL, SDL_OPENGL);
+	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL);
 
 	if (m_DisplaySurface == NULL) {
-		cerr << "Konnte kein Fenster öffnen: " << SDL_GetError() << endl;
+		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
 		exit(1);
 	}
 
 	SDL_WM_SetCaption("Einstein@Home", "Icon");
 	//SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL); 
+	
+	SDL_WM_ToggleFullScreen( m_DisplaySurface );
 
+	app_graphics_resize(desktopWidth, desktopHeight);
 	app_graphics_init();
-	app_graphics_render(500, 500, 22);
+	app_graphics_render(desktopWidth, desktopHeight, 22);
 	
 	eventLoop();
 
