@@ -28,12 +28,12 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "starsphere.h" 
 
 // ugly globals, will eventually factored out into private members
-SDL_Surface *m_DisplaySurface = 0;
+SDL_Surface *m_DisplaySurface = NULL;
 int desktopWidth = 800;
 int desktopHeight = 600;
 int desktopBitsPerPixel = 16;
@@ -79,7 +79,7 @@ void eventLoop()
 	SDL_EventState( SDL_JOYHATMOTION, SDL_IGNORE);
 	SDL_EventState( SDL_JOYBUTTONDOWN, SDL_IGNORE);
 	SDL_EventState( SDL_JOYBUTTONUP, SDL_IGNORE);
-	SDL_EventState( SDL_VIDEORESIZE, SDL_IGNORE);
+	//SDL_EventState( SDL_VIDEORESIZE, SDL_IGNORE);
 	SDL_EventState( SDL_VIDEOEXPOSE, SDL_IGNORE);
 	//SDL_EventState( SDL_USEREVENT, SDL_IGNORE);
 	SDL_EventState( SDL_SYSWMEVENT, SDL_IGNORE);
@@ -94,14 +94,18 @@ void eventLoop()
 		{
 			app_graphics_render(desktopWidth, desktopHeight, i+=0.025);
 		}
+		else if (event.type == SDL_VIDEORESIZE)
+		{
+			desktopWidth = event.resize.w;
+			desktopHeight = event.resize.h;
+			m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
+			app_graphics_resize(desktopWidth, desktopHeight);
+		}
 		else if( event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) )
 		{
+			if (m_DisplaySurface) SDL_FreeSurface(m_DisplaySurface);
+			
 			exit(0);
-		}
-		else if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN )
-		{
-			SDL_WM_ToggleFullScreen( m_DisplaySurface );
-			app_graphics_render(desktopWidth, desktopHeight, i);
 		}
 		else if( event.type == SDL_KEYDOWN )
 		{
@@ -134,6 +138,9 @@ void eventLoop()
 			case SDLK_i:
 				setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
 				break;
+			case SDLK_RETURN:
+				SDL_WM_ToggleFullScreen( m_DisplaySurface );
+				SDL_ShowCursor( SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE );
 			default:
 				break;
 			}			
@@ -141,13 +148,14 @@ void eventLoop()
 	}
 }
 
-
 int main(int argc, char **argv) {
 	
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		throw runtime_error( SDL_GetError() );
 	}
-
+    
+    atexit(SDL_Quit);
+    
     // retrieve current video settings
 	const SDL_VideoInfo *videoInfo = SDL_GetVideoInfo();
 	
@@ -205,7 +213,7 @@ int main(int argc, char **argv) {
 	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
 
-	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL);
+	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
 
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
@@ -213,7 +221,7 @@ int main(int argc, char **argv) {
 	}
 
 	SDL_WM_SetCaption("Einstein@Home", "Icon");
-	//SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL); 
+	//SDL_WM_SetIcon(SDL_LoadBMP("icon.png"), NULL); 
 
 #ifndef DEBUG
 	SDL_WM_ToggleFullScreen( m_DisplaySurface );
@@ -224,6 +232,6 @@ int main(int argc, char **argv) {
 	app_graphics_render(desktopWidth, desktopHeight, 0);
 	
 	eventLoop();
-
+	
 	return(0);
 }
