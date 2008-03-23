@@ -574,7 +574,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   GLfloat Zrot = 0.0, Zobs=0.0; 
   double revs,  t, dt = 0;
   static double start_time=-1.0, last_time=-1.0;
-  static const double rad2deg = 180.0/PI;
+  //static const double rad2deg = 180.0/PI;
 
   // Calculate the real time t since we started (or reset) and the
   // time dt since the last render() call.    Both may be useful

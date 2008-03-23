@@ -134,6 +134,8 @@ void eventLoop()
 			case SDLK_i:
 				setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
 				break;
+			default:
+				break;
 			}			
 		}
 	}
