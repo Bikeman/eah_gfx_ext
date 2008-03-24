@@ -28,7 +28,7 @@ using namespace std;
 #include <iostream>
 #endif
 
-#include "SDL/SDL.h"
+#include "SDL.h"
 
 #include "starsphere.h"
 
@@ -574,7 +574,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   GLfloat Zrot = 0.0, Zobs=0.0; 
   double revs,  t, dt = 0;
   static double start_time=-1.0, last_time=-1.0;
-  //static const double rad2deg = 180.0/PI;
+  static const double rad2deg = 180.0/PI;
 
   // Calculate the real time t since we started (or reset) and the
   // time dt since the last render() call.    Both may be useful
@@ -624,13 +624,72 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   xvp = vp_rad * SIN(vp_theta) * SIN(vp_phi);
   zvp = vp_rad * SIN(vp_theta) * COS(vp_phi);
   yvp = vp_rad * COS(vp_theta);
+
   gluLookAt ( xvp,  yvp, zvp,      // eyes position
                0.0, 0.0, 0.0,                   // looking toward here
                0.0, 1.0, 0.0);                  // which way is up?  y axis!
-
-
+  
   // Draw axes before any rotation so they stay put
   if(isFeature(AXES)) glCallList(Axes);
+  
+  // draw text
+//  glColor3f(1.0, 0.0, 0.0);
+//  glPushMatrix();
+//  		char text[] = "Einstein@Home";
+//  		
+//  		// third: relocate string to upper left corner
+//  		//glTranslatef(-5.0, 0.0, 0.0);
+//  		
+//  		
+//  	  	// second: reverse viewpoint rotation for text display (z not needed as long as y is up-vector!)
+//  		GLfloat xRotate = 0;
+//  		GLfloat yRotate = 0;
+//  		
+//
+// 		// reverse x-rotation
+//  		if( yvp == 0 ) {
+//  			xRotate = 0.0;
+//  		}
+//  		else if( zvp == 0 ) {
+//  			xRotate = 90.0 * abs(yvp)/yvp;
+//  		}
+//  		else {
+//  			xRotate = -atan(yvp/zvp) * rad2deg;
+//  			yRotate = zvp<0 ? 180 : 0;
+//  		}
+//  		glRotatef(xRotate, 1.0, 0.0, 0.0);
+//  		glRotatef(yRotate, 0.0, 1.0, 0.0);
+//
+//  		// reverse y-rotation
+//  		if( xvp == 0 ) {
+//  			yRotate = 0.0;
+//  		}
+//  		else if( zvp == 0 ) {
+//  			yRotate = 90.0 * abs(xvp)/xvp;
+//  		}
+//  		else {
+//  			yRotate = atan(xvp/zvp) * rad2deg;
+//  			yRotate -= zvp<0 ? 180 : 0;
+//  		}
+//  		glRotatef(yRotate, 0.0, 1.0, 0.0);  		
+//
+//  		
+//  		// first: center string around origin (for following rotations, see above!)
+//  		float lowerLeftX = 0;
+//  	  	float lowerLeftY = 0;
+//  	  	float lowerLeftZ = 0;
+//  	  	float upperRightX = 0;
+//  	  	float upperRightY = 0;
+//  	  	float upperRightZ = 0;
+//  	  	font->BBox(text, lowerLeftX, lowerLeftY, lowerLeftZ, upperRightX, upperRightY, upperRightZ);
+//  		glTranslatef(-(upperRightX-lowerLeftX) / 2, -(upperRightY-lowerLeftY) / 2, -(upperRightZ-lowerLeftZ) / 2);  		
+//
+//  		
+//  		// render text
+//		font->FaceSize(1);
+//		font->Depth(0.05);
+//		font->Render(text);
+//  glPopMatrix();
 
 
   // Draw the sky sphere, with rotation:
@@ -670,6 +729,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
     }
 
   glPopMatrix();
+  
   glFlush();
   
   SDL_GL_SwapBuffers();

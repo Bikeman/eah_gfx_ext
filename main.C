@@ -37,6 +37,7 @@ SDL_Surface *m_DisplaySurface = NULL;
 int desktopWidth = 800;
 int desktopHeight = 600;
 int desktopBitsPerPixel = 16;
+FTFont *font = NULL;
 
 
 using namespace std;
@@ -222,6 +223,19 @@ int main(int argc, char **argv) {
 
 	SDL_WM_SetCaption("Einstein@Home", "Icon");
 	//SDL_WM_SetIcon(SDL_LoadBMP("icon.png"), NULL); 
+	
+	char fontFile[] = "arial.ttf";
+//	font = new FTGLBitmapFont(fontFile);
+//	font = new FTGLPixmapFont(fontFile);
+//	font = new FTGLOutlineFont(fontFile);
+	font = new FTGLPolygonFont(fontFile);
+//	font = new FTGLExtrdFont(fontFile);
+//	font = new FTGLTextureFont(fontFile);
+	
+	font->CharMap(ft_encoding_unicode);
+	
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);	
 
 #ifndef DEBUG
 	SDL_WM_ToggleFullScreen( m_DisplaySurface );
@@ -232,6 +246,8 @@ int main(int argc, char **argv) {
 	app_graphics_render(desktopWidth, desktopHeight, 0);
 	
 	eventLoop();
+	
+	if (font) delete font;
 	
 	return(0);
 }

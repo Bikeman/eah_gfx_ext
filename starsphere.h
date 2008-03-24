@@ -28,6 +28,13 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include <FTGLExtrdFont.h>
+#include <FTGLOutlineFont.h>
+#include <FTGLPolygonFont.h>
+#include <FTGLTextureFont.h>
+#include <FTGLPixmapFont.h>
+#include <FTGLBitmapFont.h>
+
 #define EAH_SHMEM_APP_NAME "Einstein@Home"
 
 /* SIN and COS take arguments in DEGREES */
@@ -73,5 +80,7 @@ typedef enum Features {
 void setFeature(const FEATURES features, const bool enable);
 bool isFeature(const FEATURES features);
 
+// font from main.C
+extern FTFont *font;
 
 #endif
