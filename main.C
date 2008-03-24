@@ -139,6 +139,9 @@ void eventLoop()
 			case SDLK_i:
 				setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
 				break;
+			case SDLK_l:
+				setFeature(LOGO, isFeature(LOGO) ? false : true);
+				break;
 			case SDLK_RETURN:
 				SDL_WM_ToggleFullScreen( m_DisplaySurface );
 				SDL_ShowCursor( SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE );
@@ -194,7 +197,7 @@ int main(int argc, char **argv) {
 	 * SDL_PREALLOC - Surface nutzt vorher allokierten Speicher
 	 */
 
-	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL);
+	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
 
 	if ( !bitPerPixel) {
 		cerr << "Video mode not supported: " << SDL_GetError() << endl;
@@ -226,9 +229,9 @@ int main(int argc, char **argv) {
 	
 	char fontFile[] = "arial.ttf";
 //	font = new FTGLBitmapFont(fontFile);
-//	font = new FTGLPixmapFont(fontFile);
+	font = new FTGLPixmapFont(fontFile);
 //	font = new FTGLOutlineFont(fontFile);
-	font = new FTGLPolygonFont(fontFile);
+//	font = new FTGLPolygonFont(fontFile);
 //	font = new FTGLExtrdFont(fontFile);
 //	font = new FTGLTextureFont(fontFile);
 	
@@ -239,6 +242,7 @@ int main(int argc, char **argv) {
 
 #ifndef DEBUG
 	SDL_WM_ToggleFullScreen( m_DisplaySurface );
+	SDL_ShowCursor( SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE );
 #endif
 
 	app_graphics_resize(desktopWidth, desktopHeight);

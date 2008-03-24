@@ -27,6 +27,7 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <GL/glext.h>
 
 #include <FTGLExtrdFont.h>
 #include <FTGLOutlineFont.h>
@@ -73,7 +74,8 @@ typedef enum Features {
 	SNRS=32,
 	GLOBE=64,
 	AXES=128,
-	SEARCHINFO=256
+	SEARCHINFO=256,
+	LOGO=512
 } FEATURES;
 
 // feature control API

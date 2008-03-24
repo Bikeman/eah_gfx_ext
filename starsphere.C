@@ -28,6 +28,9 @@ using namespace std;
 #include <iostream>
 #endif
 
+// needed to find OpenGL 1.4 prototypes in glext.h (alternatives?)
+#define GL_GLEXT_PROTOTYPES
+
 #include "SDL.h"
 
 #include "starsphere.h"
@@ -559,6 +562,8 @@ void app_graphics_init() {
   setFeature(PULSARS, true);
   setFeature(OBSERVATORIES, true);
   setFeature(SNRS, true);
+  setFeature(SEARCHINFO, true);
+  setFeature(LOGO, true);
 
   glDisable(GL_CLIP_PLANE0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -631,11 +636,13 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   
   // Draw axes before any rotation so they stay put
   if(isFeature(AXES)) glCallList(Axes);
+
   
-  // draw text
+  // draw 3D vectorized text
+//  char text[] = "Einstein@Home";
 //  glColor3f(1.0, 0.0, 0.0);
-//  glPushMatrix();
-//  		char text[] = "Einstein@Home";
+  
+//  glPushMatrix();  		
 //  		
 //  		// third: relocate string to upper left corner
 //  		//glTranslatef(-5.0, 0.0, 0.0);
@@ -690,8 +697,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 //		font->Depth(0.05);
 //		font->Render(text);
 //  glPopMatrix();
-
-
+  
   // Draw the sky sphere, with rotation:
 
   glPushMatrix(); 
@@ -729,6 +735,71 @@ void app_graphics_render(int xs, int ys, double time_of_day){
     }
 
   glPopMatrix();
+  
+  
+  // draw 2D rasterized text
+
+  font->FaceSize(24);
+  static int yOffset = font->Ascender() + font->Descender();
+  
+  if(isFeature(LOGO))
+  {  
+	  GLfloat xStartPosLeft = 10.0;
+	  GLfloat yStartPos = ys - 30.0;
+	  
+	  glColor4f(1.0, 1.0, 0.0, 1.0);
+	  glWindowPos2f(xStartPosLeft, yStartPos);
+	  font->FaceSize(24);	  
+	  font->Render("Einstein@Home");
+	  glColor4f(1.0, 1.0, 1.0, 0.5);
+	  glWindowPos2f(xStartPosLeft, yStartPos - yOffset - 5);
+	  font->FaceSize(14);	  
+	  font->Render("World Year of Physics 2005");	  
+  }
+  
+  if(isFeature(SEARCHINFO))
+  {
+	  GLfloat xStartPosLeft = 10.0;
+	  GLfloat xStartPosRight = xs - 200.0;
+	  GLfloat yStartPos = 80.0;
+	  	  
+	  // left info block	  
+	  glColor4f(1.0, 1.0, 0.0, 0.5);
+	  glWindowPos2f(xStartPosLeft, yStartPos);
+	  font->FaceSize(16);
+	  font->Render("BOINC Statistics");
+	  
+	  // TODO: how to write multiline?
+	  glColor4f(1.0, 1.0, 1.0, 0.5);
+	  font->FaceSize(12);
+	  glWindowPos2f(xStartPosLeft, yStartPos - yOffset);
+	  font->Render("User: Oliver");
+	  glWindowPos2f(xStartPosLeft, yStartPos - 2*yOffset);
+	  font->Render("Team: Albert-Einstein-Institut");
+	  glWindowPos2f(xStartPosLeft, yStartPos - 3*yOffset);
+	  font->Render("Project credits: 12.000");
+	  glWindowPos2f(xStartPosLeft, yStartPos - 4*yOffset);
+	  font->Render("Project RAC: 145.00");
+	  
+	  // right info block	  
+	  glColor4f(1.0, 1.0, 0.0, 0.5);
+	  glWindowPos2f(xStartPosRight, yStartPos);
+	  font->FaceSize(16);
+	  font->Render("Search Parameters");
+	  
+	  // TODO: how to write multiline?
+	  glColor4f(1.0, 1.0, 1.0, 0.5);
+	  font->FaceSize(12);
+	  glWindowPos2f(xStartPosRight, yStartPos - yOffset);
+	  font->Render("Right ascension: 180.00 deg");
+	  glWindowPos2f(xStartPosRight, yStartPos - 2*yOffset);
+	  font->Render("Declination: 45.00 deg");
+	  glWindowPos2f(xStartPosRight, yStartPos - 3*yOffset);
+	  font->Render("Frequency: 850.05 Hz");
+	  glWindowPos2f(xStartPosRight, yStartPos - 4*yOffset);
+	  font->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
+  }
+
   
   glFlush();
   
