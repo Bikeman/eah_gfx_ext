@@ -37,6 +37,7 @@ SDL_Surface *m_DisplaySurface = NULL;
 int desktopWidth = 800;
 int desktopHeight = 600;
 int desktopBitsPerPixel = 16;
+int videoModeFlags = 0;
 FTFont *font = NULL;
 
 
@@ -99,7 +100,7 @@ void eventLoop()
 		{
 			desktopWidth = event.resize.w;
 			desktopHeight = event.resize.h;
-			m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
+			m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, videoModeFlags);
 			app_graphics_resize(desktopWidth, desktopHeight);
 		}
 		else if( event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) )
@@ -196,8 +197,10 @@ int main(int argc, char **argv) {
 	 * SDL_SRCALPHA - Surface blit nutzt alpha blending
 	 * SDL_PREALLOC - Surface nutzt vorher allokierten Speicher
 	 */
+	
+	videoModeFlags = SDL_HWSURFACE | SDL_OPENGL | SDL_RESIZABLE;
 
-	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
+	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, videoModeFlags);
 
 	if ( !bitPerPixel) {
 		cerr << "Video mode not supported: " << SDL_GetError() << endl;
@@ -213,11 +216,12 @@ int main(int argc, char **argv) {
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	// 4x FSAA :-)
-	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
-	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
+	
+	// 4x FSAA, way too heavy on many machines :-)
+//	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
+//	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
 
-	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, SDL_OPENGL|SDL_RESIZABLE);
+	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, videoModeFlags);
 
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;

@@ -562,6 +562,7 @@ void app_graphics_init() {
   setFeature(PULSARS, true);
   setFeature(OBSERVATORIES, true);
   setFeature(SNRS, true);
+  setFeature(GLOBE, true);
   setFeature(SEARCHINFO, true);
   setFeature(LOGO, true);
 
@@ -604,7 +605,6 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   // And start drawing...
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_POINT_SMOOTH);		// Anti-aliasing points (rounded)
 
   // First, write user text to screen,  from user_text.C
 
@@ -633,7 +633,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   gluLookAt ( xvp,  yvp, zvp,      // eyes position
                0.0, 0.0, 0.0,                   // looking toward here
                0.0, 1.0, 0.0);                  // which way is up?  y axis!
-  
+
   // Draw axes before any rotation so they stay put
   if(isFeature(AXES)) glCallList(Axes);
 
@@ -735,7 +735,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
     }
 
   glPopMatrix();
-  
+
   
   // draw 2D rasterized text
 
@@ -800,7 +800,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 	  font->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
   }
 
-  
+
   glFlush();
   
   SDL_GL_SwapBuffers();
