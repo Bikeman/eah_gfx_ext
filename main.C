@@ -74,7 +74,7 @@ void eventLoop()
 	SDL_EventState( SDL_ACTIVEEVENT, SDL_IGNORE);
 	SDL_EventState( SDL_KEYUP, SDL_IGNORE);
 	//SDL_EventState( SDL_KEYDOWN, SDL_IGNORE);
-	SDL_EventState( SDL_MOUSEMOTION, SDL_IGNORE);
+	//SDL_EventState( SDL_MOUSEMOTION, SDL_IGNORE);
 	SDL_EventState( SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
 	SDL_EventState( SDL_JOYAXISMOTION, SDL_IGNORE);
 	SDL_EventState( SDL_JOYBALLMOTION, SDL_IGNORE);
@@ -105,6 +105,17 @@ void eventLoop()
 	            exit(0);
 		    }		        
 #endif		
+		}
+		else if( event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) && event.type == SDL_MOUSEMOTION )
+		{
+			if(event.motion.state & SDL_BUTTON(1))
+			{
+				rotateSphere(event.motion.xrel, event.motion.yrel);
+			}
+			else if(event.motion.state & SDL_BUTTON(3))
+			{
+				zoomSphere(event.motion.yrel);
+			}
 		}
 		else if (event.type == SDL_VIDEORESIZE)
 		{
@@ -158,7 +169,7 @@ void eventLoop()
 				SDL_ShowCursor( SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE );
 			default:
 				break;
-			}			
+			}
 		}
 	}
 }

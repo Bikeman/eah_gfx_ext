@@ -541,7 +541,6 @@ void app_graphics_init() {
   glFogi(GL_FOG_MODE, GL_EXP2);
   glFogf(GL_FOG_DENSITY, 0.085);
 
-  
   /* Set initial perspective projection */
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -806,93 +805,28 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   SDL_GL_SwapBuffers();
 }
 
-
 /**
- * Preferences: (will go to preferences.C someday...)
- */ 
-void app_graphics_reread_prefs(){}
-
-
-/**
- * User input via mouse and keyboard
- * (to be moved to a separate file some day)
+ * View control
  */
-// mouse&keyboard state:
-int mouse_x=0, mouse_y=0;               
-bool mouse_down = false;
-
-
-/**
- * Controling the view with the mouse:
- *   Left button zooms in/out.
- *   Right button rotates viewpoint.
- */
-void boinc_app_mouse_move(int x, int y, int left, int middle, int right) {
-  double dx, dy;
-
-  //  fprintf(stderr,"APP: boinc_app_mouse_move(): state= %d, %d, %d\n",
-  //      left, middle, right);
-
-  if (left) {
-    // Vertical mouse motion changes elevation angle
-    dy = (y - mouse_y);
-    viewpt_elev += dy/10.0;
+void rotateSphere(const int relativeRotation, const int relativeElevation)
+{
+	// elevation
+    viewpt_elev += relativeElevation/10.0;
     if( viewpt_elev >  89.0 ) viewpt_elev = +89.0;
     if( viewpt_elev < -89.0 ) viewpt_elev = -89.0;
 
-    // Horizontal motion changes rotation angle
-    dx = (x - mouse_x);
-    rotation_offset -= dx/10.0;   
-    mouse_down=true;
-  }
-  else if (right) {
-    dy = (y - mouse_y);
-    viewpt_radius -= dy/10.0;
+    // rotation
+    rotation_offset -= relativeRotation/10.0;   
+}
+
+void zoomSphere(const int relativeZoom)
+{
+	// zoom
+    viewpt_radius -= relativeZoom/10.0;
     if (viewpt_radius > 15.0) viewpt_radius = 15.0;
     if (viewpt_radius < 0.5)  viewpt_radius = 0.5;
-    mouse_down=true;
-  }
-
-  else if (middle){
-    mouse_down=true;
-  }
-  else {
-    mouse_down = false;
-  }
-
-  // Then remember mouse position for next time
-  mouse_y = y;
-  mouse_x = x;
 }
 
-
-/**
- * Pressing a mouse button: 
- */
-void boinc_app_mouse_button(int x, int y, int button, int state) {
-
-  mouse_x = x;
-  mouse_y = y;
-
-  if(button==0 && state) { // LEFT button
-    //fprintf(stderr,"mouse_click: Left button would display help menu.\n");
-  }
-
-  if(button==2 && state) { // RIGHT button
-    // fprintf(stderr,"mouse_click: Right button just remembers position.\n");
-  }
-}
-
-
-/**
- * Pressing a key on the keyboard:
- */
-bool shift_is_down=false;
-bool ctrl_is_down=false;
-
-void boinc_app_key_press(int key, int state ) {}
-
-void boinc_app_key_release(int, int) {}
 
 /**
  * Feature control

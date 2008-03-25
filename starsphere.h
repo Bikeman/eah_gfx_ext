@@ -54,15 +54,12 @@ extern float gfx_width, gfx_height;
 
 // If graphics are disabled during compilation then we still need
 // empty callbacks for these:
-//#ifndef BOINC_APP_GRAPHICS 
-
 void app_graphics_init();
 void app_graphics_resize(int w, int h);
 void app_graphics_render(int xs, int ys, double time_of_day);
-void boinc_app_mouse_button(int x, int y, int which, int is_down);
-void boinc_app_mouse_move(int x, int y, int left, int middle, int right);
-void boinc_app_key_press(int, int);
-void boinc_app_key_release(int, int);
+
+void rotateSphere(const int relativeRotation, const int relativeElevation);
+void zoomSphere(const int relativeZoom);
 
 // features
 typedef enum Features {
