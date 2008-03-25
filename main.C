@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
 	 * SDL_PREALLOC - Surface nutzt vorher allokierten Speicher
 	 */
 	
-	videoModeFlags = SDL_HWSURFACE | SDL_OPENGL | SDL_RESIZABLE;
+	videoModeFlags = SDL_OPENGL | SDL_RESIZABLE;
 
 	Uint32 bitPerPixel = SDL_VideoModeOK( desktopWidth, desktopHeight, desktopBitsPerPixel, videoModeFlags);
 
