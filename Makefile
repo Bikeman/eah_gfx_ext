@@ -12,10 +12,14 @@ DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
 
 # primary role based tagets
 debug: starsphere
+memcheck: starsphere
+callgrind: starsphere
 release:  clean starsphere
 
 # target specific options
 debug: CPPFLAGS += $(DEBUGFLAGSCPP)
+memcheck: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
+callgrind: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
 release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
 release: LDFLAGS += -s
 
@@ -40,6 +44,12 @@ pulsar_list.o: $(DEPS) pulsar_list.C
 
 search_info.o: $(DEPS) search_info.C
 	$(CXX) -g ${CPPFLAGS} -c search_info.C
+	
+memcheck:
+	valgrind --tool=memcheck --track-fds=yes --time-stamp=yes --log-file=${PWD}/memcheck.out.%p --leak-check=full ${PWD}/starsphere
+
+callgrind:
+	valgrind --tool=callgrind --track-fds=yes --time-stamp=yes ${PWD}/starsphere
 
 clean:
 	rm -f ${OBJS} starsphere

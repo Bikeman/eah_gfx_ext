@@ -94,7 +94,17 @@ void eventLoop()
 	{
 		if( event.type == SDL_USEREVENT )
 		{
-			app_graphics_render(desktopWidth, desktopHeight, i+=0.025);
+#ifdef DEBUG_VALGRIND
+		    if(i < 0.25) {
+#endif
+		    app_graphics_render(desktopWidth, desktopHeight, i+=0.025);
+#ifdef DEBUG_VALGRIND
+		    }
+		    else {
+	            if (m_DisplaySurface) SDL_FreeSurface(m_DisplaySurface);	            
+	            exit(0);
+		    }		        
+#endif		
 		}
 		else if (event.type == SDL_VIDEORESIZE)
 		{
