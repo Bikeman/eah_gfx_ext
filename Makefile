@@ -11,6 +11,7 @@ OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.
 DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
 
 # primary role based tagets
+default: release
 debug: starsphere
 memcheck: starsphere
 callgrind: starsphere
