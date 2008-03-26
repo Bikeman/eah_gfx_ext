@@ -3,8 +3,8 @@ BOINC_PREFIX ?= /home/oliver/development/aei/boinc/bin
 CXX ?= g++
 
 # variables
-LIBS = -L${BOINC_PREFIX}/lib $(shell sdl-config --libs) $(shell pkg-config --libs ftgl)
-#LIBS = -L${BOINC_PREFIX}/lib -Wl,-Bstatic $(shell sdl-config --static-libs) -lfreetype -lz -lftgl -Wl,-Bdynamic -lGL -lGLU
+#LIBS = -L${BOINC_PREFIX}/lib $(shell sdl-config --libs) $(shell pkg-config --libs ftgl)
+LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -Wl,-Bdynamic -lGL -lGLU
 CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
 DEPS = Makefile starsphere.h 
 OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o
