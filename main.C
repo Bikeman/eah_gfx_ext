@@ -240,6 +240,7 @@ int main(int argc, char **argv) {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	
 	// 4x FSAA, way too heavy on many machines :-)
+	// FIXME: without it polygon fonts look really ugly :-(
 //	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
 //	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
 
@@ -278,6 +279,8 @@ int main(int argc, char **argv) {
 //	font = new FTGLTextureFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 	
 	font->CharMap(ft_encoding_unicode);
+//	font->Depth(0.05);
+	font->FaceSize(12);
 	
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);	

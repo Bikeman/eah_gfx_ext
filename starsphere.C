@@ -637,69 +637,84 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   if(isFeature(AXES)) glCallList(Axes);
 
   
-  // draw 3D vectorized text
-//  char text[] = "Einstein@Home";
-//  glColor3f(1.0, 0.0, 0.0);
+  	// draw 3D vectorized text
+//  	char text[] = "Einstein@Home";
+//  	glColor3f(1.0, 1.0, 0.0);
+//  
+//  	glPushMatrix();
+//  	
+//  	// get unit vector for camera position
+//  	float vCamLength = sqrt(xvp*xvp + yvp*yvp + zvp*zvp);
+//  	float vCamUnitX = xvp / vCamLength; 
+//  	float vCamUnitY = yvp / vCamLength;
+//  	float vCamUnitZ = zvp / vCamLength;
+//  	
+//  	// get scalar product vCamUnit * vTextNormal (0,0,1)
+//  	float spCamText = vCamUnitZ; 
+//  	
+//  	// get angle between vCamUnit and vTextNormal (0,0,1)
+//  	float alpha = acos(spCamText);
+//  	
+//  	// get vector product vCamUnit x vTextNormal (0,0,1)
+//  	float vRotAxisX = vCamUnitY;
+//  	float vRotAxisY = -vCamUnitX;
+//  	float vRotAxisZ = 0;
+//  	
+//  	// get unit vector for rotation axis
+//  	float vRotAxisLength = sqrt(vCamUnitY*vCamUnitY + vCamUnitX*vCamUnitX);
+//  	float vRotAxisUnitX = vRotAxisX / vRotAxisLength;
+//  	float vRotAxisUnitY = vRotAxisY / vRotAxisLength;
+//  	float vRotAxisUnitZ = 0; //vRotAxisZ / vRotAxisLength;
+//  	
+//  	// prepare quaternion
+//  	alpha *= 0.5f;
+//	float sinAlpha = sin(alpha);
+//
+//	float qRotX = vRotAxisUnitX * sinAlpha;
+//	float qRotY = vRotAxisUnitY * sinAlpha;
+//	float qRotZ = 0; //vRotAxisUnitZ * sinAlpha;
+//	float qRotW = cos(alpha);
+//	
+//	// build rotation matrix from quaternion
+//    float x2 = qRotX * qRotX;
+//    float y2 = qRotY * qRotY;
+//    float z2 = 0; //qRotZ * qRotZ;
+//    float xy = qRotX * qRotY;
+//    float xz = 0; //qRotX * qRotZ;
+//    float yz = 0; //qRotY * qRotZ;
+//    float wx = qRotW * qRotX;
+//    float wy = qRotW * qRotY;
+//    float wz = 0; //qRotW * qRotZ;
+//
+//    const GLfloat mRot[16] = {
+//            1.0f - 2.0f * (y2 + z2),        2.0f * (xy - wz),        2.0f * (xz + wy), 0.0f,
+//                   2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2),        2.0f * (yz - wx), 0.0f,
+//                   2.0f * (xz - wy),        2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
+//                               0.0f,                    0.0f,                    0.0f, 1.0f
+//    };
+//    
+//    // finally, rotate
+//    glMultMatrixf(&mRot[0]);
+//    
+//    
+//	// first: center string around origin (for following rotation, see above!)
+//	float lowerLeftX = 0;
+//  	float lowerLeftY = 0;
+//  	float lowerLeftZ = 0;
+//  	float upperRightX = 0;
+//  	float upperRightY = 0;
+//  	float upperRightZ = 0;
+//  	font->BBox(text, lowerLeftX, lowerLeftY, lowerLeftZ, upperRightX, upperRightY, upperRightZ);
+//	glTranslatef(-(upperRightX-lowerLeftX) / 2, -(upperRightY-lowerLeftY) / 2, -(upperRightZ-lowerLeftZ) / 2);  		
+//
+//	// render text
+//	font->Render(text);
+//  	
+//  	glPopMatrix();
+  	
   
-//  glPushMatrix();  		
-//  		
-//  		// third: relocate string to upper left corner
-//  		//glTranslatef(-5.0, 0.0, 0.0);
-//  		
-//  		
-//  	  	// second: reverse viewpoint rotation for text display (z not needed as long as y is up-vector!)
-//  		GLfloat xRotate = 0;
-//  		GLfloat yRotate = 0;
-//  		
-//
-// 		// reverse x-rotation
-//  		if( yvp == 0 ) {
-//  			xRotate = 0.0;
-//  		}
-//  		else if( zvp == 0 ) {
-//  			xRotate = 90.0 * abs(yvp)/yvp;
-//  		}
-//  		else {
-//  			xRotate = -atan(yvp/zvp) * rad2deg;
-//  			yRotate = zvp<0 ? 180 : 0;
-//  		}
-//  		glRotatef(xRotate, 1.0, 0.0, 0.0);
-//  		glRotatef(yRotate, 0.0, 1.0, 0.0);
-//
-//  		// reverse y-rotation
-//  		if( xvp == 0 ) {
-//  			yRotate = 0.0;
-//  		}
-//  		else if( zvp == 0 ) {
-//  			yRotate = 90.0 * abs(xvp)/xvp;
-//  		}
-//  		else {
-//  			yRotate = atan(xvp/zvp) * rad2deg;
-//  			yRotate -= zvp<0 ? 180 : 0;
-//  		}
-//  		glRotatef(yRotate, 0.0, 1.0, 0.0);  		
-//
-//  		
-//  		// first: center string around origin (for following rotations, see above!)
-//  		float lowerLeftX = 0;
-//  	  	float lowerLeftY = 0;
-//  	  	float lowerLeftZ = 0;
-//  	  	float upperRightX = 0;
-//  	  	float upperRightY = 0;
-//  	  	float upperRightZ = 0;
-//  	  	font->BBox(text, lowerLeftX, lowerLeftY, lowerLeftZ, upperRightX, upperRightY, upperRightZ);
-//  		glTranslatef(-(upperRightX-lowerLeftX) / 2, -(upperRightY-lowerLeftY) / 2, -(upperRightZ-lowerLeftZ) / 2);  		
-//
-//  		
-//  		// render text
-//		font->FaceSize(1);
-//		font->Depth(0.05);
-//		font->Render(text);
-//  glPopMatrix();
-  
-  // Draw the sky sphere, with rotation:
-
-  glPushMatrix(); 
+  	// Draw the sky sphere, with rotation:
+  	glPushMatrix(); 
     glRotatef(Zrot - rotation_offset ,  0.0, 1.0, 0.0);
 
     /* stars, pulsars, supernovae */
