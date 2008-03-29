@@ -30,7 +30,8 @@
 #include <stdexcept>
 #include <SDL.h>
 
-#include "starsphere.h" 
+#include "starsphere.h"
+#include "ResourceFactory.h" 
 
 // ugly globals, will eventually factored out into private members
 SDL_Surface *m_DisplaySurface = NULL;
@@ -250,15 +251,31 @@ int main(int argc, char **argv) {
 	}
 
 	SDL_WM_SetCaption("Einstein@Home", "Icon");
-	//SDL_WM_SetIcon(SDL_LoadBMP("icon.png"), NULL); 
+	//SDL_WM_SetIcon(SDL_LoadBMP("icon.png"), NULL);
 	
-	char fontFile[] = "arial.ttf";
-//	font = new FTGLBitmapFont(fontFile);
-	font = new FTGLPixmapFont(fontFile);
-//	font = new FTGLOutlineFont(fontFile);
-//	font = new FTGLPolygonFont(fontFile);
-//	font = new FTGLExtrdFont(fontFile);
-//	font = new FTGLTextureFont(fontFile);
+	// prepare resource factory
+	ResourceFactory factory;
+	
+	// create font resource instance
+	const Resource *fontResource = factory.createInstance("FontSansSerif");
+	
+	if(fontResource == NULL) {
+		cerr << "Font resource could not be loaded!" << endl;
+		exit(1);
+	}
+	
+	if(fontResource->Data()->size() == 0) {
+		cerr << "Font resource could not be loaded!" << endl;
+		exit(1);
+	}
+	
+	// create font instance using font resource (base address + size)
+//	font = new FTGLBitmapFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+	font = new FTGLPixmapFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+//	font = new FTGLOutlineFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+//	font = new FTGLPolygonFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+//	font = new FTGLExtrdFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+//	font = new FTGLTextureFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 	
 	font->CharMap(ft_encoding_unicode);
 	
@@ -277,6 +294,7 @@ int main(int argc, char **argv) {
 	eventLoop();
 	
 	if (font) delete font;
+	delete fontResource;
 	
-	return(0);
+	exit(0);
 }

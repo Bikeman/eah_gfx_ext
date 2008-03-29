@@ -7,15 +7,16 @@ CXX ?= g++
 LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -Wl,-Bdynamic -lGL -lGLU
 CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
 DEPS = Makefile starsphere.h 
-OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o
+OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
 DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
+RESOURCESPEC = resources
 
 # primary role based tagets
 default: release
 debug: starsphere
 memcheck: starsphere
 callgrind: starsphere
-release:  clean starsphere
+release: clean starsphere
 
 # target specific options
 debug: CPPFLAGS += $(DEBUGFLAGSCPP)
@@ -45,7 +46,21 @@ pulsar_list.o: $(DEPS) pulsar_list.C
 
 search_info.o: $(DEPS) search_info.C
 	$(CXX) -g ${CPPFLAGS} -c search_info.C
+
+
+# resource compiler
+ResourceFactory.o: ${RESOURCESPEC}.o Resource.o ResourceFactory.cpp ResourceFactory.h
+	$(CXX) -g ${CPPFLAGS} -c ResourceFactory.cpp -o ResourceFactory.o
 	
+Resource.o: Resource.cpp Resource.h
+	$(CXX) -g ${CPPFLAGS} -c Resource.cpp -o Resource.o
+
+${RESOURCESPEC}.o: ${RESOURCESPEC}.orc
+	orc/orc ${RESOURCESPEC}.orc ${RESOURCESPEC}.cpp
+	$(CXX) -g ${CPPFLAGS} -c ${RESOURCESPEC}.cpp -o ${RESOURCESPEC}.o
+
+
+# tools
 memcheck:
 	valgrind --tool=memcheck --track-fds=yes --time-stamp=yes --log-file=${PWD}/memcheck.out.%p --leak-check=full ${PWD}/starsphere
 
@@ -53,5 +68,5 @@ callgrind:
 	valgrind --tool=callgrind --track-fds=yes --time-stamp=yes ${PWD}/starsphere
 
 clean:
-	rm -f ${OBJS} starsphere
+	rm -f ${RESOURCESPEC}.cpp *.o starsphere
 
