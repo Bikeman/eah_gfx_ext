@@ -14,8 +14,8 @@ RESOURCESPEC = resources
 # primary role based tagets
 default: release
 debug: starsphere
-memcheck: starsphere
-callgrind: starsphere
+memcheck: clean debug starsphere
+callgrind: clean debug starsphere
 release: clean starsphere
 
 # target specific options
