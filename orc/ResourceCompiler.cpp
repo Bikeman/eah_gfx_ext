@@ -27,6 +27,9 @@ void ResourceCompiler::compile()
 	vector<unsigned char>::iterator dataPos;
 	unsigned int currentIndex = 0;
 	
+	// store total amount of resources
+	resourceIndexInitializer << "{0x" << hex << m_ResourceDataMap.size() << ", 0x0},";
+	
 	// iterate over all resource data mappings we have
 	for(mapPos = m_ResourceDataMap.begin(); mapPos != m_ResourceDataMap.end(); ++mapPos) {
 		
@@ -61,17 +64,17 @@ void ResourceCompiler::compile()
 		
 		// write code file contents (remove trailing commas)
 		string output = resourceIdentifierInitializer.str();
-		outputFile << "static const std::string c_ResourceIdentifiers[] = {" << endl;
+		outputFile << "extern const std::string c_ResourceIdentifiers[] = {" << endl;
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 		
 		output = resourceIndexInitializer.str();
-		outputFile << "static const unsigned int c_ResourceIndex[][2] = {" << endl;		
+		outputFile << "extern const unsigned int c_ResourceIndex[][2] = {" << endl;		
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 		
 		output = resourceStorageInitializer.str();
-		outputFile << "static const unsigned char c_ResourceStorage[] = {" << endl;
+		outputFile << "extern const unsigned char c_ResourceStorage[] = {" << endl;
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 	}
