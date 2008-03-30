@@ -643,25 +643,22 @@ void app_graphics_render(int xs, int ys, double time_of_day){
 //  
 //  	glPushMatrix();
 //  	
-//  	// get unit vector for camera position
+//  	// get vector norm (absolute value) for camera position
 //  	float vCamLength = sqrt(xvp*xvp + yvp*yvp + zvp*zvp);
-//  	float vCamUnitX = xvp / vCamLength; 
-//  	float vCamUnitY = yvp / vCamLength;
-//  	float vCamUnitZ = zvp / vCamLength;
 //  	
-//  	// get scalar product vCamUnit * vTextNormal (0,0,1)
-//  	float spCamText = vCamUnitZ; 
+//  	// get scalar product vCam * vTextNormal (0,0,1)
+//  	float spCamText = zvp; 
 //  	
-//  	// get angle between vCamUnit and vTextNormal (0,0,1)
-//  	float alpha = acos(spCamText);
+//  	// get angle between vCam and vTextNormal (0,0,1)
+//  	float alpha = acos(spCamText / vCamLength);
 //  	
-//  	// get vector product vCamUnit x vTextNormal (0,0,1)
-//  	float vRotAxisX = vCamUnitY;
-//  	float vRotAxisY = -vCamUnitX;
+//  	// get vector product vCam x vTextNormal (0,0,1)
+//  	float vRotAxisX = yvp;
+//  	float vRotAxisY = -xvp;
 //  	float vRotAxisZ = 0;
 //  	
 //  	// get unit vector for rotation axis
-//  	float vRotAxisLength = sqrt(vCamUnitY*vCamUnitY + vCamUnitX*vCamUnitX);
+//  	float vRotAxisLength = sqrt(vRotAxisX*vRotAxisX + vRotAxisY*vRotAxisY);
 //  	float vRotAxisUnitX = vRotAxisX / vRotAxisLength;
 //  	float vRotAxisUnitY = vRotAxisY / vRotAxisLength;
 //  	float vRotAxisUnitZ = 0; //vRotAxisZ / vRotAxisLength;
