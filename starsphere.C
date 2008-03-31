@@ -636,80 +636,7 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   // Draw axes before any rotation so they stay put
   if(isFeature(AXES)) glCallList(Axes);
 
-  
-  	// draw 3D vectorized text
-//  	char text[] = "Einstein@Home";
-//  	glColor3f(1.0, 1.0, 0.0);
-//  
-//  	glPushMatrix();
-//  	
-//  	// get vector norm (absolute value) for camera position
-//  	float vCamLength = sqrt(xvp*xvp + yvp*yvp + zvp*zvp);
-//  	
-//  	// get scalar product vCam * vTextNormal (0,0,1)
-//  	float spCamText = zvp; 
-//  	
-//  	// get angle between vCam and vTextNormal (0,0,1)
-//  	float alpha = acos(spCamText / vCamLength);
-//  	
-//  	// get vector product vCam x vTextNormal (0,0,1)
-//  	float vRotAxisX = yvp;
-//  	float vRotAxisY = -xvp;
-//  	float vRotAxisZ = 0;
-//  	
-//  	// get unit vector for rotation axis
-//  	float vRotAxisLength = sqrt(vRotAxisX*vRotAxisX + vRotAxisY*vRotAxisY);
-//  	float vRotAxisUnitX = vRotAxisX / vRotAxisLength;
-//  	float vRotAxisUnitY = vRotAxisY / vRotAxisLength;
-//  	float vRotAxisUnitZ = 0; //vRotAxisZ / vRotAxisLength;
-//  	
-//  	// prepare quaternion
-//  	alpha *= 0.5f;
-//	float sinAlpha = sin(alpha);
-//
-//	float qRotX = vRotAxisUnitX * sinAlpha;
-//	float qRotY = vRotAxisUnitY * sinAlpha;
-//	float qRotZ = 0; //vRotAxisUnitZ * sinAlpha;
-//	float qRotW = cos(alpha);
-//	
-//	// build rotation matrix from quaternion
-//    float x2 = qRotX * qRotX;
-//    float y2 = qRotY * qRotY;
-//    float z2 = 0; //qRotZ * qRotZ;
-//    float xy = qRotX * qRotY;
-//    float xz = 0; //qRotX * qRotZ;
-//    float yz = 0; //qRotY * qRotZ;
-//    float wx = qRotW * qRotX;
-//    float wy = qRotW * qRotY;
-//    float wz = 0; //qRotW * qRotZ;
-//
-//    const GLfloat mRot[16] = {
-//            1.0f - 2.0f * (y2 + z2),        2.0f * (xy - wz),        2.0f * (xz + wy), 0.0f,
-//                   2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2),        2.0f * (yz - wx), 0.0f,
-//                   2.0f * (xz - wy),        2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
-//                               0.0f,                    0.0f,                    0.0f, 1.0f
-//    };
-//    
-//    // finally, rotate
-//    glMultMatrixf(&mRot[0]);
-//    
-//    
-//	// first: center string around origin (for following rotation, see above!)
-//	float lowerLeftX = 0;
-//  	float lowerLeftY = 0;
-//  	float lowerLeftZ = 0;
-//  	float upperRightX = 0;
-//  	float upperRightY = 0;
-//  	float upperRightZ = 0;
-//  	font->BBox(text, lowerLeftX, lowerLeftY, lowerLeftZ, upperRightX, upperRightY, upperRightZ);
-//	glTranslatef(-(upperRightX-lowerLeftX) / 2, -(upperRightY-lowerLeftY) / 2, -(upperRightZ-lowerLeftZ) / 2);  		
-//
-//	// render text
-//	font->Render(text);
-//  	
-//  	glPopMatrix();
-  	
-  
+
   	// Draw the sky sphere, with rotation:
   	glPushMatrix(); 
     glRotatef(Zrot - rotation_offset ,  0.0, 1.0, 0.0);
@@ -748,73 +675,134 @@ void app_graphics_render(int xs, int ys, double time_of_day){
   glPopMatrix();
 
   
-  // draw 2D rasterized text
-
-  font->FaceSize(24);
-  static int yOffset = font->Ascender() + font->Descender();
+  	// draw 2D vectorized HUD
   
-  if(isFeature(LOGO))
-  {  
-	  GLfloat xStartPosLeft = 10.0;
-	  GLfloat yStartPos = ys - 30.0;
-	  
-	  glColor4f(1.0, 1.0, 0.0, 1.0);
-	  glWindowPos2f(xStartPosLeft, yStartPos);
-	  font->FaceSize(24);	  
-	  font->Render("Einstein@Home");
-	  glColor4f(1.0, 1.0, 1.0, 0.5);
-	  glWindowPos2f(xStartPosLeft, yStartPos - yOffset - 5);
-	  font->FaceSize(14);	  
-	  font->Render("World Year of Physics 2005");	  
-  }
+  	static GLfloat xStartPosLeft = 0.008;
+  	static GLfloat xStartPosRight = 0.84;
+  	static GLfloat yStartPosTop = 0.9675;
+  	static GLfloat yStartPosBottom = 0.075;
+  	static GLfloat fontScaleLargeX = 0.020;
+  	static GLfloat fontScaleMediumX = 0.0115;
+  	static GLfloat fontScaleSmallX = 0.01;
+  	static GLfloat fontScaleMediumY = fontScaleMediumX * aspect;
+  	static GLfloat fontScaleLargeY = fontScaleLargeX * aspect;
+  	static GLfloat fontScaleSmallY = fontScaleSmallX * aspect;
+//    static GLfloat yOffset = (font->Ascender() + font->Descender());
+  	static GLfloat yOffsetLarge = 0.02;
+  	static GLfloat yOffsetMedium = 0.015;
   
-  if(isFeature(SEARCHINFO))
-  {
-	  GLfloat xStartPosLeft = 10.0;
-	  GLfloat xStartPosRight = xs - 200.0;
-	  GLfloat yStartPos = 80.0;
-	  	  
-	  // left info block	  
-	  glColor4f(1.0, 1.0, 0.0, 0.5);
-	  glWindowPos2f(xStartPosLeft, yStartPos);
-	  font->FaceSize(16);
-	  font->Render("BOINC Statistics");
-	  
-	  // TODO: how to write multiline?
-	  glColor4f(1.0, 1.0, 1.0, 0.5);
-	  font->FaceSize(12);
-	  glWindowPos2f(xStartPosLeft, yStartPos - yOffset);
-	  font->Render("User: Oliver");
-	  glWindowPos2f(xStartPosLeft, yStartPos - 2*yOffset);
-	  font->Render("Team: Albert-Einstein-Institut");
-	  glWindowPos2f(xStartPosLeft, yStartPos - 3*yOffset);
-	  font->Render("Project credits: 12.000");
-	  glWindowPos2f(xStartPosLeft, yStartPos - 4*yOffset);
-	  font->Render("Project RAC: 145.00");
-	  
-	  // right info block	  
-	  glColor4f(1.0, 1.0, 0.0, 0.5);
-	  glWindowPos2f(xStartPosRight, yStartPos);
-	  font->FaceSize(16);
-	  font->Render("Search Parameters");
-	  
-	  // TODO: how to write multiline?
-	  glColor4f(1.0, 1.0, 1.0, 0.5);
-	  font->FaceSize(12);
-	  glWindowPos2f(xStartPosRight, yStartPos - yOffset);
-	  font->Render("Right ascension: 180.00 deg");
-	  glWindowPos2f(xStartPosRight, yStartPos - 2*yOffset);
-	  font->Render("Declination: 45.00 deg");
-	  glWindowPos2f(xStartPosRight, yStartPos - 3*yOffset);
-	  font->Render("Frequency: 850.05 Hz");
-	  glWindowPos2f(xStartPosRight, yStartPos - 4*yOffset);
-	  font->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
-  }
+	// save current state
+	glMatrixMode(GL_PROJECTION); 
+	glPushMatrix();
+	glLoadIdentity(); 
+	glOrtho(0, 1 , 0 , 1, -1, 1);
+	glMatrixMode(GL_MODELVIEW); 
+	glPushMatrix(); 
+	glLoadIdentity(); 
+
+	if(isFeature(LOGO)) { 
+		glPushMatrix(); 
+		glColor3f(1.0, 1.0, 0.0);
+		glTranslatef(xStartPosLeft, yStartPosTop, 0);
+		glScalef(fontScaleLargeX, fontScaleLargeY, 1.0);
+		font->Render("Einstein@Home");
+		glPopMatrix();
+		   
+		glPushMatrix();
+		glLoadIdentity();
+		glColor4f(1.0, 1.0, 1.0, 0.5);
+		glTranslatef(xStartPosLeft, yStartPosTop - yOffsetLarge, 0);
+		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+		font->Render("World Year of Physics 2005");
+		glPopMatrix();
+	}
+	if(isFeature(SEARCHINFO)) {
+		// left info block		
+		glPushMatrix(); 
+		glColor3f(1.0, 1.0, 0.0);
+		glTranslatef(xStartPosLeft, yStartPosBottom, 0);
+		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+		font->Render("BOINC Statistics");
+		glPopMatrix();
+		   
+		glPushMatrix();
+		glLoadIdentity();
+		glColor4f(1.0, 1.0, 1.0, 0.5);
+		glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("User: Oliver");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Team: Albert-Einstein-Institut");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Project credits: 12.000");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Project RAC: 145.00");
+		glPopMatrix();
+		
+		// right info block
+		glPushMatrix(); 
+		glColor3f(1.0, 1.0, 0.0);
+		glTranslatef(xStartPosRight, yStartPosBottom, 0);
+		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+		font->Render("Search Information");
+		glPopMatrix();
+		   
+		glPushMatrix();
+		glLoadIdentity();
+		glColor4f(1.0, 1.0, 1.0, 0.5);
+		glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Right ascension: 180.00 deg");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Declination: 45.00 deg");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Frequency: 850.05 Hz");
+		glPopMatrix();
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
+		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+		font->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
+		glPopMatrix();
+	}
+	
+	// restore original state
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+	glPopMatrix();
 
 
-  glFlush();
-  
-  SDL_GL_SwapBuffers();
+	glFlush();
+	glFinish();
+	  
+	SDL_GL_SwapBuffers();
 }
 
 /**

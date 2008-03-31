@@ -211,7 +211,6 @@ int main(int argc, char **argv) {
 	 * SDL_DOUBLEBUF - Surface ist "double buffered" (nur display-surface)
 	 * SDL_FULLSCREEN - Surface im Full-Screen-Mode initialisieren (nur display-surface)
 	 * SDL_OPENGL - Surface nutzt OpenGL (nur display-surface)
-	 * SDL_OPENGLBLIT - Surface unterstützt OpenGL blitting (nur display-surface)
 	 * SDL_RESIZABLE - Surfacefenster ist veränderbar (nur display-Surface)
 	 * SDL_HWACCEL- Surface blit nutzt Hardwarebeschleunigung
 	 * SDL_SRCCOLORKEY - Surface nutzt colorkey blitting
@@ -238,11 +237,12 @@ int main(int argc, char **argv) {
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	//SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	
 	// 4x FSAA, way too heavy on many machines :-)
 	// FIXME: without it polygon fonts look really ugly :-(
-//	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
-//	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
+	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS,1);
 
 	m_DisplaySurface = SDL_SetVideoMode( desktopWidth, desktopHeight, desktopBitsPerPixel, videoModeFlags);
 
@@ -272,15 +272,15 @@ int main(int argc, char **argv) {
 	
 	// create font instance using font resource (base address + size)
 //	font = new FTGLBitmapFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
-	font = new FTGLPixmapFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+//	font = new FTGLPixmapFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 //	font = new FTGLOutlineFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
-//	font = new FTGLPolygonFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
+	font = new FTGLPolygonFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 //	font = new FTGLExtrdFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 //	font = new FTGLTextureFont((&fontResource->Data()->at(0)), fontResource->Data()->size());
 	
 	font->CharMap(ft_encoding_unicode);
 //	font->Depth(0.05);
-	font->FaceSize(12);
+	font->FaceSize(1);
 	
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);	
