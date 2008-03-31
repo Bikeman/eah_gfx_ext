@@ -25,9 +25,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
+#include <SDL_opengl.h>
 
 #include <FTGLExtrdFont.h>
 #include <FTGLOutlineFont.h>
