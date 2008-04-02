@@ -30,22 +30,23 @@
 #include <stdexcept>
 
 
-#include "starsphere.h"
 #include "WindowManager.h"
 #include "ResourceFactory.h"
+#include "Starsphere.h"
 
 using namespace std;
 
-// ugly globals, will eventually factored out into private members
-FTFont *font = NULL;
 
-int main(int argc, char **argv) {
-	
+int main(int argc, char **argv)
+{
+    Starsphere graphics;
     WindowManager window;
+    
     if(!window.initialize()) {
         exit(1);
     }
     
+    window.setRenderEngine(&graphics);
     window.setWindowCaption("Einstein@Home");
 	
 	// prepare resource factory
@@ -64,32 +65,15 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 	
-	// create font instance using font resource (base address + size)
-//	font = new FTGLBitmapFont((&fontResource->data()->at(0)), fontResource->data()->size());
-//	font = new FTGLPixmapFont((&fontResource->data()->at(0)), fontResource->data()->size());
-//	font = new FTGLOutlineFont((&fontResource->data()->at(0)), fontResource->data()->size());
-	font = new FTGLPolygonFont((&fontResource->data()->at(0)), fontResource->data()->size());
-//	font = new FTGLExtrdFont((&fontResource->data()->at(0)), fontResource->data()->size());
-//	font = new FTGLTextureFont((&fontResource->data()->at(0)), fontResource->data()->size());
+	graphics.initialize(window.windowWidth(), window.windowHeight(), fontResource);
+	graphics.render(0);
 	
-	font->CharMap(ft_encoding_unicode);
-//	font->Depth(0.05);
-	font->FaceSize(1);
-	
-	glEnable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);	
-
 #ifndef DEBUG
 	window.toggleFullscreen();
 #endif
-
-	app_graphics_resize(window.windowWidth(), window.windowHeight());
-	app_graphics_init();
-	app_graphics_render(window.windowWidth(), window.windowHeight(), 0);
 	
 	window.eventLoop();
 	
-	if (font) delete font;
 	delete fontResource;
 	
 	exit(0);

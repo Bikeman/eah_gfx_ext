@@ -6,7 +6,7 @@
 
 #include <SDL.h>
 
-#include "starsphere.h" // will be kicked out when using event observers
+#include "Starsphere.h" // will be kicked out when using event observers
 
 using namespace std;
 
@@ -27,6 +27,9 @@ public:
 	void setWindowCaption(const string caption);
 	void setWindowIcon(const string filename);
 	void toggleFullscreen();
+	
+	// TODO: will be kicked out when using event observers and/or Starsphere will be replaced by interface/abstract
+	void setRenderEngine(Starsphere *graphics);
 
 private:
     // FIXME: work around static, otherwise event conflict when more than one instance
@@ -45,6 +48,9 @@ private:
         RenderEvent,
         BOINCUpdateEvent
     };
+    
+    // TODO: will be kicked out when using event observers
+    Starsphere *graphics;
 };
 
 #endif /*WINDOWMANAGER_H_*/

@@ -7,7 +7,7 @@ CXX ?= g++
 LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -Wl,-Bdynamic -lGL -lGLU
 CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
 DEPS = Makefile starsphere.h 
-OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
+OBJS = starlist.o snr_list.o pulsar_list.o Starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
 DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
 RESOURCESPEC = resources
 
@@ -29,8 +29,8 @@ release: LDFLAGS += -s
 starsphere: $(DEPS) main.C $(OBJS)
 	$(CXX) -g ${CPPFLAGS} ${LDFLAGS} main.C -o starsphere ${OBJS} ${LIBS}
 
-starsphere.o: $(DEPS) starsphere.C
-	$(CXX) -g ${CPPFLAGS} -I/usr/X11R6/include -c starsphere.C
+Starsphere.o: $(DEPS) Starsphere.cpp
+	$(CXX) -g ${CPPFLAGS} -c Starsphere.cpp
 	
 WindowManager.o: Makefile WindowManager.cpp
 	$(CXX) -g ${CPPFLAGS} -c WindowManager.cpp
@@ -41,15 +41,8 @@ starlist.o: $(DEPS) starlist.C
 snr_list.o: $(DEPS) snr_list.C
 	$(CXX) -g ${CPPFLAGS} -c snr_list.C
 
-user_text.o: $(DEPS) user_text.C
-	$(CXX) -g ${CPPFLAGS} -c user_text.C
-
 pulsar_list.o: $(DEPS) pulsar_list.C
 	$(CXX) -g ${CPPFLAGS} -c pulsar_list.C
-
-search_info.o: $(DEPS) search_info.C
-	$(CXX) -g ${CPPFLAGS} -c search_info.C
-
 
 # resource compiler
 ResourceFactory.o: ${RESOURCESPEC}.o Resource.o ResourceFactory.cpp ResourceFactory.h

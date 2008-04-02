@@ -116,7 +116,7 @@ void WindowManager::eventLoop()
 #ifdef DEBUG_VALGRIND
             if(i < 0.25) {
 #endif
-            app_graphics_render(m_CurrentWidth, m_CurrentHeight, i+=0.025);
+                graphics->render(i+=0.025);
 #ifdef DEBUG_VALGRIND
             }
             else {
@@ -133,11 +133,11 @@ void WindowManager::eventLoop()
         {
             if(event.motion.state & SDL_BUTTON(1))
             {
-                rotateSphere(event.motion.xrel, event.motion.yrel);
+                graphics->rotateSphere(event.motion.xrel, event.motion.yrel);
             }
             else if(event.motion.state & SDL_BUTTON(3))
             {
-                zoomSphere(event.motion.yrel);
+                graphics->zoomSphere(event.motion.yrel);
             }
         }
         else if (event.type == SDL_VIDEORESIZE)
@@ -145,7 +145,7 @@ void WindowManager::eventLoop()
             m_CurrentWidth = event.resize.w;
             m_CurrentHeight = event.resize.h;
             m_DisplaySurface = SDL_SetVideoMode( m_CurrentWidth, m_CurrentHeight, m_DesktopBitsPerPixel, m_VideoModeFlags);
-            app_graphics_resize(m_CurrentWidth, m_CurrentHeight);
+            graphics->resize(m_CurrentWidth, m_CurrentHeight);
         }
         else if( event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) )
         {
@@ -158,34 +158,34 @@ void WindowManager::eventLoop()
             switch(event.key.keysym.sym)
             {
             case SDLK_s:
-                setFeature(STARS, isFeature(STARS) ? false : true);
+                graphics->setFeature(graphics->STARS, graphics->isFeature(graphics->STARS) ? false : true);
                 break;
             case SDLK_c:
-                setFeature(CONSTELLATIONS, isFeature(CONSTELLATIONS) ? false : true);
+                graphics->setFeature(graphics->CONSTELLATIONS, graphics->isFeature(graphics->CONSTELLATIONS) ? false : true);
                 break;
             case SDLK_o:
-                setFeature(OBSERVATORIES, isFeature(OBSERVATORIES) ? false : true);
+                graphics->setFeature(graphics->OBSERVATORIES, graphics->isFeature(graphics->OBSERVATORIES) ? false : true);
                 break;
             case SDLK_x:
-                setFeature(XRAYS, isFeature(XRAYS) ? false : true);
+                graphics->setFeature(graphics->XRAYS, graphics->isFeature(graphics->XRAYS) ? false : true);
                 break;
             case SDLK_p:
-                setFeature(PULSARS, isFeature(PULSARS) ? false : true);
+                graphics->setFeature(graphics->PULSARS, graphics->isFeature(graphics->PULSARS) ? false : true);
                 break;
             case SDLK_r:
-                setFeature(SNRS, isFeature(SNRS) ? false : true);
+                graphics->setFeature(graphics->SNRS, graphics->isFeature(graphics->SNRS) ? false : true);
                 break;
             case SDLK_g:
-                setFeature(GLOBE, isFeature(GLOBE) ? false : true);
+                graphics->setFeature(graphics->GLOBE, graphics->isFeature(graphics->GLOBE) ? false : true);
                 break;
             case SDLK_a:
-                setFeature(AXES, isFeature(AXES) ? false : true);
+                graphics->setFeature(graphics->AXES, graphics->isFeature(graphics->AXES) ? false : true);
                 break;
             case SDLK_i:
-                setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
+                graphics->setFeature(graphics->SEARCHINFO, graphics->isFeature(graphics->SEARCHINFO) ? false : true);
                 break;
             case SDLK_l:
-                setFeature(LOGO, isFeature(LOGO) ? false : true);
+                graphics->setFeature(graphics->LOGO, graphics->isFeature(graphics->LOGO) ? false : true);
                 break;
             case SDLK_RETURN:
                 toggleFullscreen();
@@ -268,4 +268,9 @@ void WindowManager::toggleFullscreen()
 {
     SDL_WM_ToggleFullScreen( m_DisplaySurface );
     SDL_ShowCursor( SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE );
+}
+
+void WindowManager::setRenderEngine(Starsphere *graphics)
+{
+    this->graphics = graphics;
 }
