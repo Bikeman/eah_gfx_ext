@@ -10,12 +10,12 @@ Resource::~Resource()
 {
 }
 
-string Resource::Identifier() const
+string Resource::identifier() const
 {
 	return m_Identifier;
 }
 
-const vector<unsigned char>* Resource::Data() const
+const vector<unsigned char>* Resource::data() const
 {
 	return m_Data.get();
 }

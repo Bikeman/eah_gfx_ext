@@ -12,8 +12,8 @@ public:
 	Resource(const string identifier, const vector<unsigned char>& data);
 	virtual ~Resource();
 	
-	string Identifier() const;
-	const vector<unsigned char> * Data() const;
+	string identifier() const;
+	const vector<unsigned char> * data() const;
 	
 private:
 	string m_Identifier;
