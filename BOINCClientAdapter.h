@@ -14,27 +14,27 @@ public:
 	BOINCClientAdapter();
 	virtual ~BOINCClientAdapter();
 	
-	string getCoreVersion() const;
-	string getApplicationName() const;
-	string getApplicationVersion() const;
+	string coreVersion() const;
+	string applicationName() const;
+	string applicationVersion() const;
 	
-	string getUserName() const;
-	string getTeamName() const;
-	double getUserCredit() const;
-	double getUserRACredit() const;
-	double getHostCredit() const;
-	double getHostRACredit() const;
+	string userName() const;
+	string teamName() const;
+	double userCredit() const;
+	double userRACredit() const;
+	double hostCredit() const;
+	double hostRACredit() const;
 	
-	string getWUName() const;
-	double getWUCPUTime() const;
-    double getWUFPOpsEstimated() const;
-    double getWUFPOpsBound() const;
-    double getWUMemoryBound() const;
-    double getWUDiskBound() const;
+	string wuName() const;
+	double wuCPUTime() const;
+    double wuFPOpsEstimated() const;
+    double wuFPOpsBound() const;
+    double wuMemoryBound() const;
+    double wuDiskBound() const;
 	
 private:
-	void updateUserInfo();
-	void updateSharedMemoryArea();
+	void readUserInfo();
+	void readSharedMemoryArea();
 	
 	char *m_SharedMemoryArea;
 	bool m_SharedMemoryAreaAvailable;

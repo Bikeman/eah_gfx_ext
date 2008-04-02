@@ -2,31 +2,24 @@
 
 BOINCClientAdapter::BOINCClientAdapter()
 {
-	updateUserInfo();
-	
-	m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(EAH_SHMEM_APP_NAME);
-	
-	if(m_SharedMemoryArea) {
-		updateSharedMemoryArea();
-		m_SharedMemoryAreaAvailable = true;
-	}
-	else {
-		m_SharedMemoryAreaAvailable = false;
-	}
+    updateUserInfo();
+    
+    m_SharedMemoryAreaAvailable = false;
+	readSharedMemoryArea();
 }
 
 BOINCClientAdapter::~BOINCClientAdapter()
 {
 }
 
-void BOINCClientAdapter::updateUserInfo()
+void BOINCClientAdapter::readUserInfo()
 {
 	boinc_get_init_data(m_UserData);
 }
 
-void BOINCClientAdapter::updateSharedMemoryArea()
+void BOINCClientAdapter::readSharedMemoryArea()
 {
-	if(m_SharedMemoryArea) {
+	if(m_SharedMemoryAreaAvailable) {
 
 	  if(3 != sscanf( (char*)shmem,
 			  		" <graphics_info> \n"
@@ -40,81 +33,92 @@ void BOINCClientAdapter::updateSharedMemoryArea()
 		  cerr << "Incompatible shared memory data encountered!" << endl;
 	  }
 	}
+	else {
+	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(EAH_SHMEM_APP_NAME);
+	    
+	    if(m_SharedMemoryArea) {
+	        m_SharedMemoryAreaAvailable = true;
+	        readSharedMemoryArea();	        
+	    }
+	    else {
+	        m_SharedMemoryAreaAvailable = false;
+	    }
+	}
 }
 
-string BOINCClientAdapter::getCoreVersion() const
+string BOINCClientAdapter::coreVersion() const
 {
 	// int major_version;int minor_version;int release;
 }
 
-string BOINCClientAdapter::getApplicationName() const
+string BOINCClientAdapter::applicationName() const
 {
 	
 }
 
-string BOINCClientAdapter::getApplicationVersion() const
+string BOINCClientAdapter::applicationVersion() const
 {
 	
 }
 
-string BOINCClientAdapter::getUserName() const
+string BOINCClientAdapter::userName() const
 {
 	
 }
 
-string BOINCClientAdapter::getTeamName() const
+string BOINCClientAdapter::teamName() const
 {
 	
 }
 
-double BOINCClientAdapter::getUserCredit() const
+double BOINCClientAdapter::userCredit() const
 {
 	
 }
 
-double BOINCClientAdapter::getUserRACredit() const
+double BOINCClientAdapter::userRACredit() const
 {
 	
 }
 
-double BOINCClientAdapter::getHostCredit() const
+double BOINCClientAdapter::hostCredit() const
 {
 	
 }
 
-double BOINCClientAdapter::getHostRACredit() const
+double BOINCClientAdapter::hostRACredit() const
 {
 	
 }
 
-string BOINCClientAdapter::getWUName() const
+string BOINCClientAdapter::wuName() const
 {
 	
 }
 
-double BOINCClientAdapter::getWUCPUTime() const
+double BOINCClientAdapter::wuCPUTime() const
 {
 	
 }
 
-double BOINCClientAdapter::getWUFPOpsEstimated() const
-{
-	
-}
-
-
-double BOINCClientAdapter::getWUFPOpsBound() const
+double BOINCClientAdapter::wuFPOpsEstimated() const
 {
 	
 }
 
 
-double BOINCClientAdapter::getWUMemoryBound() const
+double BOINCClientAdapter::wuFPOpsBound() const
 {
 	
 }
 
-double BOINCClientAdapter::getWUDiskBound() const
+
+double BOINCClientAdapter::wuMemoryBound() const
+{
+	
+}
+
+double BOINCClientAdapter::wuDiskBound() const
 {
 	
 }
