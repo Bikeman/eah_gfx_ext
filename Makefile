@@ -7,7 +7,7 @@ CXX ?= g++
 LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -Wl,-Bdynamic -lGL -lGLU
 CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
 DEPS = Makefile starsphere.h 
-OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
+OBJS = starlist.o snr_list.o user_text.o pulsar_list.o search_info.o starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
 DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
 RESOURCESPEC = resources
 
@@ -31,6 +31,9 @@ starsphere: $(DEPS) main.C $(OBJS)
 
 starsphere.o: $(DEPS) starsphere.C
 	$(CXX) -g ${CPPFLAGS} -I/usr/X11R6/include -c starsphere.C
+	
+WindowManager.o: Makefile WindowManager.cpp
+	$(CXX) -g ${CPPFLAGS} -c WindowManager.cpp
 
 starlist.o: $(DEPS) starlist.C
 	$(CXX) -g ${CPPFLAGS} -c starlist.C
