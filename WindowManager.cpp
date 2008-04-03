@@ -96,6 +96,9 @@ bool WindowManager::initialize()
 
 void WindowManager::eventLoop()
 {
+	// be sure there's at least one observer!
+	assert(eventObservers.size() > 0);
+	
 	SDL_AddTimer(40, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 

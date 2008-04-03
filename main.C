@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 	graphics.initialize(window.windowWidth(), window.windowHeight(), fontResource);
 	graphics.render(0);
 	
-#ifndef DEBUG
+#ifdef NDEBUG
 	window.toggleFullscreen();
 #endif
 	

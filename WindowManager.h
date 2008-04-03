@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+#include <cassert>
 
 #include <SDL.h>
 

@@ -8,7 +8,7 @@ LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreety
 CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
 DEPS = Makefile
 OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o Starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
-DEBUGFLAGSCPP = -DDEBUG -pg -ggdb -O0
+DEBUGFLAGSCPP = -pg -ggdb -O0
 RESOURCESPEC = resources
 
 # primary role based tagets
@@ -22,7 +22,7 @@ release: clean starsphere
 debug: CPPFLAGS += $(DEBUGFLAGSCPP)
 memcheck: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
 callgrind: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
-release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
+release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
 release: LDFLAGS += -s
 
 # file based targets
