@@ -462,6 +462,9 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
+	
+	// FSAA will only be enabled when needed!
+	glDisable(GL_MULTISAMPLE_ARB);
 
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -603,127 +606,135 @@ void Starsphere::render(const double timeOfDay)
 	glPopMatrix();
 
 	// draw 2D vectorized HUD
-
-	static GLfloat xStartPosLeft = 0.008;
-	static GLfloat xStartPosRight = 0.84;
-	static GLfloat yStartPosTop = 0.9675;
-	static GLfloat yStartPosBottom = 0.075;
-	static GLfloat fontScaleLargeX = 0.020;
-	static GLfloat fontScaleMediumX = 0.0115;
-	static GLfloat fontScaleSmallX = 0.01;
-	static GLfloat fontScaleMediumY = fontScaleMediumX * aspect;
-	static GLfloat fontScaleLargeY = fontScaleLargeX * aspect;
-	static GLfloat fontScaleSmallY = fontScaleSmallX * aspect;
-	//    static GLfloat yOffset = (font->Ascender() + font->Descender());
-	static GLfloat yOffsetLarge = 0.02;
-	static GLfloat yOffsetMedium = 0.015;
-
-	// save current state
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0, 1, 0, 1, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	if (isFeature(LOGO)) {
-		glPushMatrix();
-		glColor3f(1.0, 1.0, 0.0);
-		glTranslatef(xStartPosLeft, yStartPosTop, 0);
-		glScalef(fontScaleLargeX, fontScaleLargeY, 1.0);
-		m_PolygonFont->Render("Einstein@Home");
-		glPopMatrix();
-
+	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
+	
+		static GLfloat xStartPosLeft = 0.008;
+		static GLfloat xStartPosRight = 0.84;
+		static GLfloat yStartPosTop = 0.9675;
+		static GLfloat yStartPosBottom = 0.075;
+		static GLfloat fontScaleLargeX = 0.020;
+		static GLfloat fontScaleMediumX = 0.0115;
+		static GLfloat fontScaleSmallX = 0.01;
+		static GLfloat fontScaleMediumY = fontScaleMediumX * aspect;
+		static GLfloat fontScaleLargeY = fontScaleLargeX * aspect;
+		static GLfloat fontScaleSmallY = fontScaleSmallX * aspect;
+		//    static GLfloat yOffset = (font->Ascender() + font->Descender());
+		static GLfloat yOffsetLarge = 0.02;
+		static GLfloat yOffsetMedium = 0.015;
+	
+		// enable FSAA
+		glEnable(GL_MULTISAMPLE_ARB);
+		
+		// save current state
+		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glColor4f(1.0, 1.0, 1.0, 0.5);
-		glTranslatef(xStartPosLeft, yStartPosTop - yOffsetLarge, 0);
-		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
-		m_PolygonFont->Render("World Year of Physics 2005");
+		glOrtho(0, 1, 0, 1, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+	
+		if (isFeature(LOGO)) {
+			glPushMatrix();
+			glColor3f(1.0, 1.0, 0.0);
+			glTranslatef(xStartPosLeft, yStartPosTop, 0);
+			glScalef(fontScaleLargeX, fontScaleLargeY, 1.0);
+			m_PolygonFont->Render("Einstein@Home");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glColor4f(1.0, 1.0, 1.0, 0.5);
+			glTranslatef(xStartPosLeft, yStartPosTop - yOffsetLarge, 0);
+			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			m_PolygonFont->Render("World Year of Physics 2005");
+			glPopMatrix();
+		}
+		if (isFeature(SEARCHINFO)) {
+			// left info block      
+			glPushMatrix();
+			glColor3f(1.0, 1.0, 0.0);
+			glTranslatef(xStartPosLeft, yStartPosBottom, 0);
+			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			m_PolygonFont->Render("BOINC Statistics");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glColor4f(1.0, 1.0, 1.0, 0.5);
+			glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("User: Oliver");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Team: Albert-Einstein-Institut");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Project credits: 12.000");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Project RAC: 145.00");
+			glPopMatrix();
+	
+			// right info block
+			glPushMatrix();
+			glColor3f(1.0, 1.0, 0.0);
+			glTranslatef(xStartPosRight, yStartPosBottom, 0);
+			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			m_PolygonFont->Render("Search Information");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glColor4f(1.0, 1.0, 1.0, 0.5);
+			glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Right ascension: 180.00 deg");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Declination: 45.00 deg");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Frequency: 850.05 Hz");
+			glPopMatrix();
+	
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
+			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			m_PolygonFont->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
+			glPopMatrix();
+		}
+	
+		// restore original state
+		glMatrixMode( GL_PROJECTION);
 		glPopMatrix();
+		glMatrixMode( GL_MODELVIEW);
+		glPopMatrix();
+		
+		// disable FSAA
+		glDisable(GL_MULTISAMPLE_ARB);
 	}
-	if (isFeature(SEARCHINFO)) {
-		// left info block      
-		glPushMatrix();
-		glColor3f(1.0, 1.0, 0.0);
-		glTranslatef(xStartPosLeft, yStartPosBottom, 0);
-		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
-		m_PolygonFont->Render("BOINC Statistics");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glColor4f(1.0, 1.0, 1.0, 0.5);
-		glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("User: Oliver");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Team: Albert-Einstein-Institut");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Project credits: 12.000");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Project RAC: 145.00");
-		glPopMatrix();
-
-		// right info block
-		glPushMatrix();
-		glColor3f(1.0, 1.0, 0.0);
-		glTranslatef(xStartPosRight, yStartPosBottom, 0);
-		glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
-		m_PolygonFont->Render("Search Information");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glColor4f(1.0, 1.0, 1.0, 0.5);
-		glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Right ascension: 180.00 deg");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Declination: 45.00 deg");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Frequency: 850.05 Hz");
-		glPopMatrix();
-
-		glPushMatrix();
-		glLoadIdentity();
-		glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
-		glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
-		m_PolygonFont->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
-		glPopMatrix();
-	}
-
-	// restore original state
-	glMatrixMode( GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode( GL_MODELVIEW);
-	glPopMatrix();
 
 	glFlush();
 	glFinish();
