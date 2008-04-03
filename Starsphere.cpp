@@ -1,6 +1,6 @@
 #include "Starsphere.h"
 
-Starsphere::Starsphere()
+Starsphere::Starsphere() : AbstractGraphicsEngine()
 {
 	Axes=0, Stars=0, Constellations=0, Pulsars=0;
 	LLOmarker=0, LHOmarker=0, GEOmarker=0;
@@ -740,6 +740,63 @@ void Starsphere::render(const double timeOfDay)
 	glFinish();
 
 	SDL_GL_SwapBuffers();
+}
+
+void Starsphere::mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed)
+{
+	
+}
+
+void Starsphere::mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed)
+{
+	switch(buttonPressed) {
+		case MouseButtonLeft:
+			rotateSphere(deltaX, deltaY);
+			break;
+		case MouseButtonRight:
+			zoomSphere(deltaY);
+			break;
+		default:
+			break;
+	}
+}
+
+void Starsphere::keyboardPressEvent(const int keyPressed)
+{
+	switch(keyPressed) {
+		case KeyS:
+			setFeature(STARS, isFeature(STARS) ? false : true);
+			break;
+		case KeyC:
+			setFeature(CONSTELLATIONS, isFeature(CONSTELLATIONS) ? false : true);
+			break;
+		case KeyO:
+			setFeature(OBSERVATORIES, isFeature(OBSERVATORIES) ? false : true);
+			break;
+		case KeyX:
+			setFeature(XRAYS, isFeature(XRAYS) ? false : true);
+			break;
+		case KeyP:
+			setFeature(PULSARS, isFeature(PULSARS) ? false : true);
+			break;
+		case KeyR:
+			setFeature(SNRS, isFeature(SNRS) ? false : true);
+			break;
+		case KeyG:
+			setFeature(GLOBE, isFeature(GLOBE) ? false : true);
+			break;
+		case KeyA:
+			setFeature(AXES, isFeature(AXES) ? false : true);
+			break;
+		case KeyI:
+			setFeature(SEARCHINFO, isFeature(SEARCHINFO) ? false : true);
+			break;
+		case KeyL:
+			setFeature(LOGO, isFeature(LOGO) ? false : true);
+			break;
+		default:
+			break;
+	}	
 }
 
 /**

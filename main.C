@@ -46,8 +46,8 @@ int main(int argc, char **argv)
         exit(1);
     }
     
-    window.setRenderEngine(&graphics);
     window.setWindowCaption("Einstein@Home");
+    window.registerEventObserver(&graphics);
 	
 	// prepare resource factory
 	ResourceFactory factory;
@@ -74,6 +74,7 @@ int main(int argc, char **argv)
 	
 	window.eventLoop();
 	
+	window.unregisterEventObserver(&graphics);
 	delete fontResource;
 	
 	exit(0);

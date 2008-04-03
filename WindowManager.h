@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <string>
+#include <list>
 
 #include <SDL.h>
 
-#include "Starsphere.h" // will be kicked out when using event observers
+#include "AbstractGraphicsEngine.h"
 
 using namespace std;
 
@@ -17,8 +18,8 @@ public:
 	virtual ~WindowManager();
 	
 	bool initialize();
-	void registerEventObserver();
-	void unregisterEventObserver();
+	void registerEventObserver(AbstractGraphicsEngine *engine);
+	void unregisterEventObserver(AbstractGraphicsEngine *engine);
 	void eventLoop();
 	
 	int windowWidth() const;
@@ -27,9 +28,6 @@ public:
 	void setWindowCaption(const string caption);
 	void setWindowIcon(const string filename);
 	void toggleFullscreen();
-	
-	// TODO: will be kicked out when using event observers and/or Starsphere will be replaced by interface/abstract
-	void setRenderEngine(Starsphere *graphics);
 
 private:
     // FIXME: work around static, otherwise event conflict when more than one instance
@@ -49,8 +47,7 @@ private:
         BOINCUpdateEvent
     };
     
-    // TODO: will be kicked out when using event observers
-    Starsphere *graphics;
+    list<AbstractGraphicsEngine *> eventObservers;
 };
 
 #endif /*WINDOWMANAGER_H_*/

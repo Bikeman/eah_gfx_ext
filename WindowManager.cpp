@@ -126,28 +126,37 @@ void WindowManager::eventLoop()
 #ifdef DEBUG_VALGRIND
 			if(i < 0.25) {
 #endif
-			graphics->render(i+=0.025);
+				// notify our observers (currently exactly one)
+				eventObservers.front()->render(i += 0.025);
 #ifdef DEBUG_VALGRIND
 			}
 			else {
 				if (m_DisplaySurface) SDL_FreeSurface(m_DisplaySurface);
-				exit(0);
+				break;
 			}
 #endif      
 		}
 		else if (event.type == SDL_USEREVENT &&
 				 event.user.code == BOINCUpdateEvent) {
 			
-			
+			// TODO: update boinc data
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
 			
 			if (event.motion.state & SDL_BUTTON(1)) {
-				graphics->rotateSphere(event.motion.xrel, event.motion.yrel);
+				// notify our observers (currently exactly one)
+				eventObservers.front()->mouseMoveEvent(
+										event.motion.xrel, 
+										event.motion.yrel,
+										AbstractGraphicsEngine::MouseButtonLeft);
 			}
 			else if (event.motion.state & SDL_BUTTON(3)) {
-				graphics->zoomSphere(event.motion.yrel);
+				// notify our observers (currently exactly one)
+				eventObservers.front()->mouseMoveEvent(
+										event.motion.xrel, 
+										event.motion.yrel,
+										AbstractGraphicsEngine::MouseButtonRight);
 			}
 		}
 		else if (event.type == SDL_VIDEORESIZE) {
@@ -160,7 +169,8 @@ void WindowManager::eventLoop()
 									m_DesktopBitsPerPixel,
 									m_VideoModeFlags);
 			
-			graphics->resize(m_CurrentWidth, m_CurrentHeight);
+			// notify our observers (currently exactly one)
+			eventObservers.front()->resize(m_CurrentWidth, m_CurrentHeight);
 		}
 		else if (event.type == SDL_QUIT ||
 				(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
@@ -169,59 +179,40 @@ void WindowManager::eventLoop()
 				SDL_FreeSurface(m_DisplaySurface);
 			}
 
-			exit(0);
+			break;
 		}
 		else if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
+				// notify our observers (currently exactly one)
 				case SDLK_s:
-					graphics->setFeature(
-							graphics->STARS,
-					        graphics->isFeature(graphics->STARS) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyS);
 					break;
 				case SDLK_c:
-					graphics->setFeature(
-					        graphics->CONSTELLATIONS,
-					        graphics->isFeature(graphics->CONSTELLATIONS) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyC);
 					break;
 				case SDLK_o:
-					graphics->setFeature(
-					        graphics->OBSERVATORIES,
-					        graphics->isFeature(graphics->OBSERVATORIES) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyO);
 					break;
 				case SDLK_x:
-					graphics->setFeature(
-							graphics->XRAYS,
-					        graphics->isFeature(graphics->XRAYS) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyX);
 					break;
 				case SDLK_p:
-					graphics->setFeature(
-							graphics->PULSARS,
-					        graphics->isFeature(graphics->PULSARS) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyP);
 					break;
 				case SDLK_r:
-					graphics->setFeature(
-							graphics->SNRS,
-					        graphics->isFeature(graphics->SNRS) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyR);
 					break;
 				case SDLK_g:
-					graphics->setFeature(
-							graphics->GLOBE,
-					        graphics->isFeature(graphics->GLOBE) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyG);
 					break;
 				case SDLK_a:
-					graphics->setFeature(
-							graphics->AXES,
-					        graphics->isFeature(graphics->AXES) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyA);
 					break;
 				case SDLK_i:
-					graphics->setFeature(
-							graphics->SEARCHINFO,
-					        graphics->isFeature(graphics->SEARCHINFO) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyI);
 					break;
 				case SDLK_l:
-					graphics->setFeature(
-							graphics->LOGO,
-					        graphics->isFeature(graphics->LOGO) ? false : true);
+					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyL);
 					break;
 				case SDLK_RETURN:
 					toggleFullscreen();
@@ -232,14 +223,15 @@ void WindowManager::eventLoop()
 	}
 }
 
-void WindowManager::registerEventObserver()
+void WindowManager::registerEventObserver(AbstractGraphicsEngine *engine)
 {
-
+	// right now we're only accepting/using ONE observer
+	eventObservers.assign(1, engine);
 }
 
-void WindowManager::unregisterEventObserver()
+void WindowManager::unregisterEventObserver(AbstractGraphicsEngine *engine)
 {
-
+	eventObservers.remove(engine);
 }
 
 Uint32 WindowManager::timerCallbackRenderEvent(Uint32 interval, void *param)
@@ -305,9 +297,4 @@ void WindowManager::toggleFullscreen()
 {
 	SDL_WM_ToggleFullScreen(m_DisplaySurface);
 	SDL_ShowCursor(SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE);
-}
-
-void WindowManager::setRenderEngine(Starsphere *graphics)
-{
-	this->graphics = graphics;
 }

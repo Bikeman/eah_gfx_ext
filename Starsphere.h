@@ -10,7 +10,7 @@
 #include <SDL_opengl.h>
 #include <FTGLPolygonFont.h>
 
-#include "Resource.h"
+#include "AbstractGraphicsEngine.h"
 
 #define EAH_SHMEM_APP_NAME "Einstein@Home"
 
@@ -30,36 +30,22 @@
 
 using namespace std;
 
-class Starsphere
+class Starsphere : public AbstractGraphicsEngine
 {
 public:
 	Starsphere();
 	virtual ~Starsphere();
 
+	// core methods
 	void initialize(const int width, const int height, const Resource *font);
 	void resize(const int width, const int height);
 	void render(const double timeOfDay);
 
-	void rotateSphere(const int relativeRotation, const int relativeElevation);
-	void zoomSphere(const int relativeZoom);
-
-	// feature control API
-	void setFeature(const int features, const bool enable);
-	bool isFeature(const int features);
-
-	enum Features {
-		STARS=1,
-		CONSTELLATIONS=2,
-		OBSERVATORIES=4,
-		XRAYS=8,
-		PULSARS=16,
-		SNRS=32,
-		GLOBE=64,
-		AXES=128,
-		SEARCHINFO=256,
-		LOGO=512
-	};
-
+	// event handling
+	void mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed);
+	void mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed);
+	void keyboardPressEvent(const int keyPressed);
+	
 private:
 	void make_stars();
 	void make_pulsars();
@@ -119,6 +105,29 @@ private:
 
 	// Graphics state info:
 	float aspect;
+	
+	//------------ new clean members -----
+	
+	// view control
+	void rotateSphere(const int relativeRotation, const int relativeElevation);
+	void zoomSphere(const int relativeZoom);
+	
+	// feature control
+	void setFeature(const int features, const bool enable);
+	bool isFeature(const int features);
+
+	enum Features {
+		STARS=1,
+		CONSTELLATIONS=2,
+		OBSERVATORIES=4,
+		XRAYS=8,
+		PULSARS=16,
+		SNRS=32,
+		GLOBE=64,
+		AXES=128,
+		SEARCHINFO=256,
+		LOGO=512
+	};
 
 	const Resource *m_FontResource;
 	FTFont *m_PolygonFont;
