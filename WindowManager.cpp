@@ -120,7 +120,9 @@ void WindowManager::eventLoop()
 	static double i = 0.0;
 
 	while (SDL_WaitEvent(&event) ) {
-		if (event.type == SDL_USEREVENT && event.user.code == RenderEvent) {
+		if (event.type == SDL_USEREVENT &&
+			event.user.code == RenderEvent) {
+			
 #ifdef DEBUG_VALGRIND
 			if(i < 0.25) {
 #endif
@@ -133,9 +135,10 @@ void WindowManager::eventLoop()
 			}
 #endif      
 		}
-		else if (event.type == SDL_USEREVENT && event.user.code
-		        == BOINCUpdateEvent) {
-
+		else if (event.type == SDL_USEREVENT &&
+				 event.user.code == BOINCUpdateEvent) {
+			
+			
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
