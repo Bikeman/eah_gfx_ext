@@ -9,10 +9,12 @@ ResourceFactory::ResourceFactory()
 	for(int i = 0; i < resourceCount; ++i) {
 		
 		// prepare temporary buffer
+		size_t resourceSize = c_ResourceIndex[i+1][1];
 		vector<unsigned char> buffer;
+		buffer.reserve(resourceSize);
 
 		// extract resource data from storage container
-		for(size_t x = 0; x < c_ResourceIndex[i+1][1]; ++x) {
+		for(size_t x = 0; x < resourceSize; ++x) {
 			
 			// use offset and relative position to find the absolute position
 			unsigned char byteValue = c_ResourceStorage[c_ResourceIndex[i+1][0] + x];
