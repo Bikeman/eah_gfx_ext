@@ -594,7 +594,7 @@ void Starsphere::render(const double timeOfDay)
 	
 		static const GLfloat xStartPosLeft = 0.008;
 		const GLfloat xStartPosRight = 1 * aspect - 0.205;
-		static const GLfloat yStartPosTop = 0.9675;
+		static const GLfloat yStartPosTop = 0.975;
 		static const GLfloat yStartPosBottom = 0.07;
 		static const GLfloat fontScaleLarge = 0.0225;
 		static const GLfloat fontScaleMedium = 0.0131;
