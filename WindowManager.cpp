@@ -8,11 +8,8 @@ WindowManager::~WindowManager()
 {
 }
 
-bool WindowManager::initialize(const bool fullscreen, const int width, const int height)
+bool WindowManager::initialize(const int width, const int height)
 {
-	// be sure there's at least one observer!
-	assert(eventObservers.size() > 0);
-	
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		cerr << "Window system could not be initalized: " << SDL_GetError() << endl;
 		return false;
@@ -116,11 +113,6 @@ bool WindowManager::initialize(const bool fullscreen, const int width, const int
 							m_CurrentHeight,
 							m_DesktopBitsPerPixel,
 							m_VideoModeFlags);
-	
-	// switch to fullscreen if requested
-	if(fullscreen && m_FullscreenModeAvailable) {
-		toggleFullscreen();
-	}
 	
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
@@ -323,12 +315,12 @@ int WindowManager::windowHeight() const
 	return m_CurrentHeight;
 }
 
-void WindowManager::setWindowCaption(const string caption)
+void WindowManager::setWindowCaption(const string caption) const
 {
 	SDL_WM_SetCaption(caption.c_str(), NULL);
 }
 
-void WindowManager::setWindowIcon(const string filename)
+void WindowManager::setWindowIcon(const string filename) const
 {
 	if (filename.length() > 0) {
 		SDL_WM_SetIcon(SDL_LoadBMP(filename.c_str()), NULL);

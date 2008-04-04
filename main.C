@@ -38,44 +38,40 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    Starsphere graphics;
-    WindowManager window;
-    
-    // register starsphere as event observer
-    window.registerEventObserver(&graphics);
-    
-#ifdef NDEBUG
-    const bool fullscreen = true;
-#else
-    const bool fullscreen = false;
-#endif
+	// prepare main objects
+	WindowManager window;
+	ResourceFactory factory;
+	Starsphere graphics; 
     
     // initialize window manager 
-    if(!window.initialize(fullscreen)) {
-    	window.unregisterEventObserver(&graphics);
+    if(!window.initialize()) {
         exit(1);
     }
     
-    window.setWindowCaption("Einstein@Home");
-	
-	// prepare resource factory
-	ResourceFactory factory;
-	
 	// create font resource instance
 	const Resource *fontResource = factory.createInstance("FontSansSerif");
 	
 	if(fontResource == NULL) {
 		cerr << "Font resource could not be loaded!" << endl;
-		window.unregisterEventObserver(&graphics);
 		exit(1);
 	}
 	
 	if(fontResource->data()->size() == 0) {
 		cerr << "Font resource could not be loaded!" << endl;
-		window.unregisterEventObserver(&graphics);
+		delete fontResource;
 		exit(1);
 	}
+
+    window.setWindowCaption("Einstein@Home");
 	
+    // register starsphere as event observer
+    window.registerEventObserver(&graphics);
+
+#ifdef NDEBUG
+	// switch to fullscreen when in release mode
+	window.toggleFullscreen();
+#endif
+
 	// pepare rendering
 	graphics.initialize(window.windowWidth(), window.windowHeight(), fontResource);
 

@@ -18,7 +18,7 @@ public:
 	WindowManager();
 	virtual ~WindowManager();
 	
-	bool initialize(const bool fullscreen, const int width = 1024, const int height = 768);
+	bool initialize(const int width = 1024, const int height = 768);
 	void registerEventObserver(AbstractGraphicsEngine *engine);
 	void unregisterEventObserver(AbstractGraphicsEngine *engine);
 	void eventLoop();
@@ -26,14 +26,14 @@ public:
 	int windowWidth() const;
 	int windowHeight() const;
 	
-	void setWindowCaption(const string caption);
-	void setWindowIcon(const string filename);
+	void setWindowCaption(const string caption) const;
+	void setWindowIcon(const string filename) const;
 	void toggleFullscreen();
 
 private:
     // FIXME: work around static, otherwise event conflict when more than one instance
-    static Uint32 timerCallbackRenderEvent( Uint32 interval, void *param );
-    static Uint32 timerCallbackBOINCUpdateEvent( Uint32 interval, void *param );
+    static Uint32 timerCallbackRenderEvent(Uint32 interval, void *param);
+    static Uint32 timerCallbackBOINCUpdateEvent(Uint32 interval, void *param);
     
     int m_DesktopWidth;
     int m_DesktopHeight;
