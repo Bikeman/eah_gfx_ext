@@ -737,8 +737,6 @@ void Starsphere::render(const double timeOfDay)
 	}
 
 	glFlush();
-	glFinish();
-
 	SDL_GL_SwapBuffers();
 }
 
