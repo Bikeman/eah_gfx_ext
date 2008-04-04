@@ -89,12 +89,12 @@ bool WindowManager::initialize(const int width, const int height)
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 1);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
+	
 	// unused requirements
 	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	//SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 	// 4x FSAA, might be too heavy for some machines :-)
