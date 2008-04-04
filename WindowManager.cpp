@@ -127,7 +127,7 @@ void WindowManager::eventLoop()
 			event.user.code == RenderEvent) {
 			
 #ifdef DEBUG_VALGRIND
-			if(i < 0.25) {
+			if(i < 12.5) {
 #endif
 				// notify our observers (currently exactly one)
 				eventObservers.front()->render(i += 0.025);
