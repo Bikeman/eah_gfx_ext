@@ -8,8 +8,11 @@ WindowManager::~WindowManager()
 {
 }
 
-bool WindowManager::initialize()
+bool WindowManager::initialize(const bool fullscreen, const int width, const int height)
 {
+	// be sure there's at least one observer!
+	assert(eventObservers.size() > 0);
+	
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		cerr << "Window system could not be initalized: " << SDL_GetError() << endl;
 		return false;
@@ -21,16 +24,20 @@ bool WindowManager::initialize()
 	const SDL_VideoInfo *videoInfo = SDL_GetVideoInfo();
 
 	if (videoInfo->current_w != 0) {
-		m_CurrentWidth = m_DesktopWidth = videoInfo->current_w;
+		m_DesktopWidth = videoInfo->current_w;
 	}
 
 	if (videoInfo->current_h != 0) {
-		m_CurrentHeight = m_DesktopHeight = videoInfo->current_h;
+		m_DesktopHeight = videoInfo->current_h;
 	}
 
 	if (videoInfo->vfmt->BitsPerPixel != 0) {
 		m_DesktopBitsPerPixel = videoInfo->vfmt->BitsPerPixel;
 	}
+	
+	// set initial non-fullscreen resolution
+	m_WindowedWidth = width;
+	m_WindowedHeight = height;
 
 	/*
 	 * SDL_ASYNCBLIT - Surface benutzt asynchrone Blits, wenn möglich
@@ -45,42 +52,76 @@ bool WindowManager::initialize()
 	 * SDL_PREALLOC - Surface nutzt vorher allokierten Speicher
 	 */
 
-	m_VideoModeFlags = SDL_OPENGL | SDL_RESIZABLE;
-
+	// set common video flags
+	m_VideoModeFlags = SDL_OPENGL;
+	
+	// check fullscreen video mode
+	m_FullscreenModeAvailable = true;
 	Uint32 bitPerPixel = SDL_VideoModeOK(
 							m_DesktopWidth,
 							m_DesktopHeight,
 							m_DesktopBitsPerPixel,
-							m_VideoModeFlags);
+							m_VideoModeFlags | SDL_FULLSCREEN);
 
-	if ( !bitPerPixel) {
-		cerr << "Video mode not supported: " << SDL_GetError() << endl;
+	if(!bitPerPixel) {
+		cerr << "Fullscreen video mode not supported: " << SDL_GetError() << endl;
+		m_FullscreenModeAvailable = false;
+	}
+	
+	// check initial windowed video mode
+	m_WindowedModeAvailable = true;
+	bitPerPixel = SDL_VideoModeOK(
+							m_WindowedWidth,
+							m_WindowedHeight,
+							m_DesktopBitsPerPixel,
+							m_VideoModeFlags | SDL_RESIZABLE);
+
+	if(!bitPerPixel) {
+		cerr << "Windowed video mode not supported: " << SDL_GetError() << endl;
+		m_WindowedModeAvailable = false;
+	}
+	
+	// both checks failed
+	if(!(m_FullscreenModeAvailable || m_WindowedModeAvailable)) {
+		cerr << "No suitable video mode available!"<< endl;
 		return false;
 	}
 
-	// specify minimum requirements
-	// (query with SDL_GL_SetAttribute() after SDL_SetVideoMode() if needed)
+	// minimum requirements
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 1);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 1);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	// unused requirements
 	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	//SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
-	// 4x FSAA, way too heavy on some machines :-)
+	// 4x FSAA, might be too heavy for some machines :-)
 	// TODO: should be controlled with config values (coupled to disabling text rendering?)
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 
+	// we always start in windowed mode
+	// (starting in fullscreen fails with high CPU load!)
+	m_CurrentWidth = m_WindowedWidth;
+	m_CurrentHeight = m_WindowedHeight;
+	m_VideoModeFlags |= SDL_RESIZABLE;
+	
 	m_DisplaySurface = SDL_SetVideoMode(
-							m_DesktopWidth,
-							m_DesktopHeight,
+							m_CurrentWidth,
+							m_CurrentHeight,
 							m_DesktopBitsPerPixel,
 							m_VideoModeFlags);
-
+	
+	// switch to fullscreen if requested
+	if(fullscreen && m_FullscreenModeAvailable) {
+		toggleFullscreen();
+	}
+	
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
 		return false;
@@ -161,8 +202,8 @@ void WindowManager::eventLoop()
 			}
 		}
 		else if (event.type == SDL_VIDEORESIZE) {
-			m_CurrentWidth = event.resize.w;
-			m_CurrentHeight = event.resize.h;
+			m_CurrentWidth = m_WindowedWidth = event.resize.w;
+			m_CurrentHeight = m_WindowedHeight = event.resize.h;
 			
 			m_DisplaySurface = SDL_SetVideoMode(
 									m_CurrentWidth,
@@ -296,6 +337,39 @@ void WindowManager::setWindowIcon(const string filename)
 
 void WindowManager::toggleFullscreen()
 {
-	SDL_WM_ToggleFullScreen(m_DisplaySurface);
-	SDL_ShowCursor(SDL_ShowCursor(SDL_QUERY) == SDL_ENABLE ? SDL_DISABLE : SDL_ENABLE);
+	// toggle fullscreen bit and reset video mode
+	if(m_WindowedModeAvailable && (m_VideoModeFlags & SDL_FULLSCREEN)) {
+		// set new dimensions
+		m_CurrentWidth = m_WindowedWidth;
+		m_CurrentHeight = m_WindowedHeight;
+		
+		// (un)set video mode flags
+		m_VideoModeFlags &= ~SDL_FULLSCREEN;
+		m_VideoModeFlags |= SDL_RESIZABLE;
+	
+		// show cursor in fullscreen mode
+		SDL_ShowCursor(SDL_ENABLE);
+	}
+	else if(m_FullscreenModeAvailable && !(m_VideoModeFlags & SDL_FULLSCREEN)) {
+		// set new dimensions
+		m_CurrentWidth = m_DesktopWidth;
+		m_CurrentHeight = m_DesktopHeight;
+		
+		// (un)set video mode flags
+		m_VideoModeFlags |= SDL_FULLSCREEN;
+		m_VideoModeFlags &= ~SDL_RESIZABLE;
+		
+		// hide cursor
+		SDL_ShowCursor(SDL_DISABLE);
+	}
+	
+	// reset video mode
+	m_DisplaySurface = SDL_SetVideoMode(
+							m_CurrentWidth,
+							m_CurrentHeight,
+							m_DesktopBitsPerPixel,
+							m_VideoModeFlags);
+	
+	// notify our observers (currently exactly one)
+	eventObservers.front()->resize(m_CurrentWidth, m_CurrentHeight);
 }

@@ -18,7 +18,7 @@ public:
 	WindowManager();
 	virtual ~WindowManager();
 	
-	bool initialize();
+	bool initialize(const bool fullscreen, const int width = 1024, const int height = 768);
 	void registerEventObserver(AbstractGraphicsEngine *engine);
 	void unregisterEventObserver(AbstractGraphicsEngine *engine);
 	void eventLoop();
@@ -40,7 +40,13 @@ private:
     int m_DesktopBitsPerPixel;
     int m_CurrentWidth;
     int m_CurrentHeight;
+    int m_WindowedWidth;
+    int m_WindowedHeight;
     Uint32 m_VideoModeFlags;
+    
+    bool m_FullscreenModeAvailable;
+    bool m_WindowedModeAvailable;
+    
     SDL_Surface *m_DisplaySurface;
     
     enum EventCodes {
