@@ -33,12 +33,8 @@ bool WindowManager::initialize()
 	}
 
 	/*
-	 * SDL_SWSURFACE - Das Surface wird im Hauptspeicher abgelegt (default)
-	 * SDL_HWSURFACE - Das Surface wird im Grafikspeicher abgelegt
 	 * SDL_ASYNCBLIT - Surface benutzt asynchrone Blits, wenn möglich
 	 * SDL_ANYFORMAT - Erlaubt jedes Pixel-Format (nur beim display-surface)
-	 * SDL_HWPALETTE - Surface nutzt exclusive Farbpalette
-	 * SDL_DOUBLEBUF - Surface ist "double buffered" (nur display-surface)
 	 * SDL_FULLSCREEN - Surface im Full-Screen-Mode initialisieren (nur display-surface)
 	 * SDL_OPENGL - Surface nutzt OpenGL (nur display-surface)
 	 * SDL_RESIZABLE - Surfacefenster ist veränderbar (nur display-Surface)
@@ -75,7 +71,6 @@ bool WindowManager::initialize()
 	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
 	// 4x FSAA, way too heavy on some machines :-)
-	// FIXME: without it polygon fonts look really ugly :-(
 	// TODO: should be controlled with config values (coupled to disabling text rendering?)
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -102,20 +97,23 @@ void WindowManager::eventLoop()
 	SDL_AddTimer(40, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
+	// events we don't ignore, hence use
 	//SDL_EventState( SDL_QUIT, SDL_IGNORE);
-	SDL_EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
-	SDL_EventState(SDL_KEYUP, SDL_IGNORE);
 	//SDL_EventState( SDL_KEYDOWN, SDL_IGNORE);
 	//SDL_EventState( SDL_MOUSEMOTION, SDL_IGNORE);
+	//SDL_EventState( SDL_VIDEORESIZE, SDL_IGNORE);
+	//SDL_EventState( SDL_USEREVENT, SDL_IGNORE);
+	
+	// events we ignore
+	SDL_EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
+	SDL_EventState(SDL_KEYUP, SDL_IGNORE);
 	SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
 	SDL_EventState(SDL_JOYAXISMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBALLMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYHATMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBUTTONDOWN, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBUTTONUP, SDL_IGNORE);
-	//SDL_EventState( SDL_VIDEORESIZE, SDL_IGNORE);
 	SDL_EventState(SDL_VIDEOEXPOSE, SDL_IGNORE);
-	//SDL_EventState( SDL_USEREVENT, SDL_IGNORE);
 	SDL_EventState(SDL_SYSWMEVENT, SDL_IGNORE);
 
 	SDL_Event event;
