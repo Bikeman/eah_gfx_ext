@@ -89,15 +89,6 @@ private:
 	GLfloat rotation_offset; // so that we can rotate sphere
 	GLfloat rotation_speed; // degrees per minute
 
-	/**
-	 * display window size for dynamic text alignment
-	 * set in app+graphics_resize(), 
-	 * used in user_text.C - annotate_screen()
-	 * and search_info.C - display_search_info()
-	 */
-	float gfx_width;
-	float gfx_height;
-
 	/* Time info */
 	double obs_dtime_drawn; // dtime() when obs were drawn
 	double gmt_offset; // dtime() correction to get GMT

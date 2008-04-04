@@ -27,15 +27,9 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	rotation_offset = 0.0;
 	rotation_speed = 180.0;
 
-	gfx_width = 0;
-	gfx_height = 0;
-
 	/* Time info */
 	gmt_offset=0.0;
 	show_gmt=true;
-
-	// Graphics state info:
-	aspect = 4 / 3;
 }
 
 Starsphere::~Starsphere()
@@ -114,7 +108,6 @@ void Starsphere::make_stars()
 		}
 	}
 	glEndList();
-	// fprintf(stderr,"make_stars: there were %d duplicate stars.\n", Ndupes);
 }
 
 /**
@@ -414,8 +407,6 @@ void Starsphere::make_globe()
 
 /**
  * Window resize/remap
- * (FWIW, this is called *before* app_graphics_init(), 
- * when window is first mapped)
  */
 void Starsphere::resize(const int width, const int height)
 {
@@ -423,9 +414,7 @@ void Starsphere::resize(const int width, const int height)
 	/* Adjust aspect ratio and projection */
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 
-	gfx_width = width;
-	gfx_height = height;
-	aspect = gfx_width / gfx_height;
+	aspect = (float)width / (float)height;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -484,12 +473,6 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable(GL_FOG);
 	glFogi(GL_FOG_MODE, GL_EXP2);
 	glFogf(GL_FOG_DENSITY, 0.085);
-
-	/* Set initial perspective projection */
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(95.0, aspect, 0.50, 25.0);
-	glMatrixMode(GL_MODELVIEW);
 
 	/* Create pre-drawn display lists */
 	make_stars();
@@ -609,19 +592,16 @@ void Starsphere::render(const double timeOfDay)
 	// draw 2D vectorized HUD
 	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
 	
-		static GLfloat xStartPosLeft = 0.008;
-		static GLfloat xStartPosRight = 0.84;
-		static GLfloat yStartPosTop = 0.9675;
-		static GLfloat yStartPosBottom = 0.075;
-		static GLfloat fontScaleLargeX = 0.020;
-		static GLfloat fontScaleMediumX = 0.0115;
-		static GLfloat fontScaleSmallX = 0.01;
-		static GLfloat fontScaleMediumY = fontScaleMediumX * aspect;
-		static GLfloat fontScaleLargeY = fontScaleLargeX * aspect;
-		static GLfloat fontScaleSmallY = fontScaleSmallX * aspect;
-		//    static GLfloat yOffset = (font->Ascender() + font->Descender());
-		static GLfloat yOffsetLarge = 0.02;
-		static GLfloat yOffsetMedium = 0.015;
+		static const GLfloat xStartPosLeft = 0.008;
+		const GLfloat xStartPosRight = 1 * aspect - 0.16;
+		static const GLfloat yStartPosTop = 0.9675;
+		static const GLfloat yStartPosBottom = 0.05;
+		static const GLfloat fontScaleLarge = 0.020;
+		static const GLfloat fontScaleMedium = 0.0115;
+		static const GLfloat fontScaleSmall = 0.01;
+//		static const GLfloat yOffset = (font->Ascender() + font->Descender());
+		static const GLfloat yOffsetLarge = 0.015;
+		static const GLfloat yOffsetMedium = 0.01;
 
 		// disable depth testing since we're in 2D mode
 		glDisable(GL_DEPTH_TEST);
@@ -633,7 +613,7 @@ void Starsphere::render(const double timeOfDay)
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glOrtho(0, 1, 0, 1, -1, 1);
+		glOrtho(0, 1 * aspect, 0, 1, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
@@ -643,13 +623,13 @@ void Starsphere::render(const double timeOfDay)
 			
 			glColor3f(1.0, 1.0, 0.0);
 			glTranslatef(xStartPosLeft, yStartPosTop, 0);
-			glScalef(fontScaleLargeX, fontScaleLargeY, 1.0);
+			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
 			m_PolygonFont->Render("Einstein@Home");
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosLeft, yStartPosTop - yOffsetLarge, 0);
-			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
 			m_PolygonFont->Render("World Year of Physics 2005");
 			
 			glPopMatrix();
@@ -660,28 +640,28 @@ void Starsphere::render(const double timeOfDay)
 			
 			glColor3f(1.0, 1.0, 0.0);
 			glTranslatef(xStartPosLeft, yStartPosBottom, 0);
-			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
 			m_PolygonFont->Render("BOINC Statistics");
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("User: Oliver");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Team: Albert-Einstein-Institut");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Project credits: 12.000");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Project RAC: 145.00");
 			
 			glPopMatrix();
@@ -691,37 +671,37 @@ void Starsphere::render(const double timeOfDay)
 			
 			glColor3f(1.0, 1.0, 0.0);
 			glTranslatef(xStartPosRight, yStartPosBottom, 0);
-			glScalef(fontScaleMediumX, fontScaleMediumY, 1.0);
+			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
 			m_PolygonFont->Render("Search Information");
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Right ascension: 180.00 deg");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Declination: 45.00 deg");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Frequency: 850.05 Hz");
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
-			glScalef(fontScaleSmallX, fontScaleSmallY, 1.0);
+			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
 			m_PolygonFont->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
 			
 			glPopMatrix();
 		}
 	
 		// restore original state
-		glMatrixMode( GL_PROJECTION);
+		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
-		glMatrixMode( GL_MODELVIEW);
+		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
 		
 		// disable FSAA
