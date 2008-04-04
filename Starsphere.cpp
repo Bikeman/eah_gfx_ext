@@ -593,15 +593,15 @@ void Starsphere::render(const double timeOfDay)
 	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
 	
 		static const GLfloat xStartPosLeft = 0.008;
-		const GLfloat xStartPosRight = 1 * aspect - 0.16;
+		const GLfloat xStartPosRight = 1 * aspect - 0.205;
 		static const GLfloat yStartPosTop = 0.9675;
-		static const GLfloat yStartPosBottom = 0.05;
-		static const GLfloat fontScaleLarge = 0.020;
-		static const GLfloat fontScaleMedium = 0.0115;
-		static const GLfloat fontScaleSmall = 0.01;
+		static const GLfloat yStartPosBottom = 0.07;
+		static const GLfloat fontScaleLarge = 0.0225;
+		static const GLfloat fontScaleMedium = 0.0131;
+		static const GLfloat fontScaleSmall = 0.0131;
 //		static const GLfloat yOffset = (font->Ascender() + font->Descender());
 		static const GLfloat yOffsetLarge = 0.015;
-		static const GLfloat yOffsetMedium = 0.01;
+		static const GLfloat yOffsetMedium = 0.015;
 
 		// disable depth testing since we're in 2D mode
 		glDisable(GL_DEPTH_TEST);
