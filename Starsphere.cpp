@@ -821,39 +821,44 @@ void Starsphere::refreshBOINCInformation()
 	stringstream buffer;
 	buffer.precision(2);
 	buffer.setf(ios::fixed, ios::floatfield);
+	buffer.fill('0');
+	buffer.setf(ios::right, ios::adjustfield);
 	
-	// store content required for our HUD
+	// store content required for our HUD (user info)
 	m_UserName = boincAdapter.userName();
 	m_TeamName = boincAdapter.teamName();
 	
-	buffer << fixed << boincAdapter.userCredit();
+	buffer << fixed << boincAdapter.userCredit() << ends;
 	m_UserCredit = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.userRACredit();
+	buffer << fixed << boincAdapter.userRACredit() << ends;
 	m_UserRACredit = buffer.str();
 	buffer.str("");
 
-	buffer << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2;
+	// store content required for our HUD (search info)
+	buffer << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2 << ends;
 	m_WUSkyPosRightAscension = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2;
+	buffer << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2 << ends;
 	m_WUSkyPosDeclination = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.wuFractionDone() * 100;
+	buffer << fixed << boincAdapter.wuFractionDone() * 100 << ends;
 	m_WUPercentDone = buffer.str();
 	buffer.str("");
 	
-	double cputime = boincAdapter.wuCPUTime();
-	int day =  cputime / 86400;
-	int hrs = (cputime - day*86400) / 3600;
-	int min = (cputime - (day*86400 + hrs*3600)) / 60;
-	int sec =  cputime - (day*86400 + hrs*3600 + min*60);	
-	// TODO: get rid of sprintf ;-)
-	char duration[] = "00:00:00:00";
-	sprintf(duration, "%.2i:%.2i:%.2i:%.2i", day, hrs, min, sec);
-	buffer << string(duration);	
+	const double cputime = boincAdapter.wuCPUTime();
+	const int day =  cputime / 86400;
+	const int hrs = (cputime - day*86400) / 3600;
+	const int min = (cputime - (day*86400 + hrs*3600)) / 60;
+	const int sec =  cputime - (day*86400 + hrs*3600 + min*60);	
+
+	buffer	<< right << setw(2) << day << ":"
+			<< right << setw(2) << hrs << ":"
+			<< right << setw(2) << min << ":"
+			<< right << setw(2) << sec << ends;
+	
 	m_WUCPUTime = buffer.str();
 }

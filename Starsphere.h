@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 
 #include <SDL.h>
