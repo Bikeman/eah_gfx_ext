@@ -3,16 +3,15 @@
 
 #include <cmath>
 #include <cstdio>
-#include <cstring>
+#include <string>
 #include <iostream>
+#include <sstream>
 
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <FTGLPolygonFont.h>
 
 #include "AbstractGraphicsEngine.h"
-
-#define EAH_SHMEM_APP_NAME "Einstein@Home"
 
 /* SIN and COS take arguments in DEGREES */
 #define PI 3.14159265
@@ -45,6 +44,9 @@ public:
 	void mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed);
 	void mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed);
 	void keyboardPressEvent(const int keyPressed);
+	
+	// update HUD content
+	void refreshBOINCInformation();
 	
 private:
 	void make_stars();
@@ -120,8 +122,19 @@ private:
 		LOGO=512
 	};
 
+	// resource handling
 	const Resource *m_FontResource;
 	FTFont *m_PolygonFont;
+	
+	// local HUD contents
+	string m_UserName;
+	string m_TeamName;
+	string m_UserCredit;
+	string m_UserRACredit;
+	string m_WUSkyPosRightAscension;
+	string m_WUSkyPosDeclination;
+	string m_WUPercentDone;
+	string m_WUCPUTime;
 };
 
 /* Constellation & star coordinates are in starlist.C */

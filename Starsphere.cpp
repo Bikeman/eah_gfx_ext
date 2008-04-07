@@ -593,7 +593,7 @@ void Starsphere::render(const double timeOfDay)
 	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
 	
 		static const GLfloat xStartPosLeft = 0.008;
-		const GLfloat xStartPosRight = 1 * aspect - 0.205;
+		const GLfloat xStartPosRight = 1 * aspect - 0.145;
 		static const GLfloat yStartPosTop = 0.975;
 		static const GLfloat yStartPosBottom = 0.07;
 		static const GLfloat fontScaleLarge = 0.0225;
@@ -647,22 +647,22 @@ void Starsphere::render(const double timeOfDay)
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("User: Oliver");
+			m_PolygonFont->Render(string("User: " + m_UserName).c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Team: Albert-Einstein-Institut");
+			m_PolygonFont->Render(string("Team: " + m_TeamName).c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Project credits: 12.000");
+			m_PolygonFont->Render(string("Project Credit: " + m_UserCredit).c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Project RAC: 145.00");
+			m_PolygonFont->Render(string("Project RAC: " + m_UserRACredit).c_str());
 			
 			glPopMatrix();
 	
@@ -678,22 +678,22 @@ void Starsphere::render(const double timeOfDay)
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Right ascension: 180.00 deg");
+			m_PolygonFont->Render(string("Ascension: " + m_WUSkyPosRightAscension + " deg").c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Declination: 45.00 deg");
+			m_PolygonFont->Render(string("Declination: " + m_WUSkyPosDeclination + " deg").c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Frequency: 850.05 Hz");
+			m_PolygonFont->Render(string("Completed: " + m_WUPercentDone + " %").c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render("Spindown rate: 3.25 * 10^-10 Hz/s");
+			m_PolygonFont->Render(string("CPU Time: " + m_WUCPUTime).c_str());
 			
 			glPopMatrix();
 		}
@@ -810,4 +810,50 @@ void Starsphere::setFeature(const int feature, const bool enable)
 bool Starsphere::isFeature(const int feature)
 {
 	return ((featureFlags & feature) == feature ? true : false);
+}
+
+void Starsphere::refreshBOINCInformation()
+{
+	// call base class implementation
+	AbstractGraphicsEngine::refreshBOINCInformation();
+	
+	// prepare conversion buffer
+	stringstream buffer;
+	buffer.precision(2);
+	buffer.setf(ios::fixed, ios::floatfield);
+	
+	// store content required for our HUD
+	m_UserName = boincAdapter.userName();
+	m_TeamName = boincAdapter.teamName();
+	
+	buffer << fixed << boincAdapter.userCredit();
+	m_UserCredit = buffer.str();
+	buffer.str("");
+	
+	buffer << fixed << boincAdapter.userRACredit();
+	m_UserRACredit = buffer.str();
+	buffer.str("");
+
+	buffer << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2;
+	m_WUSkyPosRightAscension = buffer.str();
+	buffer.str("");
+	
+	buffer << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2;
+	m_WUSkyPosDeclination = buffer.str();
+	buffer.str("");
+	
+	buffer << fixed << boincAdapter.wuFractionDone() * 100;
+	m_WUPercentDone = buffer.str();
+	buffer.str("");
+	
+	double cputime = boincAdapter.wuCPUTime();
+	int day =  cputime / 86400;
+	int hrs = (cputime - day*86400) / 3600;
+	int min = (cputime - (day*86400 + hrs*3600)) / 60;
+	int sec =  cputime - (day*86400 + hrs*3600 + min*60);	
+	// TODO: get rid of sprintf ;-)
+	char duration[] = "00:00:00:00";
+	sprintf(duration, "%.2i:%.2i:%.2i:%.2i", day, hrs, min, sec);
+	buffer << string(duration);	
+	m_WUCPUTime = buffer.str();
 }
