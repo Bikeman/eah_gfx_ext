@@ -1,13 +1,12 @@
 # point this to where you installed BOINC (--prefix you gave to configure, defaults to $BOINC_PREFIX)
-BOINC_PREFIX ?= /home/oliver/development/aei/boinc/bin
+BOINC_PREFIX ?= /home/oliver/development/aei/boinc
 CXX ?= g++
 
 # variables
-#LIBS = -L${BOINC_PREFIX}/lib $(shell sdl-config --libs) $(shell pkg-config --libs ftgl)
-LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -Wl,-Bdynamic -lGL -lGLU
-CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl)
+LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
+CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl) -I${BOINC_PREFIX}/include/BOINC
 DEPS = Makefile
-OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o Starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o
+OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o Starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o BOINCClientAdapter.o
 DEBUGFLAGSCPP = -pg -ggdb -O0
 RESOURCESPEC = resources
 
@@ -37,6 +36,9 @@ AbstractGraphicsEngine.o: AbstractGraphicsEngine.cpp
 	
 WindowManager.o: Makefile WindowManager.cpp
 	$(CXX) -g ${CPPFLAGS} -c WindowManager.cpp
+	
+BOINCClientAdapter.o: Makefile BOINCClientAdapter.cpp
+	$(CXX) -g ${CPPFLAGS} -c BOINCClientAdapter.cpp
 
 starlist.o: $(DEPS) starlist.C
 	$(CXX) -g ${CPPFLAGS} -c starlist.C

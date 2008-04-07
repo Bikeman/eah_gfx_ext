@@ -74,6 +74,7 @@ int main(int argc, char **argv)
 
 	// pepare rendering
 	graphics.initialize(window.windowWidth(), window.windowHeight(), fontResource);
+	graphics.refreshBOINCInformation();
 
 	// enter main event loop
 	window.eventLoop();

@@ -1,6 +1,7 @@
 #ifndef ABSTRACTGRAPHICSENGINE_H_
 #define ABSTRACTGRAPHICSENGINE_H_
 
+#include "BOINCClientAdapter.h"
 #include "Resource.h"
 
 class AbstractGraphicsEngine
@@ -15,6 +16,8 @@ public:
 	virtual void mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed) = 0;
 	virtual void mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed) = 0;
 	virtual void keyboardPressEvent(const int keyPressed) = 0;
+	
+	virtual void refreshBOINCInformation();
 	
 	enum MouseButton {
 		MouseButtonLeft = 1,
@@ -54,6 +57,8 @@ public:
 
 protected:
 	AbstractGraphicsEngine();
+	
+	BOINCClientAdapter boincAdapter;
 };
 
 #endif /*ABSTRACTGRAPHICSENGINE_H_*/

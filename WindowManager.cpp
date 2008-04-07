@@ -127,6 +127,7 @@ void WindowManager::eventLoop()
 	// be sure there's at least one observer!
 	assert(eventObservers.size() > 0);
 	
+	// set two main timers (interval in ms)
 	SDL_AddTimer(40, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
@@ -173,7 +174,8 @@ void WindowManager::eventLoop()
 		else if (event.type == SDL_USEREVENT &&
 				 event.user.code == BOINCUpdateEvent) {
 			
-			// TODO: update boinc data
+			// notify observers to fetch a BOINC update
+			eventObservers.front()->refreshBOINCInformation();
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
@@ -197,6 +199,7 @@ void WindowManager::eventLoop()
 			m_CurrentWidth = m_WindowedWidth = event.resize.w;
 			m_CurrentHeight = m_WindowedHeight = event.resize.h;
 			
+			// update video mode
 			m_DisplaySurface = SDL_SetVideoMode(
 									m_CurrentWidth,
 									m_CurrentHeight,
