@@ -57,6 +57,7 @@ private:
 	void make_obs();
 	void make_axes();
 	void make_globe();
+	void make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size);
 
 	GLfloat RAofZenith(double T, GLfloat LONdeg);
 	void sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius);
@@ -69,7 +70,7 @@ private:
 	 */
 	GLuint Axes, Stars, Constellations, Pulsars;
 	GLuint LLOmarker, LHOmarker, GEOmarker;
-	GLuint sphGrid, SNRs;
+	GLuint sphGrid, SNRs, SearchMarker;
 
 	/**
 	 * Parameters and State info:
@@ -111,16 +112,17 @@ private:
 	bool isFeature(const int features);
 
 	enum Features {
-		STARS=1,
-		CONSTELLATIONS=2,
-		OBSERVATORIES=4,
-		XRAYS=8,
-		PULSARS=16,
-		SNRS=32,
-		GLOBE=64,
-		AXES=128,
-		SEARCHINFO=256,
-		LOGO=512
+		STARS = 1,
+		CONSTELLATIONS = 2,
+		OBSERVATORIES = 4,
+		XRAYS = 8,
+		PULSARS = 16,
+		SNRS = 32,
+		GLOBE = 64,
+		AXES = 128,
+		SEARCHINFO = 256,
+		LOGO = 512,
+		MARKER = 1024
 	};
 
 	// resource handling
@@ -136,6 +138,10 @@ private:
 	string m_WUSkyPosDeclination;
 	string m_WUPercentDone;
 	string m_WUCPUTime;
+	
+	double m_CurrentRightAscension;
+	double m_CurrentDeclination;
+	bool m_RefreshSearchMarker;
 };
 
 /* Constellation & star coordinates are in starlist.C */

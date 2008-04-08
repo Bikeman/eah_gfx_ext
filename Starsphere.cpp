@@ -4,7 +4,7 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 {
 	Axes=0, Stars=0, Constellations=0, Pulsars=0;
 	LLOmarker=0, LHOmarker=0, GEOmarker=0;
-	sphGrid=0, SNRs=0;
+	sphGrid=0, SNRs=0, SearchMarker=0;
 
 	/**
 	 * Parameters and State info
@@ -30,6 +30,8 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	/* Time info */
 	gmt_offset=0.0;
 	show_gmt=true;
+	
+	m_RefreshSearchMarker = true;
 }
 
 Starsphere::~Starsphere()
@@ -335,6 +337,85 @@ void Starsphere::make_obs()
 	return;
 }
 
+void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
+{
+	GLfloat x, y;
+	GLfloat r1, r2, r3;
+	float theta;
+	int i, Nstep=20;
+
+	// r1 is inner circle, r2 is outer circle, r3 is crosshairs
+	r1 = size, r2=3*size, r3=4*size;
+	
+	// delete any existing marker, then create a new one
+	if (SearchMarker) {
+		glDeleteLists(SearchMarker, SearchMarker);
+	}
+	
+	SearchMarker = glGenLists(1);
+	glNewList(SearchMarker, GL_COMPILE);
+
+	// start gunsight drawing
+	glPushMatrix();
+	
+	glLineWidth(3.0);
+	glColor3f(1.0, 0.5, 0.0); // Orange
+	
+	// First rotate east  to the RA position around y
+	glRotatef(RAdeg, 0.0, 1.0, 0.0);
+	// Then rotate up to DEC position around z (not x)
+	glRotatef(DEdeg, 0.0, 0.0, 1.0);
+
+	// Inner circle
+	glBegin(GL_LINE_LOOP);
+	for (i=0; i<Nstep; i++) {
+		theta = i*360.0/Nstep;
+		x = r1*COS(theta);
+		y = r1*SIN(theta);
+		sphVertex(x, y);
+	}
+	glEnd();
+
+	// Outer circle
+	glBegin(GL_LINE_LOOP);
+	for (i=0; i<Nstep; i++) {
+		theta = i*360.0/Nstep;
+		x = r2*COS(theta);
+		y = r2*SIN(theta);
+		sphVertex(x, y);
+	}
+	glEnd();
+
+	// Arms that form the gunsight
+	glBegin(GL_LINES);
+	//  North arm:
+	sphVertex(0.0, +r1);
+	sphVertex(0.0, +r3);
+	//  South arm:
+	sphVertex(0.0, -r1);
+	sphVertex(0.0, -r3);
+	// East arm:
+	sphVertex(-r1, 0.0);
+	sphVertex(-r3, 0.0);
+	// West arm:
+	sphVertex(+r1, 0.0);
+	sphVertex(+r3, 0.0);
+
+	glEnd();
+	glPopMatrix();
+	
+	// searchlight line out to marker (OFF!)
+	if (false) {
+		glBegin(GL_LINES);
+		sphVertex3D(RAdeg, DEdeg, 0.50*sphRadius);
+		sphVertex3D(RAdeg, DEdeg, 0.95*sphRadius);
+		glEnd();
+	}
+	
+	glEndList();
+}
+
+
 /**
  * XYZ coordinate axes: (if we want them - most useful for testing)
  */
@@ -491,6 +572,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	setFeature(GLOBE, true);
 	setFeature(SEARCHINFO, true);
 	setFeature(LOGO, true);
+	setFeature(MARKER, true);
 
 	glDisable(GL_CLIP_PLANE0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -585,6 +667,16 @@ void Starsphere::render(const double timeOfDay)
 		glCallList(LHOmarker);
 		glCallList(GEOmarker);
 		glPopMatrix();
+	}
+	
+	if (isFeature(MARKER)) {
+		if(m_RefreshSearchMarker) {
+			make_search_marker(m_CurrentRightAscension, m_CurrentDeclination, 0.5);
+			m_RefreshSearchMarker = false;
+		}
+		else {
+			glCallList(SearchMarker);
+		}
 	}
 
 	glPopMatrix();
@@ -767,6 +859,9 @@ void Starsphere::keyboardPressEvent(const int keyPressed)
 		case KeyL:
 			setFeature(LOGO, isFeature(LOGO) ? false : true);
 			break;
+		case KeyM:
+			setFeature(MARKER, isFeature(MARKER) ? false : true);
+			break;
 		default:
 			break;
 	}	
@@ -837,13 +932,23 @@ void Starsphere::refreshBOINCInformation()
 	buffer.str("");
 
 	// store content required for our HUD (search info)
-	buffer << "Ascension: " << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2 << " deg" << ends;
-	m_WUSkyPosRightAscension = buffer.str();
-	buffer.str("");
+	if(m_CurrentRightAscension != boincAdapter.wuSkyPosRightAscension()) {
+		// we've got a new position, update search marker and HUD
+		m_CurrentRightAscension = boincAdapter.wuSkyPosRightAscension();
+		m_RefreshSearchMarker = true;
+		buffer << "Ascension: " << fixed << m_CurrentRightAscension * 360/PI2 << " deg" << ends;
+		m_WUSkyPosRightAscension = buffer.str();
+		buffer.str("");
+	}
 	
-	buffer << "Declination: " << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2 << " deg" << ends;
-	m_WUSkyPosDeclination = buffer.str();
-	buffer.str("");
+	if(m_CurrentDeclination != boincAdapter.wuSkyPosDeclination()) {
+		// we've got a new position, update search marker and HUD
+		m_CurrentDeclination = boincAdapter.wuSkyPosDeclination();
+		m_RefreshSearchMarker = true;
+		buffer << "Declination: " << fixed << m_CurrentDeclination * 360/PI2 << " deg" << ends;
+		m_WUSkyPosDeclination = buffer.str();
+		buffer.str("");
+	}
 	
 	buffer << "Completed: " << fixed << boincAdapter.wuFractionDone() * 100 << " %" << ends;
 	m_WUPercentDone = buffer.str();
