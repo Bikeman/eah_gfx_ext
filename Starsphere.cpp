@@ -647,22 +647,22 @@ void Starsphere::render(const double timeOfDay)
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("User: " + m_UserName).c_str());
+			m_PolygonFont->Render(m_UserName.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Team: " + m_TeamName).c_str());
+			m_PolygonFont->Render(m_TeamName.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Project Credit: " + m_UserCredit).c_str());
+			m_PolygonFont->Render(m_UserCredit.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Project RAC: " + m_UserRACredit).c_str());
+			m_PolygonFont->Render(m_UserRACredit.c_str());
 			
 			glPopMatrix();
 	
@@ -678,22 +678,22 @@ void Starsphere::render(const double timeOfDay)
 			glColor4f(1.0, 1.0, 1.0, 0.5);
 			glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Ascension: " + m_WUSkyPosRightAscension + " deg").c_str());
+			m_PolygonFont->Render(m_WUSkyPosRightAscension.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Declination: " + m_WUSkyPosDeclination + " deg").c_str());
+			m_PolygonFont->Render(m_WUSkyPosDeclination.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("Completed: " + m_WUPercentDone + " %").c_str());
+			m_PolygonFont->Render(m_WUPercentDone.c_str());
 
 			glLoadIdentity();
 			glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
 			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(string("CPU Time: " + m_WUCPUTime).c_str());
+			m_PolygonFont->Render(m_WUCPUTime.c_str());
 			
 			glPopMatrix();
 		}
@@ -825,40 +825,38 @@ void Starsphere::refreshBOINCInformation()
 	buffer.setf(ios::right, ios::adjustfield);
 	
 	// store content required for our HUD (user info)
-	m_UserName = boincAdapter.userName();
-	m_TeamName = boincAdapter.teamName();
+	m_UserName = "User: " + boincAdapter.userName();
+	m_TeamName = "Team: " + boincAdapter.teamName();
 	
-	buffer << fixed << boincAdapter.userCredit() << ends;
+	buffer << "Project Credit: " << fixed << boincAdapter.userCredit() << ends;
 	m_UserCredit = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.userRACredit() << ends;
+	buffer << "Project RAC: " << fixed << boincAdapter.userRACredit() << ends;
 	m_UserRACredit = buffer.str();
 	buffer.str("");
 
 	// store content required for our HUD (search info)
-	buffer << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2 << ends;
+	buffer << "Ascension: " << fixed << boincAdapter.wuSkyPosRightAscension() * 360/PI2 << " deg" << ends;
 	m_WUSkyPosRightAscension = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2 << ends;
+	buffer << "Declination: " << fixed << boincAdapter.wuSkyPosDeclination() * 360/PI2 << " deg" << ends;
 	m_WUSkyPosDeclination = buffer.str();
 	buffer.str("");
 	
-	buffer << fixed << boincAdapter.wuFractionDone() * 100 << ends;
+	buffer << "Completed: " << fixed << boincAdapter.wuFractionDone() * 100 << " %" << ends;
 	m_WUPercentDone = buffer.str();
 	buffer.str("");
 	
 	const double cputime = boincAdapter.wuCPUTime();
-	const int day =  cputime / 86400;
-	const int hrs = (cputime - day*86400) / 3600;
-	const int min = (cputime - (day*86400 + hrs*3600)) / 60;
-	const int sec =  cputime - (day*86400 + hrs*3600 + min*60);	
+	const int hrs =  cputime / 3600;
+	const int min = (cputime - hrs*3600) / 60;
+	const int sec =  cputime - (hrs*3600 + min*60);	
 
-	buffer	<< right << setw(2) << day << ":"
-			<< right << setw(2) << hrs << ":"
-			<< right << setw(2) << min << ":"
-			<< right << setw(2) << sec << ends;
+	buffer << "CPU Time: "  << right << setw(2) << hrs << ":"
+							<< right << setw(2) << min << ":"
+							<< right << setw(2) << sec << ends;
 	
 	m_WUCPUTime = buffer.str();
 }
