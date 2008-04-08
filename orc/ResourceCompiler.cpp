@@ -64,17 +64,17 @@ void ResourceCompiler::compile()
 		
 		// write code file contents (remove trailing commas)
 		string output = resourceIdentifierInitializer.str();
-		outputFile << "extern const std::string c_ResourceIdentifiers[] = {" << endl;
+		outputFile << "std::string c_ResourceIdentifiers[] = {" << endl;
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 		
 		output = resourceIndexInitializer.str();
-		outputFile << "extern const unsigned int c_ResourceIndex[][2] = {" << endl;		
+		outputFile << "unsigned int c_ResourceIndex[][2] = {" << endl;		
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 		
 		output = resourceStorageInitializer.str();
-		outputFile << "extern const unsigned char c_ResourceStorage[] = {" << endl;
+		outputFile << "unsigned char c_ResourceStorage[] = {" << endl;
 		outputFile << output.substr(0, output.length() - 1);
 		outputFile << endl << "};" << endl << endl;
 	}
