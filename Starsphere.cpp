@@ -505,14 +505,11 @@ void Starsphere::resize(const int width, const int height)
  */
 void Starsphere::initialize(const int width, const int height, const Resource *font)
 {
-	// store font resource
-	this->m_FontResource = font;
-	
 	// setup initial dimensions
 	resize(width, height);
 	
 	// create font instance using font resource (base address + size)
-	m_PolygonFont = new FTGLPolygonFont((&m_FontResource->data()->at(0)), m_FontResource->data()->size());
+	m_PolygonFont = new FTGLPolygonFont(&font->data()->at(0), font->data()->size());
 	
 	m_PolygonFont->CharMap(ft_encoding_unicode);
 //	m_PolygonFont->Depth(0.05);

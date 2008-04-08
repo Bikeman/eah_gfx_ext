@@ -124,7 +124,6 @@ private:
 	};
 
 	// resource handling
-	const Resource *m_FontResource;
 	FTFont *m_PolygonFont;
 	
 	// local HUD contents
