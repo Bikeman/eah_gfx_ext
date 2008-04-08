@@ -10,8 +10,7 @@ ResourceFactory::ResourceFactory()
 		
 		// prepare temporary buffer
 		size_t resourceSize = c_ResourceIndex[i+1][1];
-		vector<unsigned char> buffer;
-		buffer.reserve(resourceSize);
+		vector<unsigned char> buffer(resourceSize);
 
 		// extract resource data from storage container
 		for(size_t x = 0; x < resourceSize; ++x) {
@@ -20,7 +19,7 @@ ResourceFactory::ResourceFactory()
 			unsigned char byteValue = c_ResourceStorage[c_ResourceIndex[i+1][0] + x];
 			
 			// add byte to buffer
-			buffer.push_back(byteValue);
+			buffer[x] = byteValue;
 		}
 		
 		// add buffer to resource map
