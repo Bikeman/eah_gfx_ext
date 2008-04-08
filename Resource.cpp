@@ -1,7 +1,6 @@
 #include "Resource.h"
 
-Resource::Resource(const string identifier, const vector<unsigned char>& data) :
-				   m_Data(new vector<unsigned char>(data))
+Resource::Resource(const string identifier, const vector<unsigned char>& data) : m_Data(data)
 {
 	m_Identifier = identifier;
 }
@@ -17,5 +16,5 @@ string Resource::identifier() const
 
 const vector<unsigned char>* Resource::data() const
 {
-	return m_Data.get();
+	return &m_Data;
 }

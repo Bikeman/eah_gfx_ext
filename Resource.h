@@ -17,7 +17,7 @@ public:
 	
 private:
 	string m_Identifier;
-	const auto_ptr<vector<unsigned char> > m_Data;
+	const vector<unsigned char> m_Data;
 };
 
 #endif /*RESOURCE_H_*/
