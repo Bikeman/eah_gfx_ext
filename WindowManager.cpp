@@ -156,8 +156,9 @@ void WindowManager::eventLoop()
 		if (event.type == SDL_USEREVENT &&
 			event.user.code == RenderEvent) {
 			
-			static int i = 0;
 #ifdef DEBUG_VALGRIND
+			// stop after i iterations when running valgrinded
+			static int i = 0;
 			if(i < 500) {
 				i++;
 #endif
