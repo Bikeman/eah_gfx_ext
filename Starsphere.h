@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <ctime>
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -11,6 +12,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <FTGLPolygonFont.h>
+
+#include <util.h>
 
 #include "AbstractGraphicsEngine.h"
 
@@ -93,11 +96,6 @@ private:
 	GLfloat rotation_offset; // so that we can rotate sphere
 	GLfloat rotation_speed; // degrees per minute
 
-	/* Time info */
-	double obs_dtime_drawn; // dtime() when obs were drawn
-	double gmt_offset; // dtime() correction to get GMT
-	bool show_gmt; // show clock or not?
-
 	// Graphics state info:
 	float aspect;
 	
@@ -139,9 +137,14 @@ private:
 	string m_WUPercentDone;
 	string m_WUCPUTime;
 	
+	// search marker info
 	double m_CurrentRightAscension;
 	double m_CurrentDeclination;
 	bool m_RefreshSearchMarker;
+	
+	// observatory movement
+	// (in seconds since 1970 with usec precision)
+	double m_ObservatoryDrawTimeLocal;
 };
 
 /* Constellation & star coordinates are in starlist.C */

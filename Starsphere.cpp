@@ -26,10 +26,6 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 
 	rotation_offset = 0.0;
 	rotation_speed = 180.0;
-
-	/* Time info */
-	gmt_offset=0.0;
-	show_gmt=true;
 	
 	m_RefreshSearchMarker = true;
 }
@@ -224,11 +220,12 @@ void Starsphere::make_obs()
 	GLfloat arm_len_deg=3.000; // lenght of arms, in degrees (not to scale)
 	GLfloat h2=0.400; // slight offset for H2 arms
 
-	double obs_gmt_dtime; // current time in GMT to get zenith position
-
-	obs_gmt_dtime = 0.0; //FIXME: gmt_dtime();  // Current GMT time
-	obs_dtime_drawn = 0.0; //FIXME:dtime();    // dtime() not gmt_dtime(), for difference
-	gmt_offset = obs_gmt_dtime - obs_dtime_drawn; // save for GMT display
+	// get current time and UTC offset (for zenith position)
+	m_ObservatoryDrawTimeLocal = dtime();
+	time_t local = m_ObservatoryDrawTimeLocal;
+	tm *utc = gmtime(&local);
+	double utcOffset = difftime(local, mktime(utc));	
+	double observatoryDrawTimeGMT = m_ObservatoryDrawTimeLocal - utcOffset;
 
 	radius = 1.0*sphRadius; // radius of sphere on which they are drawn
 
@@ -241,7 +238,7 @@ void Starsphere::make_obs()
 	Lat= 30.56377;
 	Lon= 90.77408;
 
-	RAdeg= RAofZenith(obs_gmt_dtime, Lon);
+	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
 	if (!LLOmarker)
@@ -270,7 +267,7 @@ void Starsphere::make_obs()
 	Lat= 46.45510;
 	Lon= 119.40627;
 
-	RAdeg= RAofZenith(obs_gmt_dtime, Lon);
+	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
 	if (!LHOmarker)
@@ -312,7 +309,7 @@ void Starsphere::make_obs()
 	Lon= -9.80683;
 	arm_len_deg=1.50; // not to scale
 
-	RAdeg= RAofZenith(obs_gmt_dtime, Lon);
+	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
 	if (!GEOmarker)
@@ -501,9 +498,6 @@ void Starsphere::resize(const int width, const int height)
 	glLoadIdentity();
 	gluPerspective(95.0, aspect, 0.50, 25.0);
 	glMatrixMode(GL_MODELVIEW);
-
-	// Update in case time (zone?) change
-	gmt_offset = 2; //FIXME: gmt_dtime() - dtime(); 
 }
 
 /**
@@ -661,7 +655,7 @@ void Starsphere::render(const double timeOfDay)
 
 	if (isFeature(OBSERVATORIES)) {
 		glPushMatrix();
-		Zobs = (timeOfDay - obs_dtime_drawn) * 15.0/3600.0;
+		Zobs = (timeOfDay - m_ObservatoryDrawTimeLocal) * 15.0/3600.0;
 		glRotatef(Zobs, 0.0, 1.0, 0.0);
 		glCallList(LLOmarker);
 		glCallList(LHOmarker);

@@ -8,6 +8,8 @@
 
 #include <SDL.h>
 
+#include <util.h>
+
 #include "AbstractGraphicsEngine.h"
 
 using namespace std;

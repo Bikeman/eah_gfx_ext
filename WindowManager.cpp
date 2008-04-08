@@ -152,17 +152,17 @@ void WindowManager::eventLoop()
 
 	SDL_Event event;
 
-	static double i = 0.0;
-
 	while (SDL_WaitEvent(&event) ) {
 		if (event.type == SDL_USEREVENT &&
 			event.user.code == RenderEvent) {
 			
+			static int i = 0;
 #ifdef DEBUG_VALGRIND
-			if(i < 12.5) {
+			if(i < 500) {
+				i++;
 #endif
 				// notify our observers (currently exactly one)
-				eventObservers.front()->render(i += 0.025);
+				eventObservers.front()->render(dtime());
 #ifdef DEBUG_VALGRIND
 			}
 			else {
