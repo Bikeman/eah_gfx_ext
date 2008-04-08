@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	
-	if(fontResource->data()->size() == 0) {
+	if(fontResource->data()->size() <= 0) {
 		cerr << "Font resource could not be loaded!" << endl;
 		delete fontResource;
 		exit(1);
