@@ -911,41 +911,41 @@ void Starsphere::refreshBOINCInformation()
 	buffer.setf(ios::right, ios::adjustfield);
 	
 	// store content required for our HUD (user info)
-	m_UserName = "User: " + boincAdapter.userName();
-	m_TeamName = "Team: " + boincAdapter.teamName();
+	m_UserName = "User: " + m_BoincAdapter.userName();
+	m_TeamName = "Team: " + m_BoincAdapter.teamName();
 	
-	buffer << "Project Credit: " << fixed << boincAdapter.userCredit() << ends;
+	buffer << "Project Credit: " << fixed << m_BoincAdapter.userCredit() << ends;
 	m_UserCredit = buffer.str();
 	buffer.str("");
 	
-	buffer << "Project RAC: " << fixed << boincAdapter.userRACredit() << ends;
+	buffer << "Project RAC: " << fixed << m_BoincAdapter.userRACredit() << ends;
 	m_UserRACredit = buffer.str();
 	buffer.str("");
 
 	// store content required for our HUD (search info)
-	if(m_CurrentRightAscension != boincAdapter.wuSkyPosRightAscension()) {
+	if(m_CurrentRightAscension != m_BoincAdapter.wuSkyPosRightAscension()) {
 		// we've got a new position, update search marker and HUD
-		m_CurrentRightAscension = boincAdapter.wuSkyPosRightAscension();
+		m_CurrentRightAscension = m_BoincAdapter.wuSkyPosRightAscension();
 		m_RefreshSearchMarker = true;
 		buffer << "Ascension: " << fixed << m_CurrentRightAscension * 360/PI2 << " deg" << ends;
 		m_WUSkyPosRightAscension = buffer.str();
 		buffer.str("");
 	}
 	
-	if(m_CurrentDeclination != boincAdapter.wuSkyPosDeclination()) {
+	if(m_CurrentDeclination != m_BoincAdapter.wuSkyPosDeclination()) {
 		// we've got a new position, update search marker and HUD
-		m_CurrentDeclination = boincAdapter.wuSkyPosDeclination();
+		m_CurrentDeclination = m_BoincAdapter.wuSkyPosDeclination();
 		m_RefreshSearchMarker = true;
 		buffer << "Declination: " << fixed << m_CurrentDeclination * 360/PI2 << " deg" << ends;
 		m_WUSkyPosDeclination = buffer.str();
 		buffer.str("");
 	}
 	
-	buffer << "Completed: " << fixed << boincAdapter.wuFractionDone() * 100 << " %" << ends;
+	buffer << "Completed: " << fixed << m_BoincAdapter.wuFractionDone() * 100 << " %" << ends;
 	m_WUPercentDone = buffer.str();
 	buffer.str("");
 	
-	const double cputime = boincAdapter.wuCPUTime();
+	const double cputime = m_BoincAdapter.wuCPUTime();
 	const int hrs =  cputime / 3600;
 	const int min = (cputime - hrs*3600) / 60;
 	const int sec =  cputime - (hrs*3600 + min*60);	

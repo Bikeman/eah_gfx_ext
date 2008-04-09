@@ -1,6 +1,6 @@
 #include "AbstractGraphicsEngine.h"
 
-AbstractGraphicsEngine::AbstractGraphicsEngine() : boincAdapter() 
+AbstractGraphicsEngine::AbstractGraphicsEngine() : m_BoincAdapter() 
 {
 }
 
@@ -10,5 +10,5 @@ AbstractGraphicsEngine::~AbstractGraphicsEngine()
 
 void AbstractGraphicsEngine::refreshBOINCInformation()
 {
-	boincAdapter.refresh();
+	m_BoincAdapter.refresh();
 }
