@@ -28,11 +28,19 @@ void BOINCClientAdapter::readUserInfo()
 	boinc_get_init_data(m_UserData);
 }
 
+/**
+ * \todo This should be more flexible as the shared memory area's
+ * contents are very likely to change over time, i.e. when a new
+ * application (and/or search method) is implemented!
+ * \note We might use the factory method pattern here
+ */
 void BOINCClientAdapter::readSharedMemoryArea()
 {
+	// check if we already have a pointer
 	if(m_SharedMemoryAreaAvailable) {
 
-	  if(4 != sscanf(m_SharedMemoryArea,
+		// parse the current contents (see notes above!)
+		if(4 != sscanf(m_SharedMemoryArea,
 			  		"<graphics_info>\n"
 			  		"  <skypos_rac>%lf</skypos_rac>\n"
 			  		"  <skypos_dec>%lf</skypos_dec>\n"
@@ -42,18 +50,21 @@ void BOINCClientAdapter::readSharedMemoryArea()
 			  		&m_WUSkyPosDeclination,
 			  		&m_WUFractionDone,
 			  		&m_WUCPUTime))
-	  {		 
-		  cerr << "Incompatible shared memory data encountered!" << endl;
+		{		 
+			cerr << "Incompatible shared memory data encountered!" << endl;
 	  }
 	}
+	// the shared memory area's not available, try to get a pointer to it
 	else {
 	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(EAH_SHMEM_APP_NAME);
 	    
 	    if(m_SharedMemoryArea) {
+	    	// fine, get the contents recursively
 	        m_SharedMemoryAreaAvailable = true;
 	        readSharedMemoryArea();	        
 	    }
 	    else {
+	    	// bad luck
 	        m_SharedMemoryAreaAvailable = false;
 	    }
 	}
