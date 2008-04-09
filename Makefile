@@ -3,8 +3,8 @@ BOINC_PREFIX ?= /home/oliver/development/aei/boinc
 CXX ?= g++
 
 # variables
-LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
-CPPFLAGS = -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl) -I${BOINC_PREFIX}/include/BOINC
+LIBS = -L${BOINC_PREFIX}/lib -L${PWD}/oglft/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lftgl -lOGLFT -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
+CPPFLAGS = -DOGLFT_NO_SOLID -DOGLFT_NO_QT -I/usr/include $(shell sdl-config --cflags) $(shell pkg-config --cflags ftgl) -I${BOINC_PREFIX}/include/BOINC
 DEPS = Makefile
 OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o Starsphere.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o BOINCClientAdapter.o
 DEBUGFLAGSCPP = -pg -ggdb -O0

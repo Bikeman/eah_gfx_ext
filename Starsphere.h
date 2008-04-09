@@ -17,6 +17,8 @@
 
 #include "AbstractGraphicsEngine.h"
 
+#include "oglft/include/OGLFT.h"
+
 /* SIN and COS take arguments in DEGREES */
 #define PI 3.14159265
 #define PI2 (2*PI)
@@ -125,6 +127,7 @@ private:
 
 	// resource handling
 	FTFont *m_PolygonFont;
+	OGLFT::Outline* face;
 	
 	// local HUD contents
 	string m_UserName;

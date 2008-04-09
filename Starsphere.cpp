@@ -33,6 +33,7 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 Starsphere::~Starsphere()
 {
 	if(m_PolygonFont) delete m_PolygonFont;
+	if(face) delete face;
 }
 
 /**
@@ -511,6 +512,14 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	// create font instance using font resource (base address + size)
 	m_PolygonFont = new FTGLPolygonFont(&font->data()->at(0), font->data()->size());
 	
+//	face = new OGLFT::Outline( "LiberationSans-Regular.ttf", 6, 72 );
+	face = new OGLFT::Outline(&font->data()->at(0), font->data()->size(), 6, 72 );
+	if ( face == 0 || !face->isValid() ) {
+	     cerr << "Could not construct face" << endl;
+	}
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	face->setForegroundColor( 1., 0., 0. );
+	
 	m_PolygonFont->CharMap(ft_encoding_unicode);
 //	m_PolygonFont->Depth(0.05);
 	m_PolygonFont->FaceSize(1);
@@ -708,6 +717,7 @@ void Starsphere::render(const double timeOfDay)
 			glTranslatef(xStartPosLeft, yStartPosTop, 0);
 			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
 			m_PolygonFont->Render("Einstein@Home");
+			face->draw(0.0, -20.0, "Einstein@Home");
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
