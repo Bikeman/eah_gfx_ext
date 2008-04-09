@@ -17,8 +17,8 @@
  * The resource data is expected to be stored in these three externally linked arrays:
  * <ul>
  * 	<li>\ref c_ResourceIdentifiers</li>
-* 	<li>\ref c_ResourceIndex</li> 
-* 	<li>\ref c_ResourceStorage</li>
+ * 	<li>\ref c_ResourceIndex</li> 
+ * 	<li>\ref c_ResourceStorage</li>
  * </ul>
  * These arrays are compiled using the Open Resource Compiler (ORC) which can be found
  * in the \c orc subdirectory.
