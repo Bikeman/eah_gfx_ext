@@ -127,7 +127,7 @@ private:
 
 	// resource handling
 	FTFont *m_PolygonFont;
-	OGLFT::Outline* face;
+	OGLFT::TranslucentTexture* face;
 	
 	// local HUD contents
 	string m_UserName;

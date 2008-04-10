@@ -512,13 +512,17 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	// create font instance using font resource (base address + size)
 	m_PolygonFont = new FTGLPolygonFont(&font->data()->at(0), font->data()->size());
 	
-//	face = new OGLFT::Outline( "LiberationSans-Regular.ttf", 6, 72 );
-	face = new OGLFT::Outline(&font->data()->at(0), font->data()->size(), 6, 72 );
+	face = new OGLFT::TranslucentTexture( "LiberationSans-Regular.ttf", 17, 100 );
+//	face = new OGLFT::Outline(&font->data()->at(0), font->data()->size(), 6, 72 );
 	if ( face == 0 || !face->isValid() ) {
 	     cerr << "Could not construct face" << endl;
 	}
+#if defined( GL_RASTER_POSITION_UNCLIPPED_IBM )
+	glEnable( GL_RASTER_POSITION_UNCLIPPED_IBM );
+#endif
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	face->setForegroundColor( 1., 0., 0. );
+	face->setForegroundColor( 1.0, 1.0, 0.0, 1.0 );
+//	face->setBackgroundColor( 0.0, 0.0, 0.0, 0.0 );
 	
 	m_PolygonFont->CharMap(ft_encoding_unicode);
 //	m_PolygonFont->Depth(0.05);
@@ -715,9 +719,14 @@ void Starsphere::render(const double timeOfDay)
 			
 			glColor3f(1.0, 1.0, 0.0);
 			glTranslatef(xStartPosLeft, yStartPosTop, 0);
-			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
-			m_PolygonFont->Render("Einstein@Home");
-			face->draw(0.0, -20.0, "Einstein@Home");
+//			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
+			glScalef(0.001, 0.001, 1.0);
+//			m_PolygonFont->Render("Einstein@Home");
+			glEnable( GL_TEXTURE_2D );
+			glEnable(GL_DEPTH_TEST);
+			face->draw(0.0, -10.0, "Einstein@Home");
+			glDisable(GL_DEPTH_TEST);
+			glDisable( GL_TEXTURE_2D );
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
