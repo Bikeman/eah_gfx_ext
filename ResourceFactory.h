@@ -8,19 +8,18 @@
 #include "Resource.h"
 
 /**
- * \brief This factory instantiates Resource objects using a given identifier
+ * \brief This factory instantiates %Resource objects using a given identifier
  * 
  * During contruction of the factory object itself it loads all available resources into
  * an internal cache. The user can subsequently request a copy of this resource by specifying
  * it using the resource's identifier.
  *
  * The resource data is expected to be stored in these three externally linked arrays:
- * <ul>
- * 	<li>\ref c_ResourceIdentifiers</li>
- * 	<li>\ref c_ResourceIndex</li> 
- * 	<li>\ref c_ResourceStorage</li>
- * </ul>
- * These arrays are compiled using the Open Resource Compiler (ORC) which can be found
+ * - \ref c_ResourceIdentifiers
+ * - \ref c_ResourceIndex 
+ * - \ref c_ResourceStorage
+ *
+ * These arrays are compiled using the Open %Resource Compiler (ORC) which can be found
  * in the \c orc subdirectory.
  * 
  * \see Resource
@@ -73,12 +72,8 @@ extern const string c_ResourceIdentifiers[];
  * This two-dimensional array contains the necessary indices for
  * every resource in the storage container. Using these indices you
  * can easily extract a requested resource:
- * <ol>
- * 	<li>Offset to the resource</li>
- * 	<li>Length of the resource</li>
- * </ol> 
- * 
- * \see c_ResourceStorage
+ * -# Offset to the resource
+ * -# Length of the resource
  * 
  * \todo Does this need to be global?
  * Maybe we should wrap a class around the generated resources?
@@ -91,8 +86,6 @@ extern const unsigned int c_ResourceIndex[][2];
  * The container comprises all resources in a continuous byte sequence
  * expressed as hex values. Use the resource index to locate/retrieve
  * a specific resource from the container.
- * 
- * \see c_ResourceIndex
  * 
  * \todo Does this need to be global?
  * Maybe we should wrap a class around the generated resources?
