@@ -13,11 +13,12 @@
 #include <SDL_opengl.h>
 #include <FTGLPolygonFont.h>
 
+#include <oglft/OGLFT.h>
+
 #include <util.h>
 
 #include "AbstractGraphicsEngine.h"
 
-#include "oglft/include/OGLFT.h"
 
 /* SIN and COS take arguments in DEGREES */
 #define PI 3.14159265
