@@ -14,6 +14,7 @@
 class GraphicsEngineFactory
 {
 public:
+	/// Destructor
 	virtual ~GraphicsEngineFactory();
 	
 	/// Identifiers of supported graphics engines
@@ -44,7 +45,7 @@ public:
 	static AbstractGraphicsEngine * createInstance(Engines engine, Applications application);
 	
 private:
-	// Contructor (private since this a purely static factory)
+	/// Contructor (private since this a purely static factory)
 	GraphicsEngineFactory();
 };
 

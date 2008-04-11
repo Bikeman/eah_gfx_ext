@@ -19,7 +19,7 @@
 class AbstractGraphicsEngine
 {
 public:
-	/// Default destructor
+	/// Destructor
 	virtual ~AbstractGraphicsEngine();
 	
 	/**

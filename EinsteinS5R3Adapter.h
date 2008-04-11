@@ -21,9 +21,9 @@ class EinsteinS5R3Adapter
 {
 public:
 	/**
-	 * Constructor
+	 * \brief Constructor
 	 * 
-	 * \param boincClient Pointer to the general BOINC client adapter instance
+	 * \param boincClient Pointer to the parent BOINC client adapter instance
 	 */
 	EinsteinS5R3Adapter(BOINCClientAdapter* boincClient);
 	
@@ -69,8 +69,18 @@ public:
     double wuCPUTime() const;
     
 private:
+	
+	/**
+	 * \brief Parses science application specific information into local attributes
+	 * 
+	 * The information is usually transferred via a shared memory area
+	 * which is handled by the parent generic BOINC client adapter.
+	 * 
+	 * \see boincClient
+	 */
 	void parseApplicationInformation();
 	
+	/// Pointer to the (parent) BOINC client adapter
 	BOINCClientAdapter *boincClient;
 	
 	/// Right ascension of the currently searched sky position
