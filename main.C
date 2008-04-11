@@ -31,7 +31,8 @@
 
 #include "WindowManager.h"
 #include "ResourceFactory.h"
-#include "Starsphere.h"
+#include "AbstractGraphicsEngine.h"
+#include "GraphicsEngineFactory.h"
 
 using namespace std;
 
@@ -41,10 +42,19 @@ int main(int argc, char **argv)
 	// prepare main objects
 	WindowManager window;
 	ResourceFactory factory;
-	Starsphere graphics; 
+	AbstractGraphicsEngine *graphics = GraphicsEngineFactory::createInstance(
+											GraphicsEngineFactory::Starsphere,
+											GraphicsEngineFactory::EinsteinS5R3);
+	
+	if(!graphics) {
+		cerr << "Requested graphics engine could not be found/instantiated!" << endl;
+		exit(1);
+	}
     
     // initialize window manager 
     if(!window.initialize()) {
+    	cerr << "Window manager could not be initialized!" << endl;
+    	delete graphics;
         exit(1);
     }
     
@@ -53,11 +63,13 @@ int main(int argc, char **argv)
 	
 	if(fontResource == NULL) {
 		cerr << "Font resource could not be loaded!" << endl;
+		delete graphics;
 		exit(1);
 	}
 	
 	if(fontResource->data()->size() <= 0) {
 		cerr << "Font resource could not be loaded!" << endl;
+		delete graphics;
 		delete fontResource;
 		exit(1);
 	}
@@ -65,7 +77,7 @@ int main(int argc, char **argv)
     window.setWindowCaption("Einstein@Home");
 	
     // register starsphere as event observer
-    window.registerEventObserver(&graphics);
+    window.registerEventObserver(graphics);
 
 #ifdef NDEBUG
 	// switch to fullscreen when in release mode
@@ -73,14 +85,15 @@ int main(int argc, char **argv)
 #endif
 
 	// pepare rendering
-	graphics.initialize(window.windowWidth(), window.windowHeight(), fontResource);
-	graphics.refreshBOINCInformation();
+	graphics->initialize(window.windowWidth(), window.windowHeight(), fontResource);
+	graphics->refreshBOINCInformation();
 
 	// enter main event loop
 	window.eventLoop();
 	
 	// clean up end exit
-	window.unregisterEventObserver(&graphics);
+	window.unregisterEventObserver(graphics);
+	delete graphics;
 	delete fontResource;
 	
 	exit(0);
