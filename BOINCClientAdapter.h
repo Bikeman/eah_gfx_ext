@@ -11,16 +11,10 @@
 using namespace std;
 
 /**
- * This is the common name tag used to identify the shared memory area
- * provided by the \b Einstein\@Home application
- */
-#define EAH_SHMEM_APP_NAME "EinsteinHS"
-
-/**
- * \brief Adapter class which facilitates all communications with the BOINC client
+ * \brief Adapter class which facilitates communications with the BOINC client
  * 
- * This adapter class can be used to query the BOINC core client as well as the \b Einstein\@Home
- * application for informational data.
+ * This adapter class can be used to query the BOINC core client for information
+ * about the user and the running science application instance.
  * 
  * \author Oliver Bock\n
  * Max-Planck-Institute for Gravitational Physics\n
@@ -34,13 +28,22 @@ public:
 	
 	/// Destructor
 	virtual ~BOINCClientAdapter();
+
+	/**
+	 * \brief Initializes the BOINC client adapter instance
+	 * 
+	 * This method has to be called first, otherwise no data will be returned when requested!
+	 */
+	void initialize(string sharedMemoryIdentifier);
 	
 	/**
 	 * \brief Refreshes dynamic data (e.g. search information)
 	 * 
-	 * You want to call this method periodically to refresh any volatile client information
+	 * You want to call this method periodically to refresh any volatile client information.
+	 * Please make sure that you call initialize() first!
 	 * 	
-	 * \see AbstractGraphicsEngine::refreshBOINCInformation()
+	 * \see AbstractGraphicsEngine::refreshBOINCInformation
+	 * \see initialize
 	 */
 	void refresh();
 	
@@ -119,36 +122,14 @@ public:
     double wuFPOpsBound() const;
     double wuMemoryBound() const;
     double wuDiskBound() const;
-
-    /**
-	 * \brief Retrieves the right ascension of the currently searched sky position
-	 * 
-	 * \return The right ascension (in radians)
-	 */
-    double wuSkyPosRightAscension() const;
     
     /**
-	 * \brief Retrieves the declination of the currently searched sky position
-	 * 
-	 * \return The right ascension (in radians)
-	 */
-    double wuSkyPosDeclination() const;
-    
-    /**
-     * \brief Retrieves the completion fraction of the currently active work unit
+     * \brief Retrieves information provided by the running science application
      * 
-     * \return The completion fraction (range 0-1)
-     */    
-    double wuFractionDone() const;
-    
-    /**
-     * \brief Retrieves the amount of CPU time consumed for the currently active work unit
-     * during the active session
-     * 
-     * \return The accumulated CPU time consumed during this work unit session (in seconds)
+     * \return The application specific information string (i.e. XML)
      */
-    double wuCPUTime() const;
-	
+    string applicationInformation() const;
+
 private:
     /**
      * \brief Fetch the contents of \c init_data.xml
@@ -171,8 +152,17 @@ private:
 	 */
 	void readSharedMemoryArea();
 	
+	/// State flag which indicates whether the adapter instance is ready to be used
+	bool m_Initialized;
+	
+	/// Name tag used to identify the shared memory area provided by the \b Einstein\@Home application
+	string m_SharedMemoryAreaIdentifier;
+	
 	/// Pointer to the shared memory area
 	char *m_SharedMemoryArea;
+	
+	/// The contents of the shared memory area after the last refresh
+	string m_SharedMemoryAreaContents;
 	
 	/// Flag to indicate whether the shared memory area is available or not
 	bool m_SharedMemoryAreaAvailable;
@@ -183,18 +173,6 @@ private:
 	 * It contains initial information about the current work unit computation session.
 	 */
 	APP_INIT_DATA m_UserData;
-	
-	/// Right ascension of the currently searched sky position
-	double m_WUSkyPosRightAscension;
-	
-	/// Declination of the currently searched sky position
-	double m_WUSkyPosDeclination;
-	
-	/// The completion fraction of the active work unit
-	double m_WUFractionDone;
-	
-	/// Amount of CPU time consumed for the work unit during the active session
-	double m_WUCPUTime;
 };
 
 #endif /*BOINCCLIENTADAPTER_H_*/

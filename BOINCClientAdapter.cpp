@@ -2,24 +2,32 @@
 
 BOINCClientAdapter::BOINCClientAdapter()
 {
-	m_WUSkyPosRightAscension = 0.0;
-	m_WUSkyPosDeclination = 0.0;
-	m_WUFractionDone = 0.0;
-	m_WUCPUTime = 0.0;
-	
-    m_SharedMemoryAreaAvailable = false;
-    
-	readUserInfo();
-	readSharedMemoryArea();
+	m_Initialized = false;
+	m_SharedMemoryAreaAvailable = false;
 }
 
 BOINCClientAdapter::~BOINCClientAdapter()
 {
 }
 
+void BOINCClientAdapter::initialize(string sharedMemoryIdentifier)
+{
+	m_SharedMemoryAreaIdentifier = sharedMemoryIdentifier;
+	
+	readUserInfo();
+	readSharedMemoryArea();
+	
+	m_Initialized = true;
+}
+
 void BOINCClientAdapter::refresh()
 {
-	readSharedMemoryArea();
+	if(m_Initialized) {
+		readSharedMemoryArea();
+	}
+	else {
+		cerr << "The BOINC Client Adapter has not yet been initialized!";
+	}
 }
 
 void BOINCClientAdapter::readUserInfo()
@@ -28,35 +36,16 @@ void BOINCClientAdapter::readUserInfo()
 	boinc_get_init_data(m_UserData);
 }
 
-/**
- * \todo This should be more flexible as the shared memory area's
- * contents are very likely to change over time, i.e. when a new
- * application (and/or search method) is implemented!
- * \note We might use the factory method pattern here
- */
 void BOINCClientAdapter::readSharedMemoryArea()
 {
 	// check if we already have a pointer
 	if(m_SharedMemoryAreaAvailable) {
-
-		// parse the current contents (see notes above!)
-		if(4 != sscanf(m_SharedMemoryArea,
-			  		"<graphics_info>\n"
-			  		"  <skypos_rac>%lf</skypos_rac>\n"
-			  		"  <skypos_dec>%lf</skypos_dec>\n"
-			  		"  <fraction_done>%lf</fraction_done>\n"
-			  		"  <cpu_time>%lf</cpu_time>\n",
-			  		&m_WUSkyPosRightAscension,
-			  		&m_WUSkyPosDeclination,
-			  		&m_WUFractionDone,
-			  		&m_WUCPUTime))
-		{		 
-			cerr << "Incompatible shared memory data encountered!" << endl;
-	  }
+		// load contents
+		m_SharedMemoryAreaContents = string(m_SharedMemoryArea);
 	}
 	// the shared memory area's not available, try to get a pointer to it
 	else {
-	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(EAH_SHMEM_APP_NAME);
+	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(m_SharedMemoryAreaIdentifier.c_str());
 	    
 	    if(m_SharedMemoryArea) {
 	    	// fine, get the contents recursively
@@ -65,14 +54,22 @@ void BOINCClientAdapter::readSharedMemoryArea()
 	    }
 	    else {
 	    	// bad luck
+	    	m_SharedMemoryAreaContents = "";
 	        m_SharedMemoryAreaAvailable = false;
 	    }
 	}
 }
 
+string BOINCClientAdapter::applicationInformation() const
+{
+	return m_SharedMemoryAreaContents;
+}
+
 string BOINCClientAdapter::coreVersion() const
 {
 	stringstream buffer;
+	
+	// build common version string
 	buffer	<< m_UserData.major_version << "."
 			<< m_UserData.minor_version << "."
 			<< m_UserData.release;
@@ -148,24 +145,4 @@ double BOINCClientAdapter::wuMemoryBound() const
 double BOINCClientAdapter::wuDiskBound() const
 {
 	return m_UserData.rsc_disk_bound;
-}
-
-double BOINCClientAdapter::wuSkyPosRightAscension() const
-{
-	return m_WUSkyPosRightAscension;
-}
-
-double BOINCClientAdapter::wuSkyPosDeclination() const
-{
-	return m_WUSkyPosDeclination;
-}
-
-double BOINCClientAdapter::wuFractionDone() const
-{
-	return m_WUFractionDone;
-}
-
-double BOINCClientAdapter::wuCPUTime() const
-{
-	return m_WUCPUTime;
 }
