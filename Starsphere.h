@@ -46,9 +46,11 @@ public:
 	void render(const double timeOfDay);
 
 	// event handling
-	void mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed);
-	void mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed);
-	void keyboardPressEvent(const int keyPressed);
+	void mouseButtonEvent(const int positionX, const int positionY,
+						  const AbstractGraphicsEngine::MouseButton buttonPressed);
+	void mouseMoveEvent(const int deltaX, const int deltaY,
+						const AbstractGraphicsEngine::MouseButton buttonPressed);
+	void keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed);
 	
 	// update HUD content
 	virtual void refreshBOINCInformation();
@@ -139,9 +141,6 @@ private:
 	void zoomSphere(const int relativeZoom);
 	
 	// feature control
-	void setFeature(const int features, const bool enable);
-	bool isFeature(const int features);
-
 	enum Features {
 		STARS = 1,
 		CONSTELLATIONS = 2,
@@ -154,7 +153,10 @@ private:
 		SEARCHINFO = 256,
 		LOGO = 512,
 		MARKER = 1024
-	};
+	};	
+	
+	void setFeature(const Features features, const bool enable);
+	bool isFeature(const Features features);
 
 	// observatory movement
 	// (in seconds since 1970 with usec precision)

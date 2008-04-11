@@ -47,6 +47,17 @@ public:
 	virtual void render(const double timeOfDay) = 0;
 	
 	/**
+	 * \brief Defined mouse button identifiers
+	 * 
+	 * \see mouseButtonEvent
+	 * \see mouseMoveEvent
+	 */ 	
+	enum MouseButton {
+		MouseButtonLeft = 1,
+		MouseButtonRight = 2
+	};
+	
+	/**
 	 * \brief This method is called when the windowing system encounters a mouse button event
 	 * 
 	 * \param positionX The mouse position on the x-axis when the event occurred (range: 0-width)
@@ -56,7 +67,7 @@ public:
 	 * 
 	 * \see MouseButton
 	 */	
-	virtual void mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed) = 0;
+	virtual void mouseButtonEvent(const int positionX, const int positionY, const MouseButton buttonPressed) = 0;
 	
 	/**
 	 * \brief This method is called when the windowing system encounters a mouse move event
@@ -68,39 +79,7 @@ public:
 	 *
 	 * \see MouseButton
 	 */	
-	virtual void mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed) = 0;
-	
-	/**
-	 * \brief This method is called when the windowing system encounters a key press event
-	 * 
-	 * \attention Please note that not all key events are currently forwarded (this should be change
-	 * as soon as the need arises). Please see WindowManager::eventLoop for details.
-	 * 
-	 * \param keyPressed The keyboard key pressed. It can be identified using the elements of \ref KeyBoardKey.
-	 * 
-	 * \see KeyBoardKey
-	 * \see WindowManager::eventLoop
-	 */
-	virtual void keyboardPressEvent(const int keyPressed) = 0;
-	
-	/**
-	 * \brief This method is called when the BOINC client information should be updated
-	 * 
-	 * When you inherit from this class and override this method, please make sure you call this (base)
-	 * method anyway as it already has a default implementation which refreshes \ref m_BoincAdapter.
-	 */
-	virtual void refreshBOINCInformation();
-
-	/**
-	 * \brief Defined mouse button identifiers
-	 * 
-	 * \see mouseButtonEvent
-	 * \see mouseMoveEvent
-	 */ 	
-	enum MouseButton {
-		MouseButtonLeft = 1,
-		MouseButtonRight = 2
-	};
+	virtual void mouseMoveEvent(const int deltaX, const int deltaY, const MouseButton buttonPressed) = 0;
 	
 	/**
 	 * \brief Defined keyboard identifiers
@@ -137,6 +116,27 @@ public:
 		KeyEnter = 0x4000000,
 		KeyEscape = 0x8000000
 	};
+	
+	/**
+	 * \brief This method is called when the windowing system encounters a key press event
+	 * 
+	 * \attention Please note that not all key events are currently forwarded (this should be change
+	 * as soon as the need arises). Please see WindowManager::eventLoop for details.
+	 * 
+	 * \param keyPressed The keyboard key pressed. It can be identified using the elements of \ref KeyBoardKey.
+	 * 
+	 * \see KeyBoardKey
+	 * \see WindowManager::eventLoop
+	 */
+	virtual void keyboardPressEvent(const KeyBoardKey keyPressed) = 0;
+	
+	/**
+	 * \brief This method is called when the BOINC client information should be updated
+	 * 
+	 * When you inherit from this class and override this method, please make sure you call this (base)
+	 * method anyway as it already has a default implementation which refreshes \ref m_BoincAdapter.
+	 */
+	virtual void refreshBOINCInformation();
 
 protected:
 	/// Default constructor (protected since this is an abstract class)

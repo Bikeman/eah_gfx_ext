@@ -27,6 +27,8 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	rotation_offset = 0.0;
 	rotation_speed = 180.0;
 	
+	m_CurrentRightAscension = -1.0;
+	m_CurrentDeclination = -1.0;
 	m_RefreshSearchMarker = true;
 	
 	m_XStartPosLeft = 0.008;
@@ -758,12 +760,14 @@ void Starsphere::render(const double timeOfDay)
 	SDL_GL_SwapBuffers();
 }
 
-void Starsphere::mouseButtonEvent(const int positionX, const int positionY, const int buttonPressed)
+void Starsphere::mouseButtonEvent(const int positionX, const int positionY,
+								  const AbstractGraphicsEngine::MouseButton buttonPressed)
 {
 	
 }
 
-void Starsphere::mouseMoveEvent(const int deltaX, const int deltaY, const int buttonPressed)
+void Starsphere::mouseMoveEvent(const int deltaX, const int deltaY,
+								const AbstractGraphicsEngine::MouseButton buttonPressed)
 {
 	switch(buttonPressed) {
 		case MouseButtonLeft:
@@ -777,7 +781,7 @@ void Starsphere::mouseMoveEvent(const int deltaX, const int deltaY, const int bu
 	}
 }
 
-void Starsphere::keyboardPressEvent(const int keyPressed)
+void Starsphere::keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed)
 {
 	switch(keyPressed) {
 		case KeyS:
@@ -848,12 +852,12 @@ void Starsphere::zoomSphere(const int relativeZoom)
 /**
  * Feature control
  */
-void Starsphere::setFeature(const int feature, const bool enable)
+void Starsphere::setFeature(const Features feature, const bool enable)
 {
 	featureFlags = enable ? (featureFlags | feature) : (featureFlags & ~feature);
 }
 
-bool Starsphere::isFeature(const int feature)
+bool Starsphere::isFeature(const Features feature)
 {
 	return ((featureFlags & feature) == feature ? true : false);
 }
