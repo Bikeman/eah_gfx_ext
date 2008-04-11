@@ -28,6 +28,14 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	rotation_speed = 180.0;
 	
 	m_RefreshSearchMarker = true;
+	
+	m_XStartPosLeft = 0.008;
+	m_YStartPosTop = 0.975;
+	m_FontScaleLarge = 0.0225;
+	m_FontScaleMedium = 0.0131;
+	m_FontScaleSmall = 0.0131;
+	m_YOffsetLarge = 0.015;
+	m_YOffsetMedium = 0.015;
 }
 
 Starsphere::~Starsphere()
@@ -506,6 +514,9 @@ void Starsphere::resize(const int width, const int height)
  */
 void Starsphere::initialize(const int width, const int height, const Resource *font)
 {
+	// Initialize the BOINC client adapter
+	m_BoincAdapter.initialize("EinsteinHS");
+	
 	// setup initial dimensions
 	resize(width, height);
 	
@@ -688,17 +699,6 @@ void Starsphere::render(const double timeOfDay)
 	// draw 2D vectorized HUD
 	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
 	
-		static const GLfloat xStartPosLeft = 0.008;
-		const GLfloat xStartPosRight = 1 * aspect - 0.145;
-		static const GLfloat yStartPosTop = 0.975;
-		static const GLfloat yStartPosBottom = 0.07;
-		static const GLfloat fontScaleLarge = 0.0225;
-		static const GLfloat fontScaleMedium = 0.0131;
-		static const GLfloat fontScaleSmall = 0.0131;
-//		static const GLfloat yOffset = (font->Ascender() + font->Descender());
-		static const GLfloat yOffsetLarge = 0.015;
-		static const GLfloat yOffsetMedium = 0.015;
-
 		// disable depth testing since we're in 2D mode
 		glDisable(GL_DEPTH_TEST);
 		
@@ -718,7 +718,7 @@ void Starsphere::render(const double timeOfDay)
 			glPushMatrix();
 			
 			glColor3f(1.0, 1.0, 0.0);
-			glTranslatef(xStartPosLeft, yStartPosTop, 0);
+			glTranslatef(m_XStartPosLeft, m_YStartPosTop, 0);
 //			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
 			glScalef(0.001, 0.001, 1.0);
 //			m_PolygonFont->Render("Einstein@Home");
@@ -730,76 +730,17 @@ void Starsphere::render(const double timeOfDay)
 
 			glLoadIdentity();
 			glColor4f(1.0, 1.0, 1.0, 0.5);
-			glTranslatef(xStartPosLeft, yStartPosTop - yOffsetLarge, 0);
-			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
+			glTranslatef(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, 0);
+			glScalef(m_FontScaleMedium, m_FontScaleMedium, 1.0);
 			m_PolygonFont->Render("World Year of Physics 2005");
 			
 			glPopMatrix();
 		}
+		
 		if (isFeature(SEARCHINFO)) {
-			// left info block      
-			glPushMatrix();
-			
-			glColor3f(1.0, 1.0, 0.0);
-			glTranslatef(xStartPosLeft, yStartPosBottom, 0);
-			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
-			m_PolygonFont->Render("BOINC Statistics");
-
-			glLoadIdentity();
-			glColor4f(1.0, 1.0, 1.0, 0.5);
-			glTranslatef(xStartPosLeft, yStartPosBottom - yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_UserName.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosLeft, yStartPosBottom - 2*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_TeamName.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosLeft, yStartPosBottom - 3*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_UserCredit.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosLeft, yStartPosBottom - 4*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_UserRACredit.c_str());
-			
-			glPopMatrix();
-	
-			// right info block
-			glPushMatrix();
-			
-			glColor3f(1.0, 1.0, 0.0);
-			glTranslatef(xStartPosRight, yStartPosBottom, 0);
-			glScalef(fontScaleMedium, fontScaleMedium, 1.0);
-			m_PolygonFont->Render("Search Information");
-
-			glLoadIdentity();
-			glColor4f(1.0, 1.0, 1.0, 0.5);
-			glTranslatef(xStartPosRight, yStartPosBottom - yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_WUSkyPosRightAscension.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosRight, yStartPosBottom - 2*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_WUSkyPosDeclination.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosRight, yStartPosBottom - 3*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_WUPercentDone.c_str());
-
-			glLoadIdentity();
-			glTranslatef(xStartPosRight, yStartPosBottom - 4*yOffsetMedium, 0);
-			glScalef(fontScaleSmall, fontScaleSmall, 1.0);
-			m_PolygonFont->Render(m_WUCPUTime.c_str());
-			
-			glPopMatrix();
+			renderSearchInformation();
 		}
-	
+		
 		// restore original state
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
@@ -940,38 +881,4 @@ void Starsphere::refreshBOINCInformation()
 	buffer << "Project RAC: " << fixed << m_BoincAdapter.userRACredit() << ends;
 	m_UserRACredit = buffer.str();
 	buffer.str("");
-
-	// store content required for our HUD (search info)
-	if(m_CurrentRightAscension != m_BoincAdapter.wuSkyPosRightAscension()) {
-		// we've got a new position, update search marker and HUD
-		m_CurrentRightAscension = m_BoincAdapter.wuSkyPosRightAscension();
-		m_RefreshSearchMarker = true;
-		buffer << "Ascension: " << fixed << m_CurrentRightAscension * 360/PI2 << " deg" << ends;
-		m_WUSkyPosRightAscension = buffer.str();
-		buffer.str("");
-	}
-	
-	if(m_CurrentDeclination != m_BoincAdapter.wuSkyPosDeclination()) {
-		// we've got a new position, update search marker and HUD
-		m_CurrentDeclination = m_BoincAdapter.wuSkyPosDeclination();
-		m_RefreshSearchMarker = true;
-		buffer << "Declination: " << fixed << m_CurrentDeclination * 360/PI2 << " deg" << ends;
-		m_WUSkyPosDeclination = buffer.str();
-		buffer.str("");
-	}
-	
-	buffer << "Completed: " << fixed << m_BoincAdapter.wuFractionDone() * 100 << " %" << ends;
-	m_WUPercentDone = buffer.str();
-	buffer.str("");
-	
-	const double cputime = m_BoincAdapter.wuCPUTime();
-	const int hrs =  cputime / 3600;
-	const int min = (cputime - hrs*3600) / 60;
-	const int sec =  cputime - (hrs*3600 + min*60);	
-
-	buffer << "CPU Time: "  << right << setw(2) << hrs << ":"
-							<< right << setw(2) << min << ":"
-							<< right << setw(2) << sec << ends;
-	
-	m_WUCPUTime = buffer.str();
 }
