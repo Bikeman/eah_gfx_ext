@@ -45,7 +45,7 @@ void BOINCClientAdapter::readSharedMemoryArea()
 	}
 	// the shared memory area's not available, try to get a pointer to it
 	else {
-	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem(m_SharedMemoryAreaIdentifier.c_str());
+	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem((char*)m_SharedMemoryAreaIdentifier.c_str());
 	    
 	    if(m_SharedMemoryArea) {
 	    	// fine, get the contents recursively
