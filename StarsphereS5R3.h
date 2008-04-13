@@ -14,6 +14,8 @@ public:
 	StarsphereS5R3();
 	virtual ~StarsphereS5R3();
 	
+	void initialize(const int width, const int height, const Resource *font);
+	void resize(const int width, const int height);
 	void refreshBOINCInformation();
 	
 private:
@@ -26,8 +28,13 @@ private:
 	string m_WUPercentDone;
 	string m_WUCPUTime;
 	
+	GLfloat m_YOffsetMedium;
 	GLfloat m_XStartPosRight;
 	GLfloat m_YStartPosBottom;
+	GLfloat m_Y1StartPosBottom;
+	GLfloat m_Y2StartPosBottom;
+	GLfloat m_Y3StartPosBottom;
+	GLfloat m_Y4StartPosBottom;
 };
 
 #endif /*STARSPHERES5R3_H_*/

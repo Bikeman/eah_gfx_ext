@@ -30,20 +30,14 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	m_CurrentRightAscension = -1.0;
 	m_CurrentDeclination = -1.0;
 	m_RefreshSearchMarker = true;
-	
-	m_XStartPosLeft = 0.008;
-	m_YStartPosTop = 0.975;
-	m_FontScaleLarge = 0.0225;
-	m_FontScaleMedium = 0.0131;
-	m_FontScaleSmall = 0.0131;
-	m_YOffsetLarge = 0.015;
-	m_YOffsetMedium = 0.015;
 }
 
 Starsphere::~Starsphere()
 {
-	if(m_PolygonFont) delete m_PolygonFont;
-	if(face) delete face;
+	if(m_FontLogo1) delete m_FontLogo1;
+	if(m_FontLogo2) delete m_FontLogo2;
+	if(m_FontHeader) delete m_FontHeader;
+	if(m_FontText) delete m_FontText;
 }
 
 /**
@@ -499,12 +493,16 @@ void Starsphere::make_globe()
  */
 void Starsphere::resize(const int width, const int height)
 {
-
+	// store current settings
+	m_CurrentWidth = width;
+	m_CurrentHeight = height;
+	aspect = (float)width / (float)height;
+	
+	// adjust HUD config
+	m_YStartPosTop = height - 25;
+	
 	/* Adjust aspect ratio and projection */
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-
-	aspect = (float)width / (float)height;
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(95.0, aspect, 0.50, 25.0);
@@ -522,25 +520,48 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	// setup initial dimensions
 	resize(width, height);
 	
-	// create font instance using font resource (base address + size)
-	m_PolygonFont = new FTGLPolygonFont(&font->data()->at(0), font->data()->size());
-	
-	face = new OGLFT::TranslucentTexture( "LiberationSans-Regular.ttf", 17, 100 );
-//	face = new OGLFT::Outline(&font->data()->at(0), font->data()->size(), 6, 72 );
-	if ( face == 0 || !face->isValid() ) {
-	     cerr << "Could not construct face" << endl;
+	// create large font instances using font resource (base address + size)
+	m_FontLogo1 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 24, 72 );
+	if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
+	     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
+	     return;
 	}
+	m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+	
+	// create medium font instances using font resource (base address + size)
+	m_FontLogo2 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
+	if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
+	     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
+	     return;
+	}
+	m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+	
+	// create medium font instances using font resource (base address + size)
+	m_FontHeader = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
+	if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
+	     cerr << "Could not construct header font face from in memory resource!" << endl;
+	     return;
+	}
+	m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+		
+	// create small font instances using font resource (base address + size)
+	m_FontText = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 11, 72 );	
+	if ( m_FontText == 0 || !m_FontText->isValid() ) {
+	     cerr << "Could not construct text font face from in memory resource!" << endl;
+	     return;
+	}
+	m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+
+	// more font setup and optimizations
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 #if defined( GL_RASTER_POSITION_UNCLIPPED_IBM )
 	glEnable( GL_RASTER_POSITION_UNCLIPPED_IBM );
 #endif
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-	face->setForegroundColor( 1.0, 1.0, 0.0, 1.0 );
-//	face->setBackgroundColor( 0.0, 0.0, 0.0, 0.0 );
 	
-	m_PolygonFont->CharMap(ft_encoding_unicode);
-//	m_PolygonFont->Depth(0.05);
-	m_PolygonFont->FaceSize(1);
-
+	// inital HUD offset setup
+	m_XStartPosLeft = 5;
+	m_YOffsetLarge = 18;
+		
 	// Drawing setup:
 	glClearColor(0.0, 0.0, 0.0, 0.0); // background is black
 	glEnable(GL_CULL_FACE);
@@ -704,39 +725,21 @@ void Starsphere::render(const double timeOfDay)
 		// disable depth testing since we're in 2D mode
 		glDisable(GL_DEPTH_TEST);
 		
-		// enable FSAA
-		glEnable(GL_MULTISAMPLE_ARB);
+		// enable textured fonts
+		glEnable(GL_TEXTURE_2D);
 		
 		// save current state
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
-		glOrtho(0, 1 * aspect, 0, 1, -1, 1);
+		glOrtho(0, m_CurrentWidth, 0, m_CurrentHeight, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
 	
 		if (isFeature(LOGO)) {
-			glPushMatrix();
-			
-			glColor3f(1.0, 1.0, 0.0);
-			glTranslatef(m_XStartPosLeft, m_YStartPosTop, 0);
-//			glScalef(fontScaleLarge, fontScaleLarge, 1.0);
-			glScalef(0.001, 0.001, 1.0);
-//			m_PolygonFont->Render("Einstein@Home");
-			glEnable( GL_TEXTURE_2D );
-			glEnable(GL_DEPTH_TEST);
-			face->draw(0.0, -10.0, "Einstein@Home");
-			glDisable(GL_DEPTH_TEST);
-			glDisable( GL_TEXTURE_2D );
-
-			glLoadIdentity();
-			glColor4f(1.0, 1.0, 1.0, 0.5);
-			glTranslatef(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, 0);
-			glScalef(m_FontScaleMedium, m_FontScaleMedium, 1.0);
-			m_PolygonFont->Render("World Year of Physics 2005");
-			
-			glPopMatrix();
+			m_FontLogo1->draw(m_XStartPosLeft, m_YStartPosTop, "Einstein@Home");
+			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "World Year of Physics 2005");
 		}
 		
 		if (isFeature(SEARCHINFO)) {
@@ -749,8 +752,8 @@ void Starsphere::render(const double timeOfDay)
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
 		
-		// disable FSAA
-		glDisable(GL_MULTISAMPLE_ARB);
+		// disable font textures
+		glDisable(GL_TEXTURE_2D);
 		
 		// enable depth testing since we're leaving 2D mode
 		glEnable(GL_DEPTH_TEST);

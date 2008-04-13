@@ -11,7 +11,6 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <FTGLPolygonFont.h>
 
 #include <oglft/OGLFT.h>
 
@@ -42,8 +41,8 @@ public:
 	virtual ~Starsphere();
 
 	// core methods
-	void initialize(const int width, const int height, const Resource *font);
-	void resize(const int width, const int height);
+	virtual void initialize(const int width, const int height, const Resource *font);
+	virtual void resize(const int width, const int height);
 	void render(const double timeOfDay);
 
 	// event handling
@@ -62,20 +61,20 @@ protected:
 	
 
 	// resource handling
-	FTFont *m_PolygonFont;
-	OGLFT::TranslucentTexture* face;
+	OGLFT::TranslucentTexture* m_FontLogo1;
+	OGLFT::TranslucentTexture* m_FontLogo2;
+	OGLFT::TranslucentTexture* m_FontHeader;
+	OGLFT::TranslucentTexture* m_FontText;
 	
 	// Graphics state info:
+	int m_CurrentWidth;
+	int m_CurrentHeight;
 	float aspect;
 	
 	// HUD text rendering config (maybe overridden in subclasses)
 	GLfloat m_XStartPosLeft;
 	GLfloat m_YStartPosTop;
-	GLfloat m_FontScaleLarge;
-	GLfloat m_FontScaleMedium;
-	GLfloat m_FontScaleSmall;
 	GLfloat m_YOffsetLarge;
-	GLfloat m_YOffsetMedium;
 	
 	// local HUD contents
 	string m_UserName;

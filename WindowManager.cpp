@@ -96,11 +96,8 @@ bool WindowManager::initialize(const int width, const int height)
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-
-	// 4x FSAA, might be too heavy for some machines :-)
-	// TODO: should be controlled with config values (coupled to disabling text rendering?)
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	//SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 
 	// we always start in windowed mode
 	// (starting in fullscreen fails with high CPU load!)

@@ -1,12 +1,33 @@
 #include "StarsphereS5R3.h"
 
-StarsphereS5R3::StarsphereS5R3() : m_EinsteinAdapter(&m_BoincAdapter)
+StarsphereS5R3::StarsphereS5R3() : Starsphere(), m_EinsteinAdapter(&m_BoincAdapter)
 {
-	m_YStartPosBottom = 0.07;
 }
 
 StarsphereS5R3::~StarsphereS5R3()
 {
+}
+
+void StarsphereS5R3::initialize(const int width, const int height, const Resource *font)
+{
+	Starsphere::initialize(width, height, font);
+	
+	// adjust HUD config
+	m_YOffsetMedium = 15;
+	m_XStartPosRight = width - 125;
+	m_YStartPosBottom = 70;	
+	m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
+	m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
+	m_Y3StartPosBottom = m_Y2StartPosBottom - m_YOffsetMedium;
+	m_Y4StartPosBottom = m_Y3StartPosBottom - m_YOffsetMedium;
+}
+
+void StarsphereS5R3::resize(const int width, const int height)
+{
+	Starsphere::resize(width, height);
+	
+	// adjust HUD config
+	m_XStartPosRight = width - 125;
 }
 
 void StarsphereS5R3::refreshBOINCInformation()
@@ -57,67 +78,17 @@ void StarsphereS5R3::refreshBOINCInformation()
 
 void StarsphereS5R3::renderSearchInformation()
 {
-		m_XStartPosRight = 1 * aspect - 0.145;
-	
 		// left info block      
-		glPushMatrix();
+		m_FontHeader->draw(m_XStartPosLeft, m_YStartPosBottom, "BOINC Statistics");
+		m_FontText->draw(m_XStartPosLeft, m_Y1StartPosBottom, m_UserName.c_str());
+		m_FontText->draw(m_XStartPosLeft, m_Y2StartPosBottom, m_TeamName.c_str());
+		m_FontText->draw(m_XStartPosLeft, m_Y3StartPosBottom, m_UserCredit.c_str());
+		m_FontText->draw(m_XStartPosLeft, m_Y4StartPosBottom, m_UserRACredit.c_str());
 		
-		glColor3f(1.0, 1.0, 0.0);
-		glTranslatef(m_XStartPosLeft, m_YStartPosBottom, 0);
-		glScalef(m_FontScaleMedium, m_FontScaleMedium, 1.0);
-		m_PolygonFont->Render("BOINC Statistics");
-	
-		glLoadIdentity();
-		glColor4f(1.0, 1.0, 1.0, 0.5);
-		glTranslatef(m_XStartPosLeft, m_YStartPosBottom - m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_UserName.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosLeft, m_YStartPosBottom - 2*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_TeamName.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosLeft, m_YStartPosBottom - 3*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_UserCredit.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosLeft, m_YStartPosBottom - 4*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_UserRACredit.c_str());
-		
-		glPopMatrix();
-	
 		// right info block
-		glPushMatrix();
-		
-		glColor3f(1.0, 1.0, 0.0);
-		glTranslatef(m_XStartPosRight, m_YStartPosBottom, 0);
-		glScalef(m_FontScaleMedium, m_FontScaleMedium, 1.0);
-		m_PolygonFont->Render("Search Information");
-	
-		glLoadIdentity();
-		glColor4f(1.0, 1.0, 1.0, 0.5);
-		glTranslatef(m_XStartPosRight, m_YStartPosBottom - m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_WUSkyPosRightAscension.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosRight, m_YStartPosBottom - 2*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_WUSkyPosDeclination.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosRight, m_YStartPosBottom - 3*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_WUPercentDone.c_str());
-	
-		glLoadIdentity();
-		glTranslatef(m_XStartPosRight, m_YStartPosBottom - 4*m_YOffsetMedium, 0);
-		glScalef(m_FontScaleSmall, m_FontScaleSmall, 1.0);
-		m_PolygonFont->Render(m_WUCPUTime.c_str());
-		
-		glPopMatrix();
+		m_FontHeader->draw(m_XStartPosRight, m_YStartPosBottom, "Search Information");
+		m_FontText->draw(m_XStartPosRight, m_Y1StartPosBottom, m_WUSkyPosRightAscension.c_str());
+		m_FontText->draw(m_XStartPosRight, m_Y2StartPosBottom, m_WUSkyPosDeclination.c_str());
+		m_FontText->draw(m_XStartPosRight, m_Y3StartPosBottom, m_WUPercentDone.c_str());
+		m_FontText->draw(m_XStartPosRight, m_Y4StartPosBottom, m_WUCPUTime.c_str());
 }
