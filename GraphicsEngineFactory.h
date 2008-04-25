@@ -28,7 +28,7 @@ public:
 	};
 	
 	/**
-	 * \brief Instaniates a new graphics engine
+	 * \brief Instantiates a new graphics engine
 	 * 
 	 * Use this method to create a new grahics engine instance. However, please make
 	 * that you use only sensible combinations of \c engine and \c application (you

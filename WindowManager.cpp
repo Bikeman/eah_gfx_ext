@@ -124,7 +124,8 @@ void WindowManager::eventLoop()
 	// be sure there's at least one observer!
 	assert(eventObservers.size() > 0);
 	
-	// set two main timers (interval in ms)
+	// TODO: make interval setting available to the outside
+	// set two main timers (interval in ms)	
 	SDL_AddTimer(40, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
