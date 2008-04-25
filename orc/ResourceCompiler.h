@@ -33,6 +33,10 @@ using namespace std;
  * \see ResourceFactory::c_ResourceIdentifiers
  * \see ResourceFactory::c_ResourceIndex
  * \see ResourceFactory::c_ResourceStorage
+ * 
+ * \author Oliver Bock\n
+ * Max-Planck-Institute for Gravitational Physics\n
+ * Hannover, Germany
  */
 class ResourceCompiler
 {
