@@ -35,13 +35,51 @@
 
 using namespace std;
 
+
+/**
+ * \brief %Starsphere rendering engine for \b Einstein\@Home
+ * 
+ * This class comprises the generic parts of the %Starsphere rendering engine.
+ * %Starsphere displays the celestial sphere indicating a fixed set of stars with
+ * their constellations as well as known pulsars and supernova remnants. Apart from
+ * that the four main gravitational wave observatory locations are shown at their actual
+ * real-time position. Furthermore a head-up display (HUD) shows relevant BOINC
+ * statistics as well as information on the current workunit (WU) being processed.
+ * 
+ * For more details please refer to http://einstein.phys.uwm.edu/starsphere.php
+ * 
+ * Note: all science run specific parts are implemented in specialized subclasses
+ * of this engine.
+ * 
+ * \todo The code of this implementaion is based on the former version of %Starsphere
+ * by Bruce Allen, David Hammer and Eric Myers. Due to this there's still
+ * some refactoring and code cleanup left to be done.
+ * 
+ * \author Oliver Bock\n
+ * Max-Planck-Institute for Gravitational Physics\n
+ * Hannover, Germany
+ */
 class Starsphere : public AbstractGraphicsEngine
 {
 public:
+	/// Destructor
 	virtual ~Starsphere();
 
-	// core methods
+	/**
+	 * \brief This method is called to initialize the engine
+	 * 
+	 * \param width The current width of the display surface
+	 * \param height The current height of the display surface
+	 * \param font A pointer to a Resource object containing TTF font faces for text rendering 
+	 */
 	virtual void initialize(const int width, const int height, const Resource *font);
+	
+	/**
+	 * \brief This method is called when the windowing system encounters a window resize event
+	 * 
+	 * \param width The new width of the display surface
+	 * \param height The new height of the display surface
+	 */
 	virtual void resize(const int width, const int height);
 	void render(const double timeOfDay);
 
@@ -52,12 +90,29 @@ public:
 						const AbstractGraphicsEngine::MouseButton buttonPressed);
 	void keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed);
 	
-	// update HUD content
+	/**
+	 * \brief This method is called when the BOINC client information should be updated
+	 */
 	virtual void refreshBOINCInformation();
 	
 protected:
-	/// Contructor (protected since this an abstract class)	
+	/**
+	 * \brief Default contructor
+	 * 
+	 * The constructor is protected since this an abstract class.
+	 */	
 	Starsphere();
+	
+	/**
+	 * \brief Render science run specific search information
+	 * 
+	 * This abtract method is to be defined by derived classes implementing
+	 * the science run specific search information handling and rendering.
+	 * 
+	 * Note: for this engine this also includes the "BOINC Statistics"
+	 * as it is top-aligned to the "Search Information".
+	 */
+	virtual void renderSearchInformation() = 0;
 	
 
 	// resource handling
@@ -107,7 +162,7 @@ private:
 	 * (someday the keyboard can be used to turn display of items on/off)
 	 */
 	GLuint Axes, Stars, Constellations, Pulsars;
-	GLuint LLOmarker, LHOmarker, GEOmarker;
+	GLuint LLOmarker, LHOmarker, GEOmarker, VIRGOmarker;
 	GLuint sphGrid, SNRs, SearchMarker;
 
 	/**
@@ -132,9 +187,6 @@ private:
 	GLfloat rotation_speed; // degrees per minute
 
 	//------------ new clean members -----
-	
-	// application specific rendering
-	virtual void renderSearchInformation() = 0;
 	
 	// view control
 	void rotateSphere(const int relativeRotation, const int relativeElevation);

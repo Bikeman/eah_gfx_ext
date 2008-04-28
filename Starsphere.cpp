@@ -3,7 +3,7 @@
 Starsphere::Starsphere() : AbstractGraphicsEngine()
 {
 	Axes=0, Stars=0, Constellations=0, Pulsars=0;
-	LLOmarker=0, LHOmarker=0, GEOmarker=0;
+	LLOmarker=0, LHOmarker=0, GEOmarker=0, VIRGOmarker=0;
 	sphGrid=0, SNRs=0, SearchMarker=0;
 
 	/**
@@ -252,16 +252,16 @@ void Starsphere::make_obs()
 	glColor3f(0.0, 1.0, 0.0);
 	glLineWidth(lineSize);
 	glBegin(GL_LINE_STRIP);
-	//  North/South arm:
-	sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
-	sphVertex3D(RAdeg, DEdeg, radius);
-	// East/West arm:
-	sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+		//  North/South arm:
+		sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
+		// East/West arm:
+		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
 	glEnd();
 	// arm joint H2
 	glPointSize((GLfloat) lineSize);
 	glBegin(GL_POINTS);
-	sphVertex3D(RAdeg, DEdeg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
 	glEnd();
 	glEndList();
 
@@ -281,28 +281,28 @@ void Starsphere::make_obs()
 	glColor3f(0.0, 0.0, 1.0);
 	glLineWidth(lineSize);
 	glBegin(GL_LINE_STRIP);
-	// North/South arm:
-	sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-	sphVertex3D(RAdeg, DEdeg, radius);
-	// East/West arm:
-	sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+		// North/South arm:
+		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
+		// East/West arm:
+		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
 	glEnd();
 	glBegin(GL_LINE_STRIP);
-	// North/South arm, H2:
-	sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
-	sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
-	// East/West arm, H2;
-	sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
+		// North/South arm, H2:
+		sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
+		sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+		// East/West arm, H2;
+		sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
 	glEnd();
 	// arm joint H1
 	glPointSize((GLfloat) lineSize);
 	glBegin(GL_POINTS);
-	sphVertex3D(RAdeg, DEdeg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
 	glEnd();
 	// arm joint H2
 	glPointSize((GLfloat) lineSize);
 	glBegin(GL_POINTS);
-	sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+		sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
 	glEnd();
 	glEndList();
 
@@ -323,16 +323,46 @@ void Starsphere::make_obs()
 	glColor3f(1.0, 0.0, 0.0);
 	glLineWidth(lineSize);
 	glBegin(GL_LINE_STRIP);
-	// North/South arm:
-	sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-	sphVertex3D(RAdeg, DEdeg, radius);
-	// West/East arm:
-	sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
+		// North/South arm:
+		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
+		// West/East arm:
+		sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
 	glEnd();
 	// arm joint
 	glPointSize((GLfloat) lineSize);
 	glBegin(GL_POINTS);
-	sphVertex3D(RAdeg, DEdeg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
+	glEnd();
+	glEndList();
+	
+	/**
+	 *  VIRGO Interferometer:
+	 */
+
+	Lat= 43.63139;
+	Lon= -10.505;
+	arm_len_deg=3.000; // not to scale
+
+	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
+	DEdeg= Lat;
+
+	if (!VIRGOmarker)
+		VIRGOmarker = glGenLists(1);
+	glNewList(VIRGOmarker, GL_COMPILE);
+	glColor3f(1.0, 1.0, 1.0);
+	glLineWidth(lineSize);
+	glBegin(GL_LINE_STRIP);
+		// North/South arm:
+		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+		sphVertex3D(RAdeg, DEdeg, radius);
+		// West/East arm:
+		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+	glEnd();
+	// arm joint
+	glPointSize((GLfloat) lineSize);
+	glBegin(GL_POINTS);
+		sphVertex3D(RAdeg, DEdeg, radius);
 	glEnd();
 	glEndList();
 
@@ -704,6 +734,7 @@ void Starsphere::render(const double timeOfDay)
 		glCallList(LLOmarker);
 		glCallList(LHOmarker);
 		glCallList(GEOmarker);
+		glCallList(VIRGOmarker);
 		glPopMatrix();
 	}
 	
