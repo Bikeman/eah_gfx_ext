@@ -139,7 +139,11 @@ public:
 	virtual void refreshBOINCInformation();
 
 protected:
-	/// Default constructor (protected since this is an abstract class)
+	/**
+	 * \brief Default constructor
+	 * 
+	 * The constructor is protected since this is an abstract class.
+	 */
 	AbstractGraphicsEngine();
 	
 	/// BOINC client adapter instance for information retrieval
