@@ -216,15 +216,15 @@ private:
 };
 
 /* Constellation & star coordinates are in starlist.C */
-extern float star_info[][2];
-extern int Nstars;
+extern "C" float star_info[][2];
+extern "C" int Nstars;
 
 /* Pulsar coordinates are in pulsar_list.C */
-extern float pulsar_info[][2];
-extern int Npulsars;
+extern "C" float pulsar_info[][2];
+extern "C" int Npulsars;
 
 /* SNR coordinates are in snr_list.C */
-extern float SNR_info[][2];
-extern int NSNRs;
+extern "C" float SNR_info[][2];
+extern "C" int NSNRs;
 
 #endif /*STARSPHERE_H_*/

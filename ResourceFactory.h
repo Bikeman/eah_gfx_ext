@@ -64,7 +64,7 @@ private:
  * \todo Does this need to be global?
  * Maybe we should wrap a class around the generated resources?
  */
-extern const string c_ResourceIdentifiers[];
+extern "C++" const string c_ResourceIdentifiers[];
 
 /**
  * \brief Declaration of the external list of resource indices
@@ -78,7 +78,7 @@ extern const string c_ResourceIdentifiers[];
  * \todo Does this need to be global?
  * Maybe we should wrap a class around the generated resources?
  */
-extern const unsigned int c_ResourceIndex[][2];
+extern "C++" const unsigned int c_ResourceIndex[][2];
 
 /**
  * \brief Declaration of the external resource storage container
@@ -90,6 +90,6 @@ extern const unsigned int c_ResourceIndex[][2];
  * \todo Does this need to be global?
  * Maybe we should wrap a class around the generated resources?
  */
-extern const unsigned char c_ResourceStorage[];
+extern "C++" const unsigned char c_ResourceStorage[];
 
 #endif /*RESOURCEFACTORY_H_*/
