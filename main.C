@@ -27,14 +27,11 @@
  */
 
 #include <iostream>
-#include <stdexcept>
 
 #include "WindowManager.h"
 #include "ResourceFactory.h"
 #include "AbstractGraphicsEngine.h"
 #include "GraphicsEngineFactory.h"
-
-using namespace std;
 
 
 int main(int argc, char **argv)
