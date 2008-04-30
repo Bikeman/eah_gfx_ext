@@ -3,8 +3,6 @@
  *  THIS FILE WAS MACHINE GENERATED on Wed Oct 13 14:28:28 EDT 2004
  *
  *****************************************************************************/
-static volatile const char *CVSfileVersion= "$Id$";
-
 
 #define N_PULSAR_ITEMS 2
 
