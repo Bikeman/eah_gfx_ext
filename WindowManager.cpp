@@ -173,7 +173,7 @@ void WindowManager::eventLoop()
 		else if (event.type == SDL_USEREVENT &&
 				 event.user.code == BOINCUpdateEvent) {
 			
-			// notify observers to fetch a BOINC update
+			// notify observers (currently exactly one) to fetch a BOINC update
 			eventObservers.front()->refreshBOINCInformation();
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
