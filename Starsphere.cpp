@@ -379,9 +379,9 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 	// r1 is inner circle, r2 is outer circle, r3 is crosshairs
 	r1 = size, r2=3*size, r3=4*size;
 	
-	// delete any existing marker, then create a new one
+	// delete existing marker, then create a new one
 	if (SearchMarker) {
-		glDeleteLists(SearchMarker, SearchMarker);
+		glDeleteLists(SearchMarker, 1);
 	}
 	
 	SearchMarker = glGenLists(1);
@@ -432,8 +432,8 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 	// West arm:
 	sphVertex(+r1, 0.0);
 	sphVertex(+r3, 0.0);
-
 	glEnd();
+	
 	glPopMatrix();
 	
 	// searchlight line out to marker (OFF!)
@@ -896,10 +896,10 @@ bool Starsphere::isFeature(const Features feature)
 	return ((featureFlags & feature) == feature ? true : false);
 }
 
-void Starsphere::refreshBOINCInformation()
+void Starsphere::refreshLocalBOINCInformation()
 {
 	// call base class implementation
-	AbstractGraphicsEngine::refreshBOINCInformation();
+	AbstractGraphicsEngine::refreshLocalBOINCInformation();
 	
 	// prepare conversion buffer
 	stringstream buffer;

@@ -32,7 +32,11 @@ void StarsphereS5R3::resize(const int width, const int height)
 
 void StarsphereS5R3::refreshBOINCInformation()
 {
-	Starsphere::refreshBOINCInformation();
+	// call base class implementation
+	Starsphere::refreshLocalBOINCInformation();
+	
+	// update local/specific content
+	m_EinsteinAdapter.refresh();
 	
 	// prepare conversion buffer
 	stringstream buffer;

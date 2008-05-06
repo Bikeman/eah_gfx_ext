@@ -23,7 +23,10 @@ void BOINCClientAdapter::initialize(string sharedMemoryIdentifier)
 void BOINCClientAdapter::refresh()
 {
 	if(m_Initialized) {
+		readUserInfo();
 		readSharedMemoryArea();
+		
+		/// \todo Check that we're still watching our own WU (or science app)! 
 	}
 	else {
 		cerr << "The BOINC Client Adapter has not yet been initialized!";

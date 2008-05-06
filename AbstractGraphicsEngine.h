@@ -133,10 +133,13 @@ public:
 	/**
 	 * \brief This method is called when the BOINC client information should be updated
 	 * 
-	 * When you inherit from this class and override this method, please make sure you call this (base)
-	 * method anyway as it already has a default implementation which refreshes \ref m_BoincAdapter.
+	 * When you inherit from this class and implement this method, please make sure you call
+	 * \ref refreshLocalBOINCInformation() to invoke the generic default implementation which
+	 * refreshes \ref m_BoincAdapter.
+	 * 
+	 * \see refreshLocalBOINCInformation()
 	 */
-	virtual void refreshBOINCInformation();
+	virtual void refreshBOINCInformation() = 0;
 
 protected:
 	/**
@@ -145,6 +148,15 @@ protected:
 	 * The constructor is protected since this is an abstract class.
 	 */
 	AbstractGraphicsEngine();
+
+	/**
+	 * \brief This method has to be called in order to update the BOINC client information
+	 * 
+	 * This is the local/generic implementation which refreshes \ref m_BoincAdapter.
+	 * 
+	 * \see refreshBOINCInformation()
+	 */
+	virtual void refreshLocalBOINCInformation();
 	
 	/// BOINC client adapter instance for information retrieval
 	BOINCClientAdapter m_BoincAdapter;

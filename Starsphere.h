@@ -90,11 +90,6 @@ public:
 						const AbstractGraphicsEngine::MouseButton buttonPressed);
 	void keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed);
 	
-	/**
-	 * \brief This method is called when the BOINC client information should be updated
-	 */
-	virtual void refreshBOINCInformation();
-	
 protected:
 	/**
 	 * \brief Default contructor
@@ -114,7 +109,17 @@ protected:
 	 */
 	virtual void renderSearchInformation() = 0;
 	
-
+	/**
+	 * \brief This method has to be called in order to update the BOINC client information
+	 * 
+	 * This is the local/generic implementation which calls
+	 * AbstractGraphicsEngine::refreshLocalBOINCInformation() first and
+	 * refreshes the "BOINC Statistics" afterwards.
+	 * 
+	 * \see AbstractGraphicsEngine::refreshLocalBOINCInformation()
+	 */
+	virtual void refreshLocalBOINCInformation();
+	
 	// resource handling
 	OGLFT::TranslucentTexture* m_FontLogo1;
 	OGLFT::TranslucentTexture* m_FontLogo2;

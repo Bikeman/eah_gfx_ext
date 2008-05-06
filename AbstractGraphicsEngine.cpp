@@ -8,7 +8,7 @@ AbstractGraphicsEngine::~AbstractGraphicsEngine()
 {
 }
 
-void AbstractGraphicsEngine::refreshBOINCInformation()
+void AbstractGraphicsEngine::refreshLocalBOINCInformation()
 {
 	m_BoincAdapter.refresh();
 }

@@ -57,8 +57,12 @@ public:
 	/**
 	 * \brief This method is called when the BOINC client information should be updated
 	 * 
-	 * As this method overrides its parent's implementation, it calls Starsphere::refreshBOINCInformation()
-	 * first in order to "add" the sepcialized parts afterwards.
+	 * This method implements AbstractGraphicsEngine::refreshBOINCInformation() and calls
+	 * Starsphere::refreshLocalBOINCInformation() first and "adds" the sepcialized
+	 * parts afterwards.
+	 * 
+	 * \see AbstractGraphicsEngine::refreshBOINCInformation()
+	 * \see Starsphere::refreshLocalBOINCInformation()
 	 */
 	void refreshBOINCInformation();
 	
