@@ -76,14 +76,14 @@ int main(int argc, char **argv)
     // register starsphere as event observer
     window.registerEventObserver(graphics);
 
-#ifdef NDEBUG
-	// switch to fullscreen when in release mode
-	window.toggleFullscreen();
-#endif
-
 	// pepare rendering
 	graphics->initialize(window.windowWidth(), window.windowHeight(), fontResource);
 	graphics->refreshBOINCInformation();
+	
+#ifdef NDEBUG
+	// switch to fullscreen when in release mode (on windoze: after init!)
+	window.toggleFullscreen();
+#endif
 
 	// enter main event loop
 	window.eventLoop();

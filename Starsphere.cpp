@@ -2,6 +2,12 @@
 
 Starsphere::Starsphere() : AbstractGraphicsEngine()
 {
+	m_FontResource = 0;
+	m_FontLogo1 = 0;
+	m_FontLogo2 = 0;
+	m_FontHeader = 0;
+	m_FontText = 0;
+	
 	Axes=0, Stars=0, Constellations=0, Pulsars=0;
 	LLOmarker=0, LHOmarker=0, GEOmarker=0, VIRGOmarker=0;
 	sphGrid=0, SNRs=0, SearchMarker=0;
@@ -547,40 +553,11 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	// check whether we initialize the first time or have to recycle (required for windoze)
 	if(!recycle) {
 		
+		// store the font resource
+		if(font) m_FontResource = font;
+		
 		// Initialize the BOINC client adapter
 		m_BoincAdapter.initialize("EinsteinHS");
-		
-		// create large font instances using font resource (base address + size)
-		m_FontLogo1 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 24, 72 );
-		if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
-		     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
-		     return;
-		}
-		m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-		
-		// create medium font instances using font resource (base address + size)
-		m_FontLogo2 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
-		if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
-		     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
-		     return;
-		}
-		m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
-		
-		// create medium font instances using font resource (base address + size)
-		m_FontHeader = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
-		if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
-		     cerr << "Could not construct header font face from in memory resource!" << endl;
-		     return;
-		}
-		m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-			
-		// create small font instances using font resource (base address + size)
-		m_FontText = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 11, 72 );	
-		if ( m_FontText == 0 || !m_FontText->isValid() ) {
-		     cerr << "Could not construct text font face from in memory resource!" << endl;
-		     return;
-		}
-		m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
 		
 		// inital HUD offset setup
 		m_XStartPosLeft = 5;
@@ -595,6 +572,76 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		setFeature(SEARCHINFO, true);
 		setFeature(LOGO, true);
 		setFeature(MARKER, true);
+	}
+	else {
+		
+		// seems that windoze also "resets" our OpenGL fonts
+		// let's clean up before reinitializing them
+		if(m_FontLogo1) delete m_FontLogo1;
+		if(m_FontLogo2) delete m_FontLogo2;
+		if(m_FontHeader)delete m_FontHeader;
+		if(m_FontText)  delete m_FontText;
+	}
+
+	// we might be called to recycle even before initialization
+	if(!m_FontResource) {
+		
+		// display a warning, this could be unintentionally
+		cerr << "Warning: font resource still unknown! You might want to recycle at a later stage..." << endl;
+	}
+	else {
+		
+		// create large font instances using font resource (base address + size)
+		m_FontLogo1 = new OGLFT::TranslucentTexture(
+									&m_FontResource->data()->at(0),
+									m_FontResource->data()->size(),
+									24, 72 );
+		
+		if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
+		     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
+		     return;
+		}
+		
+		m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+		
+		// create medium font instances using font resource (base address + size)
+		m_FontLogo2 = new OGLFT::TranslucentTexture(
+									&m_FontResource->data()->at(0),
+									m_FontResource->data()->size(),
+									13, 78 );
+		
+		if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
+		     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
+		     return;
+		}
+		
+		m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+		
+		// create medium font instances using font resource (base address + size)
+		m_FontHeader = new OGLFT::TranslucentTexture(
+									&m_FontResource->data()->at(0),
+									m_FontResource->data()->size(),
+									13, 78 );
+		
+		if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
+		     cerr << "Could not construct header font face from in memory resource!" << endl;
+		     return;
+		}
+		
+		m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+			
+		// create small font instances using font resource (base address + size)
+		m_FontText = new OGLFT::TranslucentTexture(
+									&m_FontResource->data()->at(0),
+									m_FontResource->data()->size(),
+									11, 72 );
+		
+		if ( m_FontText == 0 || !m_FontText->isValid() ) {
+		     cerr << "Could not construct text font face from in memory resource!" << endl;
+		     return;
+		}
+		
+		m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
 	}
 	
 	// setup initial dimensions

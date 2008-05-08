@@ -122,10 +122,11 @@ protected:
 	virtual void refreshLocalBOINCInformation();
 	
 	// resource handling
-	OGLFT::TranslucentTexture* m_FontLogo1;
-	OGLFT::TranslucentTexture* m_FontLogo2;
-	OGLFT::TranslucentTexture* m_FontHeader;
-	OGLFT::TranslucentTexture* m_FontText;
+	const Resource *m_FontResource;
+	OGLFT::TranslucentTexture *m_FontLogo1;
+	OGLFT::TranslucentTexture *m_FontLogo2;
+	OGLFT::TranslucentTexture *m_FontHeader;
+	OGLFT::TranslucentTexture *m_FontText;
 	
 	// Graphics state info:
 	int m_CurrentWidth;
