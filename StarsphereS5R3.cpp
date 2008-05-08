@@ -8,18 +8,22 @@ StarsphereS5R3::~StarsphereS5R3()
 {
 }
 
-void StarsphereS5R3::initialize(const int width, const int height, const Resource *font)
+void StarsphereS5R3::initialize(const int width, const int height, const Resource *font, const bool recycle)
 {
-	Starsphere::initialize(width, height, font);
+	Starsphere::initialize(width, height, font, recycle);
 	
-	// adjust HUD config
-	m_YOffsetMedium = 15;
-	m_XStartPosRight = width - 125;
-	m_YStartPosBottom = 70;	
-	m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
-	m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
-	m_Y3StartPosBottom = m_Y2StartPosBottom - m_YOffsetMedium;
-	m_Y4StartPosBottom = m_Y3StartPosBottom - m_YOffsetMedium;
+	// check whether we initialize the first time or have to recycle (required for windoze)
+	if(!recycle) {
+			
+		// adjust HUD config
+		m_YOffsetMedium = 15;
+		m_XStartPosRight = width - 125;
+		m_YStartPosBottom = 70;	
+		m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
+		m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
+		m_Y3StartPosBottom = m_Y2StartPosBottom - m_YOffsetMedium;
+		m_Y4StartPosBottom = m_Y3StartPosBottom - m_YOffsetMedium;
+	}
 }
 
 void StarsphereS5R3::resize(const int width, const int height)
@@ -68,6 +72,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 	m_WUPercentDone = buffer.str();
 	buffer.str("");
 	
+	/// \todo Show accumulated time (init_data time + shmem time)
 	const double cputime = m_EinsteinAdapter.wuCPUTime();
 	const int hrs =  cputime / 3600;
 	const int min = (cputime - hrs*3600) / 60;

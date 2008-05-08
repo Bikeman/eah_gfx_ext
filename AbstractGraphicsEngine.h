@@ -28,8 +28,9 @@ public:
 	 * \param width The current width of the display surface
 	 * \param height The current height of the display surface
 	 * \param font A pointer to a Resource object containing TTF font faces for text rendering 
+	 * \param recycle This flag indicates whether we initialize (FALSE) or reinitialize (TRUE) the context
 	 */
-	virtual void initialize(const int width, const int height, const Resource *font) = 0;
+	virtual void initialize(const int width, const int height, const Resource *font, const bool recycle = false) = 0;
 	
 	/**
 	 * \brief This method is called when the windowing system encounters a window resize event

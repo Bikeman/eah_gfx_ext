@@ -542,45 +542,63 @@ void Starsphere::resize(const int width, const int height)
 /**
  *  What to do when graphics are "initialized".
  */
-void Starsphere::initialize(const int width, const int height, const Resource *font)
+void Starsphere::initialize(const int width, const int height, const Resource *font, const bool recycle)
 {
-	// Initialize the BOINC client adapter
-	m_BoincAdapter.initialize("EinsteinHS");
+	// check whether we initialize the first time or have to recycle (required for windoze)
+	if(!recycle) {
+		
+		// Initialize the BOINC client adapter
+		m_BoincAdapter.initialize("EinsteinHS");
+		
+		// create large font instances using font resource (base address + size)
+		m_FontLogo1 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 24, 72 );
+		if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
+		     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
+		     return;
+		}
+		m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+		
+		// create medium font instances using font resource (base address + size)
+		m_FontLogo2 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
+		if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
+		     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
+		     return;
+		}
+		m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+		
+		// create medium font instances using font resource (base address + size)
+		m_FontHeader = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
+		if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
+		     cerr << "Could not construct header font face from in memory resource!" << endl;
+		     return;
+		}
+		m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+			
+		// create small font instances using font resource (base address + size)
+		m_FontText = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 11, 72 );	
+		if ( m_FontText == 0 || !m_FontText->isValid() ) {
+		     cerr << "Could not construct text font face from in memory resource!" << endl;
+		     return;
+		}
+		m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+		
+		// inital HUD offset setup
+		m_XStartPosLeft = 5;
+		m_YOffsetLarge = 18;
+		
+		setFeature(STARS, true);
+		setFeature(CONSTELLATIONS, true);
+		setFeature(PULSARS, true);
+		setFeature(OBSERVATORIES, true);
+		setFeature(SNRS, true);
+		setFeature(GLOBE, true);
+		setFeature(SEARCHINFO, true);
+		setFeature(LOGO, true);
+		setFeature(MARKER, true);
+	}
 	
 	// setup initial dimensions
 	resize(width, height);
-	
-	// create large font instances using font resource (base address + size)
-	m_FontLogo1 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 24, 72 );
-	if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
-	     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
-	     return;
-	}
-	m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-	
-	// create medium font instances using font resource (base address + size)
-	m_FontLogo2 = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
-	if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
-	     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
-	     return;
-	}
-	m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
-	
-	// create medium font instances using font resource (base address + size)
-	m_FontHeader = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 13, 78 );	
-	if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
-	     cerr << "Could not construct header font face from in memory resource!" << endl;
-	     return;
-	}
-	m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-		
-	// create small font instances using font resource (base address + size)
-	m_FontText = new OGLFT::TranslucentTexture(&font->data()->at(0), font->data()->size(), 11, 72 );	
-	if ( m_FontText == 0 || !m_FontText->isValid() ) {
-	     cerr << "Could not construct text font face from in memory resource!" << endl;
-	     return;
-	}
-	m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
 
 	// more font setup and optimizations
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
@@ -588,10 +606,6 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable( GL_RASTER_POSITION_UNCLIPPED_IBM );
 #endif
 	
-	// inital HUD offset setup
-	m_XStartPosLeft = 5;
-	m_YOffsetLarge = 18;
-		
 	// Drawing setup:
 	glClearColor(0.0, 0.0, 0.0, 0.0); // background is black
 	glEnable(GL_CULL_FACE);
@@ -631,16 +645,6 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	make_axes();
 	make_globe();
 	make_obs();
-
-	setFeature(STARS, true);
-	setFeature(CONSTELLATIONS, true);
-	setFeature(PULSARS, true);
-	setFeature(OBSERVATORIES, true);
-	setFeature(SNRS, true);
-	setFeature(GLOBE, true);
-	setFeature(SEARCHINFO, true);
-	setFeature(LOGO, true);
-	setFeature(MARKER, true);
 
 	glDisable(GL_CLIP_PLANE0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);

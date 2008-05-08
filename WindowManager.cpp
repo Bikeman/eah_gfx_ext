@@ -208,7 +208,8 @@ void WindowManager::eventLoop()
 									m_VideoModeFlags);
 			
 			// notify our observers (currently exactly one)
-			eventObservers.front()->resize(m_CurrentWidth, m_CurrentHeight);
+			// (windoze needs to be reinitialized instead of just resized, oh well)
+			eventObservers.front()->initialize(m_CurrentWidth, m_CurrentHeight, 0, true);
 		}
 		else if (event.type == SDL_QUIT ||
 				(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
