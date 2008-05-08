@@ -162,7 +162,7 @@ void WindowManager::eventLoop()
 			if(i < 500) {
 				i++;
 #endif
-				// notify our observers (currently exactly one)
+				// notify our observers (currently exactly one, hence front())
 				eventObservers.front()->render(dtime());
 #ifdef DEBUG_VALGRIND
 			}
@@ -175,21 +175,21 @@ void WindowManager::eventLoop()
 		else if (event.type == SDL_USEREVENT &&
 				 event.user.code == BOINCUpdateEvent) {
 			
-			// notify observers (currently exactly one) to fetch a BOINC update
+			// notify observers (currently exactly one, hence front()) to fetch a BOINC update
 			eventObservers.front()->refreshBOINCInformation();
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
 			
 			if (event.motion.state & SDL_BUTTON(1)) {
-				// notify our observers (currently exactly one)
+				// notify our observers (currently exactly one, hence front())
 				eventObservers.front()->mouseMoveEvent(
 										event.motion.xrel, 
 										event.motion.yrel,
 										AbstractGraphicsEngine::MouseButtonLeft);
 			}
 			else if (event.motion.state & SDL_BUTTON(3)) {
-				// notify our observers (currently exactly one)
+				// notify our observers (currently exactly one, hence front())
 				eventObservers.front()->mouseMoveEvent(
 										event.motion.xrel, 
 										event.motion.yrel,
@@ -207,7 +207,7 @@ void WindowManager::eventLoop()
 									m_DesktopBitsPerPixel,
 									m_VideoModeFlags);
 			
-			// notify our observers (currently exactly one)
+			// notify our observers (currently exactly one, hence front())
 			// (windoze needs to be reinitialized instead of just resized, oh well)
 			eventObservers.front()->initialize(m_CurrentWidth, m_CurrentHeight, 0, true);
 		}
@@ -221,7 +221,7 @@ void WindowManager::eventLoop()
 		}
 		else if (event.type == SDL_KEYDOWN) {
 			switch (event.key.keysym.sym) {
-				// notify our observers (currently exactly one)
+				// notify our observers (currently exactly one, hence front())
 				case SDLK_s:
 					eventObservers.front()->keyboardPressEvent(AbstractGraphicsEngine::KeyS);
 					break;
@@ -369,6 +369,7 @@ void WindowManager::toggleFullscreen()
 							m_DesktopBitsPerPixel,
 							m_VideoModeFlags);
 	
-	// notify our observers (currently exactly one)
-	eventObservers.front()->resize(m_CurrentWidth, m_CurrentHeight);
+	// notify our observers (currently exactly one, hence front())
+	// (windoze needs to be reinitialized instead of just resized, oh well)
+	eventObservers.front()->initialize(m_CurrentWidth, m_CurrentHeight, 0, true);
 }
