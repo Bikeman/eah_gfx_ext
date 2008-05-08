@@ -50,6 +50,7 @@ bool WindowManager::initialize(const int width, const int height)
 	 */
 
 	// set common video flags
+	// (for OpenGL nothing more than SDL_OPENGL and SDL_FULLSCREEN should be used)
 	m_VideoModeFlags = SDL_OPENGL;
 	
 	// check fullscreen video mode
@@ -105,6 +106,7 @@ bool WindowManager::initialize(const int width, const int height)
 	m_CurrentHeight = m_WindowedHeight;
 	m_VideoModeFlags |= SDL_RESIZABLE;
 	
+	// finally, get surface
 	m_DisplaySurface = SDL_SetVideoMode(
 							m_CurrentWidth,
 							m_CurrentHeight,
@@ -211,9 +213,8 @@ void WindowManager::eventLoop()
 		else if (event.type == SDL_QUIT ||
 				(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
 			
-			if (m_DisplaySurface) {
-				SDL_FreeSurface(m_DisplaySurface);
-			}
+			// just exit (SDL_FreeSurface is called automatically)
+			SDL_Quit();
 
 			break;
 		}
