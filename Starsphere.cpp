@@ -574,8 +574,11 @@ void Starsphere::resize(const int width, const int height)
 	
 	// adjust HUD config
 	m_YStartPosTop = height - 25;
+
+	// make sure the search marker is updated (conditional rendering!)
+	m_RefreshSearchMarker = true;
 	
-	/* Adjust aspect ratio and projection */
+	// adjust aspect ratio and projection
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -594,7 +597,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		// store the font resource
 		if(font) m_FontResource = font;
 		
-		// Initialize the BOINC client adapter
+		// initialize the BOINC client adapter
 		m_BoincAdapter.initialize("EinsteinHS");
 		
 		// inital HUD offset setup
@@ -691,7 +694,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable( GL_RASTER_POSITION_UNCLIPPED_IBM );
 #endif
 	
-	// Drawing setup:
+	// drawing setup:
 	glClearColor(0.0, 0.0, 0.0, 0.0); // background is black
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
@@ -712,17 +715,17 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	/* Enable depth buffering for 3D graphics */
+	// enable depth buffering for 3D graphics
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	/* Fog aids depth perception */
+	// fog aids depth perception
 	glEnable(GL_FOG);
 	glFogi(GL_FOG_MODE, GL_EXP2);
 	glFogf(GL_FOG_DENSITY, 0.085);
 
-	/* Create pre-drawn display lists */
+	// create pre-drawn display lists
 	make_stars();
 	make_constellations();
 	make_pulsars();
@@ -768,22 +771,21 @@ void Starsphere::render(const double timeOfDay)
 	revs = Zrot/360.0;
 	Zrot = -360.0 * (revs - (int)revs);
 
-	// And start drawing...
+	// and start drawing...
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Now draw the scene...
+	// now draw the scene...
 	glLoadIdentity();
 
 	// Vary the viewpoint with both a long period wobble of the elevation 
 	// of the view and a longer period zoom in/out that might even penetrate
 	// The starsphere for a brief time.   Increase the power in pow(,) to 
 	// make the visit inside briefer.
-
 	vp_theta = 90.0 - viewpt_elev + wobble_amp*sin(PI2*t/(wobble_period*60.0));
 	vp_phi = viewpt_azimuth;
 	vp_rad = viewpt_radius - zoom_amp*sin(PI2*t/(zoom_period*60.0));
-	if (vp_rad <0.0)
-		vp_rad = 0.0; // cannot pass origin (confusing)
+	if(vp_rad <0.0) vp_rad = 0.0; // cannot pass origin (confusing)
+
 	// TRIED THIS TOO: -zoom_amp*pow(fabs(sin(PI2*t/(zoom_period*60.0))),3);
 	xvp = vp_rad * SIN(vp_theta) * SIN(vp_phi);
 	zvp = vp_rad * SIN(vp_theta) * COS(vp_phi);
@@ -793,29 +795,21 @@ void Starsphere::render(const double timeOfDay)
 	        0.0, 0.0, 0.0, // looking toward here
 	        0.0, 1.0, 0.0); // which way is up?  y axis!
 
-	// Draw axes before any rotation so they stay put
-	if (isFeature(AXES))
-		glCallList(Axes);
+	// draw axes before any rotation so they stay put
+	if (isFeature(AXES)) glCallList(Axes);
 
-	// Draw the sky sphere, with rotation:
+	// draw the sky sphere, with rotation:
 	glPushMatrix();
 	glRotatef(Zrot - rotation_offset, 0.0, 1.0, 0.0);
 
-	/* stars, pulsars, supernovae */
+	// stars, pulsars, supernovae, grid
+	if (isFeature(STARS))		glCallList(Stars);
+	if (isFeature(PULSARS))		glCallList(Pulsars);
+	if (isFeature(SNRS))		glCallList(SNRs);
+	if (isFeature(CONSTELLATIONS))	glCallList(Constellations);
+	if (isFeature(GLOBE))		glCallList(sphGrid);
 
-	if (isFeature(STARS))
-		glCallList(Stars);
-	if (isFeature(PULSARS))
-		glCallList(Pulsars);
-	if (isFeature(SNRS))
-		glCallList(SNRs);
-	if (isFeature(CONSTELLATIONS))
-		glCallList(Constellations);
-	if (isFeature(GLOBE))
-		glCallList(sphGrid);
-
-	/* Observatories move an extra 15 degrees/hr since they were drawn */
-
+	// observatories move an extra 15 degrees/hr since they were drawn
 	if (isFeature(OBSERVATORIES)) {
 		glPushMatrix();
 		Zobs = (timeOfDay - m_ObservatoryDrawTimeLocal) * 15.0/3600.0;
@@ -827,6 +821,7 @@ void Starsphere::render(const double timeOfDay)
 		glPopMatrix();
 	}
 	
+	// draw the search marker (gunsight)
 	if (isFeature(MARKER)) {
 		if(m_RefreshSearchMarker) {
 			make_search_marker(m_CurrentRightAscension, m_CurrentDeclination, 0.5);
@@ -862,9 +857,7 @@ void Starsphere::render(const double timeOfDay)
 			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "World Year of Physics 2005");
 		}
 		
-		if (isFeature(SEARCHINFO)) {
-			renderSearchInformation();
-		}
+		if (isFeature(SEARCHINFO)) renderSearchInformation();
 		
 		// restore original state
 		glMatrixMode(GL_PROJECTION);
