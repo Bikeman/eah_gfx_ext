@@ -78,5 +78,5 @@ callgrind:
 	valgrind --tool=callgrind --track-fds=yes --time-stamp=yes ${PWD}/starsphere
 
 clean:
-	rm -f ${RESOURCESPEC}.cpp *.o starsphere
+	rm -f ${RESOURCESPEC}.cpp $(OBJS) starsphere
 

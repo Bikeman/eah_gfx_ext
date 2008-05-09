@@ -90,32 +90,35 @@ void Starsphere::make_stars()
 	bool is_dupe;
 	int Ndupes=0;
 
-	if (!Stars)
-		Stars = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(Stars) glDeleteLists(Stars, 1);
+	Stars = glGenLists(1);
 	glNewList(Stars, GL_COMPILE);
-	glColor3f(1.0, 1.0, 1.0);
-
-	/**
-	 * At some point in the future star_info[][] will also contain
-	 * star magnitude and the marker size will vary with this.
-	 */
-	for (i=0; i < Nstars; i++) {
-		// same stars appear more than once in constallations so ignore dupes
-		is_dupe=false;
-		for (j=0; j< i; j++) {
-			if (star_info[j][0] == star_info[i][0] && star_info[j][0]
-			        == star_info[i][0]) {
-				is_dupe=true;
-				Ndupes++;
-				break;
+	
+		glColor3f(1.0, 1.0, 1.0);
+	
+		/**
+		 * At some point in the future star_info[][] will also contain
+		 * star magnitude and the marker size will vary with this.
+		 */
+		for (i=0; i < Nstars; i++) {
+			// same stars appear more than once in constallations so ignore dupes
+			is_dupe=false;
+			for (j=0; j< i; j++) {
+				if (star_info[j][0] == star_info[i][0] && star_info[j][0]
+				        == star_info[i][0]) {
+					is_dupe=true;
+					Ndupes++;
+					break;
+				}
+			}
+			if (!is_dupe) {
+				// mag_size = 0.05 + 0.50*rand()/RAND_MAX;
+				mag_size = 4.0;
+				star_marker(star_info[i][0], star_info[i][1], mag_size);
 			}
 		}
-		if (!is_dupe) {
-			// mag_size = 0.05 + 0.50*rand()/RAND_MAX;
-			mag_size = 4.0;
-			star_marker(star_info[i][0], star_info[i][1], mag_size);
-		}
-	}
+		
 	glEndList();
 }
 
@@ -127,14 +130,17 @@ void Starsphere::make_pulsars()
 	GLfloat mag_size=3.0;
 	int i;
 
-	if (!Pulsars)
-		Pulsars = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(Pulsars) glDeleteLists(Pulsars, 1);
+	Pulsars = glGenLists(1);
 	glNewList(Pulsars, GL_COMPILE);
-	glColor3f(0.80, 0.0, 0.85); // _P_ulsars are _P_urple
-
-	for (i=0; i < Npulsars; i++) {
-		star_marker(pulsar_info[i][0], pulsar_info[i][1], mag_size);
-	}
+	
+		glColor3f(0.80, 0.0, 0.85); // _P_ulsars are _P_urple
+	
+		for (i=0; i < Npulsars; i++) {
+			star_marker(pulsar_info[i][0], pulsar_info[i][1], mag_size);
+		}
+		
 	glEndList();
 }
 
@@ -146,14 +152,17 @@ void Starsphere::make_snrs()
 	GLfloat mag_size=3.0;
 	int i;
 
-	if (!SNRs)
-		SNRs = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(SNRs) glDeleteLists(SNRs, 1);
+	SNRs = glGenLists(1);
 	glNewList(SNRs, GL_COMPILE);
-	glColor3f(0.7, 0.176, 0.0); // _S_NRs are _S_ienna
-
-	for (i=0; i < NSNRs; i++) {
-		star_marker(SNR_info[i][0], SNR_info[i][1], mag_size);
-	}
+	
+		glColor3f(0.7, 0.176, 0.0); // _S_NRs are _S_ienna
+	
+		for (i=0; i < NSNRs; i++) {
+			star_marker(SNR_info[i][0], SNR_info[i][1], mag_size);
+		}
+		
 	glEndList();
 }
 
@@ -165,19 +174,22 @@ void Starsphere::make_constellations()
 {
 	GLint star_num=0;
 
-	if (!Constellations)
-		Constellations = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(Constellations) glDeleteLists(Constellations, 1);
+	Constellations = glGenLists(1);
 	glNewList(Constellations, GL_COMPILE);
-	glLineWidth(1.0);
-	glColor3f(0.7, 0.7, 0.0); // light yellow
-
-	glBegin(GL_LINES); // draws lines between *pairs* of vertices
-	for (star_num=0; star_num < Nstars; ++star_num) {
-		sphVertex(star_info[star_num][0], star_info[star_num][1]);
-		star_num++;
-		sphVertex(star_info[star_num][0], star_info[star_num][1]);
-	}
-	glEnd();
+	
+		glLineWidth(1.0);
+		glColor3f(0.7, 0.7, 0.0); // light yellow
+	
+		glBegin(GL_LINES); // draws lines between *pairs* of vertices
+			for (star_num=0; star_num < Nstars; ++star_num) {
+				sphVertex(star_info[star_num][0], star_info[star_num][1]);
+				star_num++;
+				sphVertex(star_info[star_num][0], star_info[star_num][1]);
+			}
+		glEnd();
+		
 	glEndList();
 }
 
@@ -252,23 +264,28 @@ void Starsphere::make_obs()
 	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
-	if (!LLOmarker)
-		LLOmarker = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(LLOmarker) glDeleteLists(LLOmarker, 1);
+	LLOmarker = glGenLists(1);
 	glNewList(LLOmarker, GL_COMPILE);
-	glColor3f(0.0, 1.0, 0.0);
-	glLineWidth(lineSize);
-	glBegin(GL_LINE_STRIP);
-		//  North/South arm:
-		sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
-		sphVertex3D(RAdeg, DEdeg, radius);
-		// East/West arm:
-		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
-	glEnd();
-	// arm joint H2
-	glPointSize((GLfloat) lineSize);
-	glBegin(GL_POINTS);
-		sphVertex3D(RAdeg, DEdeg, radius);
-	glEnd();
+	
+		glColor3f(0.0, 1.0, 0.0);
+		glLineWidth(lineSize);
+		
+		glBegin(GL_LINE_STRIP);
+			//  North/South arm:
+			sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
+			sphVertex3D(RAdeg, DEdeg, radius);
+			// East/West arm:
+			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+		glEnd();
+		
+		// arm joint H2
+		glPointSize((GLfloat) lineSize);
+		glBegin(GL_POINTS);
+			sphVertex3D(RAdeg, DEdeg, radius);
+		glEnd();
+		
 	glEndList();
 
 	/**
@@ -281,35 +298,42 @@ void Starsphere::make_obs()
 	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
-	if (!LHOmarker)
-		LHOmarker = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(LHOmarker) glDeleteLists(LHOmarker, 1);
+	LHOmarker = glGenLists(1);
 	glNewList(LHOmarker, GL_COMPILE);
-	glColor3f(0.0, 0.0, 1.0);
-	glLineWidth(lineSize);
-	glBegin(GL_LINE_STRIP);
-		// North/South arm:
-		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-		sphVertex3D(RAdeg, DEdeg, radius);
-		// East/West arm:
-		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
-	glEnd();
-	glBegin(GL_LINE_STRIP);
-		// North/South arm, H2:
-		sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
-		sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
-		// East/West arm, H2;
-		sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
-	glEnd();
-	// arm joint H1
-	glPointSize((GLfloat) lineSize);
-	glBegin(GL_POINTS);
-		sphVertex3D(RAdeg, DEdeg, radius);
-	glEnd();
-	// arm joint H2
-	glPointSize((GLfloat) lineSize);
-	glBegin(GL_POINTS);
-		sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
-	glEnd();
+	
+		glColor3f(0.0, 0.0, 1.0);
+		glLineWidth(lineSize);
+		
+		glBegin(GL_LINE_STRIP);
+			// North/South arm:
+			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+			sphVertex3D(RAdeg, DEdeg, radius);
+			// East/West arm:
+			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+		glEnd();
+		
+		glBegin(GL_LINE_STRIP);
+			// North/South arm, H2:
+			sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
+			sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+			// East/West arm, H2;
+			sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
+		glEnd();
+		
+		// arm joint H1
+		glPointSize((GLfloat) lineSize);
+		glBegin(GL_POINTS);
+			sphVertex3D(RAdeg, DEdeg, radius);
+		glEnd();
+		
+		// arm joint H2
+		glPointSize((GLfloat) lineSize);
+		glBegin(GL_POINTS);
+			sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
+		glEnd();
+		
 	glEndList();
 
 	/**
@@ -323,23 +347,28 @@ void Starsphere::make_obs()
 	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
-	if (!GEOmarker)
-		GEOmarker = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(GEOmarker) glDeleteLists(GEOmarker, 1);
+	GEOmarker = glGenLists(1);
 	glNewList(GEOmarker, GL_COMPILE);
-	glColor3f(1.0, 0.0, 0.0);
-	glLineWidth(lineSize);
-	glBegin(GL_LINE_STRIP);
-		// North/South arm:
-		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-		sphVertex3D(RAdeg, DEdeg, radius);
-		// West/East arm:
-		sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
-	glEnd();
-	// arm joint
-	glPointSize((GLfloat) lineSize);
-	glBegin(GL_POINTS);
-		sphVertex3D(RAdeg, DEdeg, radius);
-	glEnd();
+	
+		glColor3f(1.0, 0.0, 0.0);
+		glLineWidth(lineSize);
+		
+		glBegin(GL_LINE_STRIP);
+			// North/South arm:
+			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+			sphVertex3D(RAdeg, DEdeg, radius);
+			// West/East arm:
+			sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
+		glEnd();
+		
+		// arm joint
+		glPointSize((GLfloat) lineSize);
+		glBegin(GL_POINTS);
+			sphVertex3D(RAdeg, DEdeg, radius);
+		glEnd();
+		
 	glEndList();
 	
 	/**
@@ -353,23 +382,28 @@ void Starsphere::make_obs()
 	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
 	DEdeg= Lat;
 
-	if (!VIRGOmarker)
-		VIRGOmarker = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(VIRGOmarker) glDeleteLists(VIRGOmarker, 1);
+	VIRGOmarker = glGenLists(1);
 	glNewList(VIRGOmarker, GL_COMPILE);
-	glColor3f(1.0, 1.0, 1.0);
-	glLineWidth(lineSize);
-	glBegin(GL_LINE_STRIP);
-		// North/South arm:
-		sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
-		sphVertex3D(RAdeg, DEdeg, radius);
-		// West/East arm:
-		sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
-	glEnd();
-	// arm joint
-	glPointSize((GLfloat) lineSize);
-	glBegin(GL_POINTS);
-		sphVertex3D(RAdeg, DEdeg, radius);
-	glEnd();
+	
+		glColor3f(1.0, 1.0, 1.0);
+		glLineWidth(lineSize);
+		
+		glBegin(GL_LINE_STRIP);
+			// North/South arm:
+			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
+			sphVertex3D(RAdeg, DEdeg, radius);
+			// West/East arm:
+			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
+		glEnd();
+		
+		// arm joint
+		glPointSize((GLfloat) lineSize);
+		glBegin(GL_POINTS);
+			sphVertex3D(RAdeg, DEdeg, radius);
+		glEnd();
+	
 	glEndList();
 
 	return;
@@ -385,70 +419,67 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 	// r1 is inner circle, r2 is outer circle, r3 is crosshairs
 	r1 = size, r2=3*size, r3=4*size;
 	
-	// delete existing marker, then create a new one
-	if (SearchMarker) {
-		glDeleteLists(SearchMarker, 1);
-	}
-	
+	// delete existing, create new (required for windoze)
+	if(SearchMarker) glDeleteLists(SearchMarker, 1);
 	SearchMarker = glGenLists(1);
 	glNewList(SearchMarker, GL_COMPILE);
 
-	// start gunsight drawing
-	glPushMatrix();
+		// start gunsight drawing
+		glPushMatrix();
+		
+		glLineWidth(3.0);
+		glColor3f(1.0, 0.5, 0.0); // Orange
+		
+		// First rotate east  to the RA position around y
+		glRotatef(RAdeg, 0.0, 1.0, 0.0);
+		// Then rotate up to DEC position around z (not x)
+		glRotatef(DEdeg, 0.0, 0.0, 1.0);
 	
-	glLineWidth(3.0);
-	glColor3f(1.0, 0.5, 0.0); // Orange
-	
-	// First rotate east  to the RA position around y
-	glRotatef(RAdeg, 0.0, 1.0, 0.0);
-	// Then rotate up to DEC position around z (not x)
-	glRotatef(DEdeg, 0.0, 0.0, 1.0);
-
-	// Inner circle
-	glBegin(GL_LINE_LOOP);
-	for (i=0; i<Nstep; i++) {
-		theta = i*360.0/Nstep;
-		x = r1*COS(theta);
-		y = r1*SIN(theta);
-		sphVertex(x, y);
-	}
-	glEnd();
-
-	// Outer circle
-	glBegin(GL_LINE_LOOP);
-	for (i=0; i<Nstep; i++) {
-		theta = i*360.0/Nstep;
-		x = r2*COS(theta);
-		y = r2*SIN(theta);
-		sphVertex(x, y);
-	}
-	glEnd();
-
-	// Arms that form the gunsight
-	glBegin(GL_LINES);
-	//  North arm:
-	sphVertex(0.0, +r1);
-	sphVertex(0.0, +r3);
-	//  South arm:
-	sphVertex(0.0, -r1);
-	sphVertex(0.0, -r3);
-	// East arm:
-	sphVertex(-r1, 0.0);
-	sphVertex(-r3, 0.0);
-	// West arm:
-	sphVertex(+r1, 0.0);
-	sphVertex(+r3, 0.0);
-	glEnd();
-	
-	glPopMatrix();
-	
-	// searchlight line out to marker (OFF!)
-	if (false) {
-		glBegin(GL_LINES);
-		sphVertex3D(RAdeg, DEdeg, 0.50*sphRadius);
-		sphVertex3D(RAdeg, DEdeg, 0.95*sphRadius);
+		// Inner circle
+		glBegin(GL_LINE_LOOP);
+			for (i=0; i<Nstep; i++) {
+				theta = i*360.0/Nstep;
+				x = r1*COS(theta);
+				y = r1*SIN(theta);
+				sphVertex(x, y);
+			}
 		glEnd();
-	}
+	
+		// Outer circle
+		glBegin(GL_LINE_LOOP);
+			for (i=0; i<Nstep; i++) {
+				theta = i*360.0/Nstep;
+				x = r2*COS(theta);
+				y = r2*SIN(theta);
+				sphVertex(x, y);
+			}
+		glEnd();
+	
+		// Arms that form the gunsight
+		glBegin(GL_LINES);
+			//  North arm:
+			sphVertex(0.0, +r1);
+			sphVertex(0.0, +r3);
+			//  South arm:
+			sphVertex(0.0, -r1);
+			sphVertex(0.0, -r3);
+			// East arm:
+			sphVertex(-r1, 0.0);
+			sphVertex(-r3, 0.0);
+			// West arm:
+			sphVertex(+r1, 0.0);
+			sphVertex(+r3, 0.0);
+		glEnd();
+		
+		glPopMatrix();
+		
+		// searchlight line out to marker (OFF!)
+		if (false) {
+			glBegin(GL_LINES);
+				sphVertex3D(RAdeg, DEdeg, 0.50*sphRadius);
+				sphVertex3D(RAdeg, DEdeg, 0.95*sphRadius);
+			glEnd();
+		}
 	
 	glEndList();
 }
@@ -461,24 +492,27 @@ void Starsphere::make_axes()
 {
 	GLfloat axl=10.0;
 
-	if (!Axes)
-		Axes = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(Axes) glDeleteLists(Axes, 1);
+	Axes = glGenLists(1);
 	glNewList(Axes, GL_COMPILE);
-	glLineWidth(2.0);
 
-	glBegin(GL_LINES);
-	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(-axl, 0.0, 0.0);
-	glVertex3f(axl, 0.0, 0.0);
-
-	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(0.0, -axl, 0.0);
-	glVertex3f(0.0, axl, 0.0);
-
-	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(0.0, 0.0, -axl);
-	glVertex3f(0.0, 0.0, axl);
-	glEnd();
+		glBegin(GL_LINES);
+			glLineWidth(2.0);
+			
+			glColor3f(1.0, 0.0, 0.0);
+			glVertex3f(-axl, 0.0, 0.0);
+			glVertex3f(axl, 0.0, 0.0);
+		
+			glColor3f(0.0, 1.0, 0.0);
+			glVertex3f(0.0, -axl, 0.0);
+			glVertex3f(0.0, axl, 0.0);
+		
+			glColor3f(0.0, 0.0, 1.0);
+			glVertex3f(0.0, 0.0, -axl);
+			glVertex3f(0.0, 0.0, axl);
+		glEnd();
+	
 	glEndList();
 }
 
@@ -490,37 +524,41 @@ void Starsphere::make_globe()
 	int hr, j, i, iMax=100;
 	GLfloat RAdeg, DEdeg;
 
-	if (!sphGrid)
-		sphGrid = glGenLists(1);
+	// delete existing, create new (required for windoze)
+	if(sphGrid) glDeleteLists(sphGrid, 1);
+	sphGrid = glGenLists(1);
 	glNewList(sphGrid, GL_COMPILE);
-	glLineWidth(1.0);
 
-	// Lines of constant Right Ascencion (East Longitude)
-
-	for (hr=0; hr<24; hr++) {
-		RAdeg=hr*15.0;
-		glColor3f(0.25, 0.25, 0.25);
-		if (hr==0)
-			glColor3f(0.55, 0.55, 0.55);
-		glBegin(GL_LINE_STRIP);
-		for (i=0; i<=iMax; i++) {
-			DEdeg = i*180.0/iMax - 90.0;
-			sphVertex(RAdeg, DEdeg);
+		glLineWidth(1.0);
+		
+		// Lines of constant Right Ascencion (East Longitude)
+		for (hr=0; hr<24; hr++) {
+			RAdeg=hr*15.0;
+			glColor3f(0.25, 0.25, 0.25);
+			
+			// mark median
+			if(hr==0) glColor3f(0.55, 0.55, 0.55);
+			
+			glBegin(GL_LINE_STRIP);
+				for (i=0; i<=iMax; i++) {
+					DEdeg = i*180.0/iMax - 90.0;
+					sphVertex(RAdeg, DEdeg);
+				}
+			glEnd();
 		}
-		glEnd();
-	}
-
-	// Lines of constant Declination (Lattitude)
-
-	for (j=1; j<=12; j++) {
-		DEdeg = 90.0 - j*15.0;
-		glBegin(GL_LINE_STRIP);
-		for (i=0; i<=iMax; i++) {
-			RAdeg = i*360.0/iMax;
-			sphVertex(RAdeg, DEdeg);
+	
+		// Lines of constant Declination (Lattitude)	
+		for (j=1; j<=12; j++) {
+			DEdeg = 90.0 - j*15.0;
+			
+			glBegin(GL_LINE_STRIP);
+				for (i=0; i<=iMax; i++) {
+					RAdeg = i*360.0/iMax;
+					sphVertex(RAdeg, DEdeg);
+				}
+			glEnd();
 		}
-		glEnd();
-	}
+		
 	glEndList();
 }
 
@@ -663,7 +701,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable(GL_POINT_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
 	
-	// FSAA will only be enabled when needed!
+	// FSAA will be enabled explicitly when needed!
 	glDisable(GL_MULTISAMPLE_ARB);
 
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
