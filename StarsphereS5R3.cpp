@@ -72,8 +72,8 @@ void StarsphereS5R3::refreshBOINCInformation()
 	m_WUPercentDone = buffer.str();
 	buffer.str("");
 	
-	/// \todo Show accumulated time (init_data time + shmem time)
-	const double cputime = m_EinsteinAdapter.wuCPUTime();
+	// show WU's total CPU time (previously accumulated + current session) 
+	const double cputime = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
 	const int hrs =  cputime / 3600;
 	const int min = (cputime - hrs*3600) / 60;
 	const int sec =  cputime - (hrs*3600 + min*60);	

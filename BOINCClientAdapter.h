@@ -122,6 +122,13 @@ public:
     double wuFPOpsBound() const;
     double wuMemoryBound() const;
     double wuDiskBound() const;
+
+	/**
+	 * \brief Retrieves the accumulated time spent on the currently active work unit
+	 * 
+	 * \return The time spent on the work unit
+	 */
+    double wuCPUTimeSpent() const;
     
     /**
      * \brief Retrieves information provided by the running science application

@@ -149,3 +149,8 @@ double BOINCClientAdapter::wuDiskBound() const
 {
 	return m_UserData.rsc_disk_bound;
 }
+
+double BOINCClientAdapter::wuCPUTimeSpent() const
+{
+	return m_UserData.wu_cpu_time;
+}
