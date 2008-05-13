@@ -25,8 +25,8 @@ release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
 release: LDFLAGS += -s
 
 # file based targets
-starsphere: $(DEPS) main.C $(OBJS)
-	$(CXX) -g ${CPPFLAGS} ${LDFLAGS} main.C -o starsphere ${OBJS} ${LIBS}
+starsphere: $(DEPS) main.cpp $(OBJS)
+	$(CXX) -g ${CPPFLAGS} ${LDFLAGS} main.cpp -o starsphere ${OBJS} ${LIBS}
 
 Starsphere.o: $(DEPS) Starsphere.cpp
 	$(CXX) -g ${CPPFLAGS} -c Starsphere.cpp
