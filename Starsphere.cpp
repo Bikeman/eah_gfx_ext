@@ -474,13 +474,13 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 		glPopMatrix();
 		
 		// searchlight line out to marker (OFF!)
-		if (false) {
+		if(false) {
 			glBegin(GL_LINES);
 				sphVertex3D(RAdeg, DEdeg, 0.50*sphRadius);
 				sphVertex3D(RAdeg, DEdeg, 0.95*sphRadius);
 			glEnd();
 		}
-	
+
 	glEndList();
 }
 

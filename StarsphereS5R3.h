@@ -79,10 +79,10 @@ private:
 	/// Specialized BOINC client adapter instance for information retrieval
 	EinsteinS5R3Adapter m_EinsteinAdapter;
 	
-	/// Local copy of the current WU's search parameter "Right-Ascension"
+	/// Local copy of the current WU's search parameter "Right-Ascension" (degrees)
 	string m_WUSkyPosRightAscension;
 	
-	/// Local copy of the current WU's search parameter "Declination"
+	/// Local copy of the current WU's search parameter "Declination" (degrees)
 	string m_WUSkyPosDeclination;
 	
 	/// Local copy of the current WU's search parameter "Percent done"

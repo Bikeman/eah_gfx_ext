@@ -42,6 +42,11 @@ void EinsteinS5R3Adapter::parseApplicationInformation()
 		{		 
 			cerr << "Incompatible shared memory data encountered!" << endl;
 		}
+		else {
+			// convert radians to degrees
+			m_WUSkyPosRightAscension *= 180/PI;
+			m_WUSkyPosDeclination *= 180/PI;
+		}
 	}
 }
 

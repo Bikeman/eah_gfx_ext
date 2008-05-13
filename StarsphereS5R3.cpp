@@ -54,7 +54,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 		// we've got a new position, update search marker and HUD
 		m_CurrentRightAscension = m_EinsteinAdapter.wuSkyPosRightAscension();
 		m_RefreshSearchMarker = true;
-		buffer << "Ascension: " << fixed << m_CurrentRightAscension * 360/PI2 << " deg" << ends;
+		buffer << "Ascension: " << fixed << m_CurrentRightAscension << " deg" << ends;
 		m_WUSkyPosRightAscension = buffer.str();
 		buffer.str("");
 	}
@@ -63,7 +63,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 		// we've got a new position, update search marker and HUD
 		m_CurrentDeclination = m_EinsteinAdapter.wuSkyPosDeclination();
 		m_RefreshSearchMarker = true;
-		buffer << "Declination: " << fixed << m_CurrentDeclination * 360/PI2 << " deg" << ends;
+		buffer << "Declination: " << fixed << m_CurrentDeclination << " deg" << ends;
 		m_WUSkyPosDeclination = buffer.str();
 		buffer.str("");
 	}

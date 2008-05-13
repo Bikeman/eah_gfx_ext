@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define PI 3.14159265
+
 /**
  * \brief Adapter class which facilitates communications with the \b Einstein\@Home S5R3 application
  * 
@@ -42,14 +44,14 @@ public:
     /**
 	 * \brief Retrieves the right ascension of the currently searched sky position
 	 * 
-	 * \return The right ascension (in radians)
+	 * \return The right ascension (in degrees)
 	 */
     double wuSkyPosRightAscension() const;
     
     /**
 	 * \brief Retrieves the declination of the currently searched sky position
 	 * 
-	 * \return The right ascension (in radians)
+	 * \return The right ascension (in degrees)
 	 */
     double wuSkyPosDeclination() const;
     
@@ -83,10 +85,10 @@ private:
 	/// Pointer to the (parent) BOINC client adapter
 	BOINCClientAdapter *boincClient;
 	
-	/// Right ascension of the currently searched sky position
+	/// Right ascension of the currently searched sky position (in degrees)
 	double m_WUSkyPosRightAscension;
 	
-	/// Declination of the currently searched sky position
+	/// Declination of the currently searched sky position (in degrees)
 	double m_WUSkyPosDeclination;
 	
 	/// The completion fraction of the active work unit
