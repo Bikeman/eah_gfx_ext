@@ -80,10 +80,14 @@ int main(int argc, char **argv)
 	graphics->initialize(window.windowWidth(), window.windowHeight(), fontResource);
 	graphics->refreshBOINCInformation();
 	
-#ifdef NDEBUG
-	// switch to fullscreen when in release mode (on windoze: after init!)
-	window.toggleFullscreen();
-#endif
+	// check optional command line parameter
+	if(argc == 2) {
+		string param(argv[1]);
+		if(param == "--fullscreen") {
+			// switch to fullscreen (on windoze: after init!)
+			window.toggleFullscreen();
+		}
+	}
 
 	// enter main event loop
 	window.eventLoop();
