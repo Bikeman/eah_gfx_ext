@@ -1,16 +1,34 @@
 /***************************************************************************
- *  List of known supernova remnants, extracted from Dave Green's SNR
- *  catalogue http://www.mrao.cam.ac.uk/surveys/snrs/snrs.data.html
- *
- *  Green D.A., 2004, `A Catalogue of Galactic Supernova Remnants
- *  (2004 January version)', Mullard Radio Astronomy Observatory,
- *  Cavendish Laboratory, Cambridge, United Kingdom (available at
- *  "http://www.mrao.cam.ac.uk/surveys/snrs/").
- *
- *  Copyright 2004 Graham Woan
- *  Licensed for distribution under GNU Public License GPL2
- *
- *****************************************************************************/
+ *   Copyright (C) 2004 Graham Woan                                        *
+ *                                                                         *
+ *   Copyright (C) 2008 by Oliver Bock                                     *
+ *   oliver.bock[AT]aei.mpg.de                                             *
+ *                                                                         *
+ *   This file is part of Einstein@Home.                                   *
+ *                                                                         *
+ *   Einstein@Home is free software: you can redistribute it and/or modify *
+ *   it under the terms of the GNU General Public License as published     *
+ *   by the Free Software Foundation, version 2 of the License.            *
+ *                                                                         *
+ *   Einstein@Home is distributed in the hope that it will be useful,      *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with Einstein@Home. If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                         *
+ ***************************************************************************/
+
+/***************************************************************************
+ *   List of known supernova remnants, extracted from Dave Green's SNR     *
+ *   catalogue http://www.mrao.cam.ac.uk/surveys/snrs/snrs.data.html       *
+ *                                                                         *
+ *   Green D.A., 2004, `A Catalogue of Galactic Supernova Remnants         *
+ *   (2004 January version)', Mullard Radio Astronomy Observatory,         *
+ *   Cavendish Laboratory, Cambridge, United Kingdom (available at         *
+ *   "http://www.mrao.cam.ac.uk/surveys/snrs/").                           *
+ ***************************************************************************/
 
 #define N_SNR_ITEMS 2
 

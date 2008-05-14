@@ -1,25 +1,30 @@
 /***************************************************************************
- *  The stars that make up the constellations.   Each *pair* of star
- *  positions defines a link (line) to be drawn to outline the constellations.
- *  Some stars appear more than once.
- *
- *  @(#) $Id$
- *  tested with sextant version 4.11 -EAM 15Oct2004
- *****************************************************************************/
+ *   Copyright (C) 2004 David Hammer, Eric Myers, Bruce Allen              *
+ *                                                                         *
+ *   Copyright (C) 2008 by Oliver Bock                                     *
+ *   oliver.bock[AT]aei.mpg.de                                             *
+ *                                                                         *
+ *   This file is part of Einstein@Home.                                   *
+ *                                                                         *
+ *   Einstein@Home is free software: you can redistribute it and/or modify *
+ *   it under the terms of the GNU General Public License as published     *
+ *   by the Free Software Foundation, version 2 of the License.            *
+ *                                                                         *
+ *   Einstein@Home is distributed in the hope that it will be useful,      *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with Einstein@Home. If not, see <http://www.gnu.org/licenses/>. *
+ *                                                                         *
+ ***************************************************************************/
 
-/***********************************************************************
- * Copyright (C) 2004 David Hammer, Eric Myers, Bruce Allen
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
- *
- * You should have received a copy of the GNU General Public License
- * (for example COPYING); if not, write to the Free
- * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- ************************************************************************/
-
+/***************************************************************************
+ *   The stars that make up the constellations. Each *pair* of star        *
+ *   positions defines a link (line) to be drawn to outline the            *
+ *   constellations. Some stars appear more than once.                     *
+ ***************************************************************************/
 
 float star_info[][2] = {
    { 298.82819233f , +06.40793334f } , { 297.69450860f , +08.86738491f } ,
