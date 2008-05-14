@@ -26,8 +26,8 @@ BOINC_PREFIX ?= /home/oliver/development/aei/boinc
 CXX ?= g++
 
 # variables
-LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) -lfreetype -lOGLFT -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
-CPPFLAGS = -DOGLFT_NO_SOLID -DOGLFT_NO_QT -I/usr/include $(shell sdl-config --cflags) -I/usr/include/freetype2 -I${BOINC_PREFIX}/include/BOINC
+LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) $(shell freetype-config --libs) -lOGLFT -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
+CPPFLAGS = -DOGLFT_NO_SOLID -DOGLFT_NO_QT -I/usr/include $(shell sdl-config --cflags) $(shell freetype-config --cflags) -I${BOINC_PREFIX}/include/BOINC
 DEPS = Makefile
 OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o GraphicsEngineFactory.o Starsphere.o StarsphereS5R3.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o BOINCClientAdapter.o EinsteinS5R3Adapter.o
 DEBUGFLAGSCPP = -pg -ggdb -O0
