@@ -1,10 +1,38 @@
 #!/bin/sh
 
-### functions #######################################################
+###########################################################################
+#   Copyright (C) 2008 by Oliver Bock                                     #
+#   oliver.bock[AT]aei.mpg.de                                             #
+#                                                                         #
+#   This file is part of Einstein@Home.                                   #
+#                                                                         #
+#   Einstein@Home is free software: you can redistribute it and/or modify #
+#   it under the terms of the GNU General Public License as published     #
+#   by the Free Software Foundation, version 2 of the License.            #
+#                                                                         #
+#   Einstein@Home is distributed in the hope that it will be useful,      #
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          #
+#   GNU General Public License for more details.                          #
+#                                                                         #
+#   You should have received a copy of the GNU General Public License     #
+#   along with Einstein@Home. If not, see <http://www.gnu.org/licenses/>. #
+#                                                                         #
+###########################################################################
+
+### TODOs #################################################################
+
+# error level checking (break in case of error, always 2>&1 for make logging)
+# more refactoring (every lib in dedicated function? per traget?)
+
+### functions #############################################################
 
 check_prerequisites()
 {
 	echo "Not yet implemented: check_prerequisites()"
+	# automake
+	# autoconf
+	# cmake
 	# wget
 	# C compiler
 	# lex or flex
@@ -15,64 +43,62 @@ check_prerequisites()
 
 prepare_generic()
 {
-	echo "Preparing source tree..." | tee -a setup.log
-	mkdir -p 3rdparty/sdl >> setup.log
-	mkdir -p 3rdparty/freetype2 >> setup.log
-	mkdir -p 3rdparty/oglft >> setup.log
-	mkdir -p 3rdparty/boinc >> setup.log
+	cd $ROOT
+
+	echo "Preparing source tree..." | tee -a $ROOT/setup.log
+	mkdir -p 3rdparty/sdl >> $ROOT/setup.log
+	mkdir -p 3rdparty/freetype2 >> $ROOT/setup.log
+	mkdir -p 3rdparty/oglft >> $ROOT/setup.log
+	mkdir -p 3rdparty/boinc >> $ROOT/setup.log
 	
-	echo "Preparing build tree..." | tee -a setup.log
-	mkdir -p build/sdl >> setup.log
-	mkdir -p build/freetype2 >> setup.log
-	mkdir -p build/oglft >> setup.log
-	mkdir -p build/boinc >> setup.log
+	echo "Preparing build tree..." | tee -a $ROOT/setup.log
+	mkdir -p build/sdl >> $ROOT/setup.log
+	mkdir -p build/freetype2 >> $ROOT/setup.log
+	mkdir -p build/oglft >> $ROOT/setup.log
+	mkdir -p build/boinc >> $ROOT/setup.log
 	
-	echo "Preparing install tree..." | tee -a setup.log
-	mkdir -p install/bin >> setup.log
-	mkdir -p install/include >> setup.log
-	mkdir -p install/lib >> setup.log
+	echo "Preparing install tree..." | tee -a $ROOT/setup.log
+	mkdir -p install/bin >> $ROOT/setup.log
+	mkdir -p install/include >> $ROOT/setup.log
+	mkdir -p install/lib >> $ROOT/setup.log
 	
 	# prepare additional sources
 	
-	cd $ROOT
-	cd 3rdparty/sdl
+	cd $ROOT/3rdparty/sdl
 	if [ -d .svn ]; then
-		echo "Updating SDL..." | tee -a ../../setup.log
-		svn update >> ../../setup.log
+		echo "Updating SDL..." | tee -a $ROOT/setup.log
+		svn update >> $ROOT/setup.log
 	else
-		echo "Retrieving SDL..." | tee -a ../../setup.log
-		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> ../../setup.log
+		echo "Retrieving SDL..." | tee -a $ROOT/setup.log
+		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $ROOT/setup.log
 	fi
 	
-	cd $ROOT
-	cd 3rdparty/freetype2
+	cd $ROOT/3rdparty/freetype2
 	if [ -d CVS ]; then
-		echo "Updating Freetype2..." | tee -a ../../setup.log
-		cvs update >> ../../setup.log 2>&1
+		echo "Updating Freetype2..." | tee -a $ROOT/setup.log
+		cvs update -C >> $ROOT/setup.log 2>&1
 	else
 		cd ..
-		echo "Retrieving Freetype2..." | tee -a ../setup.log
-		cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/freetype checkout -r VER-2-3-5-REAL freetype2 >> ../setup.log 2>&1
+		echo "Retrieving Freetype2..." | tee -a $ROOT/setup.log
+		cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/freetype checkout -r VER-2-3-5-REAL freetype2 >> $ROOT/setup.log 2>&1
 	fi
 	
-	cd $ROOT
-	cd 3rdparty/oglft
+	cd $ROOT/3rdparty/oglft
 	if [ -d .svn ]; then
-		echo "Updating OGLFT..." | tee -a ../../setup.log
+		echo "Updating OGLFT..." | tee -a $ROOT/setup.log
 		svn update >> ../../setup.log
 	else
-		echo "Retrieving OGLFT..." | tee -a ../../setup.log
-		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> ../../setup.log
+		echo "Retrieving OGLFT..." | tee -a $ROOT/setup.log
+		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $ROOT/setup.log
 	fi
 	
-	cd $ROOT
-	cd 3rdparty/boinc
+	cd $ROOT/3rdparty/boinc
 	if [ -d .svn ]; then
-		echo "Updating BOINC..." | tee -a ../../setup.log
-		svn update >> ../../setup.log
+		echo "Updating BOINC..." | tee -a $ROOT/setup.log
+		svn update >> $ROOT/setup.log
 	else
-		echo "Retrieving BOINC..." | tee -a ../../setup.log
-		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> ../../setup.log
+		echo "Retrieving BOINC..." | tee -a $ROOT/setup.log
+		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $ROOT/setup.log
 	fi
 }
 
@@ -80,32 +106,82 @@ prepare_generic()
 prepare_win32()
 {
 	cd $ROOT
-	mkdir -p 3rdparty/mingw/xscripts >> setup.log
+
+	echo "Preparing MinGW source tree..." | tee -a $ROOT/setup.log
+	mkdir -p 3rdparty/mingw/xscripts >> $ROOT/setup.log
 	cd 3rdparty/mingw/xscripts
 
 	if [ -d CVS ]; then
-		echo "Updating MinGW build script..." | tee -a ../../../setup.log
-		cvs update -C >> ../../../setup.log 2>&1
+		echo "Updating MinGW build script..." | tee -a $ROOT/setup.log
+		cvs update -C >> $ROOT/setup.log 2>&1
 	else
 		cd ..
-		echo "Retrieving MinGW build script..." | tee -a ../../setup.log
-		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> ../../setup.log 2>&1
+		echo "Retrieving MinGW build script..." | tee -a $ROOT/setup.log
+		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $ROOT/setup.log 2>&1
 	fi
 	
-	cd $ROOT
-	cd 3rdparty/mingw/xscripts
-	echo "Preparing MinGW build script..." | tee -a ../../../setup.log
-	cp -f $ROOT/patches/x86-mingw32-build.sh.conf.patch . >> ../../../setup.log
-	patch x86-mingw32-build.sh.conf < x86-mingw32-build.sh.conf.patch >> ../../../setup.log
-	chmod +x x86-mingw32-build.sh >> ../../../setup.log
+	cd $ROOT/3rdparty/mingw/xscripts
+	echo "Preparing MinGW build script..." | tee -a $ROOT/setup.log
+	# note: svn has no force/overwrite switch. the file might not be updated when patched
+	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $ROOT/setup.log
+	chmod +x x86-mingw32-build.sh >> $ROOT/setup.log
 }
 
 
 build_generic()
 {
-	echo "Not yet implemented: build_generic()"
+	cd $ROOT/3rdparty/sdl
+	echo "Building SDL (this may take a while)..." | tee -a $ROOT/setup.log
+	./autogen.sh >> $ROOT/setup.log
+	cd $ROOT/build/sdl
+	$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed SDL!" | tee -a $ROOT/setup.log
+
+	cd $ROOT/3rdparty/freetype2
+	echo "Building Freetype2 (this may take a while)..." | tee -a $ROOT/setup.log
+	chmod +x autogen.sh >> $ROOT/setup.log
+	chmod +x configure >> $ROOT/setup.log
+	#./autogen.sh >> $ROOT/setup.log
+	cd $ROOT/build/freetype2
+	# note: freetype (or sdl?) probably doesn't need *no* configure when static -> ansi build, see readme!
+	$ROOT/3rdparty/freetype2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed Freetype2!" | tee -a $ROOT/setup.log
+
+	cd $ROOT/3rdparty/oglft/liboglft
+	echo "Building OGLFT (this may take a while)..." | tee -a $ROOT/setup.log
+	# note: svn has no force/overwrite switch. the file might not be updated when patched
+	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $ROOT/setup.log
+	cd $ROOT/build/oglft
+	cmake $ROOT/3rdparty/oglft >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	mkdir -p $ROOT/install/include/oglft >> $ROOT/setup.log
+	cp OGLFT.h $ROOT/install/include/oglft >> $ROOT/setup.log
+	cp liboglft/liboglft.a $ROOT/install/lib >> $ROOT/setup.log
+	echo "Successfully built and installed OGLFT!" | tee -a $ROOT/setup.log
+
+	cd $ROOT/3rdparty/boinc
+	echo "Building BOINC (this may take a while)..." | tee -a $ROOT/setup.log
+	./_autosetup >> $ROOT/setup.log
+	cd $ROOT/build/boinc
+	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed BOINC!" | tee -a $ROOT/setup.log
 }
 
+build_mingw()
+{
+	echo "Not yet implemented: build_mingw()"
+}
+
+build_starsphere()
+{
+	echo "Not yet implemented: build_starsphere()"
+}
 
 build_linux()
 {
@@ -126,18 +202,6 @@ build_win32()
 	build_mingw
 	build_generic
 	build_starsphere
-}
-
-
-build_mingw()
-{
-	echo "Not yet implemented: build_mingw()"
-}
-
-
-build_starsphere()
-{
-	echo "Not yet implemented: build_starsphere()"
 }
 
 
@@ -166,11 +230,11 @@ print_usage()
 	echo "  --win32"
 	echo "*************************"
 
-	echo "Wrong usage. Stopping!" >> setup.log
+	echo "Wrong usage. Stopping!" >> $ROOT/setup.log
 }
 
 
-### main control ####################################################
+### main control ##########################################################
 
 ROOT=`pwd`
 DATE=`date`
@@ -180,10 +244,10 @@ TARGET_LINUX=1
 TARGET_MAC=2
 TARGET_WIN32=3
 
-echo "************************************" >> setup.log
-echo "Starting new setup run!" >> setup.log
-echo "$DATE" >> setup.log
-echo "************************************" >> setup.log
+echo "************************************" >> $ROOT/setup.log
+echo "Starting new setup run!" >> $ROOT/setup.log
+echo "$DATE" >> $ROOT/setup.log
+echo "************************************" >> $ROOT/setup.log
 
 # crude command line parsing :-)
 
@@ -196,17 +260,17 @@ case "$1" in
 	"--linux")
 		TARGET=$TARGET_LINUX
 		check_last_build "$1"
-		echo "Building linux version:" | tee -a setup.log
+		echo "Building linux version:" | tee -a $ROOT/setup.log
 		;;
 	"--mac")
 		TARGET=$TARGET_MAC
 		check_last_build "$1"
-		echo "Building mac version:" | tee -a setup.log
+		echo "Building mac version:" | tee -a $ROOT/setup.log
 		;;
 	"--win32")
 			TARGET=$TARGET_WIN32
 			check_last_build "$1"
-			echo "Building win32 version:" | tee -a setup.log
+			echo "Building win32 version:" | tee -a $ROOT/setup.log
 			;;
 	*)
 			print_usage
@@ -218,5 +282,9 @@ esac
 
 check_prerequisites
 prepare_generic
+
+if [ TARGET=$TARGET_LINUX ]; then
+	build_linux
+fi
 
 exit 0
