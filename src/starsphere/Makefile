@@ -1,7 +1,4 @@
 ###########################################################################
-#   Copyright (C) 2004 David Hammer, Eric Myers, Bruce Allen              #
-#   Copyright (C) 2008 Bernd Machenschalk                                 #
-#                                                                         #
 #   Copyright (C) 2008 by Oliver Bock                                     #
 #   oliver.bock[AT]aei.mpg.de                                             #
 #                                                                         #
@@ -21,17 +18,31 @@
 #                                                                         #
 ###########################################################################
 
-# point this to where you installed BOINC (--prefix you gave to configure, defaults to $BOINC_PREFIX)
-BOINC_PREFIX ?= /home/oliver/development/aei/boinc
+# path settings
+STARSPHERE_SRC?=$(PWD)
+STARSPHERE_INSTALL?=$(PWD)
+
+# config values
 CXX ?= g++
 
 # variables
-LIBS = -L${BOINC_PREFIX}/lib -Bstatic $(shell sdl-config --static-libs) $(shell freetype-config --libs) -lOGLFT -lboinc_api -lboinc -Wl,-Bdynamic -lGL -lGLU
-CPPFLAGS = -DOGLFT_NO_SOLID -DOGLFT_NO_QT -I/usr/include $(shell sdl-config --cflags) $(shell freetype-config --cflags) -I${BOINC_PREFIX}/include/BOINC
+LIBS = -Wl,-Bstatic -lframework -lOGLFT -L$(STARSPHERE_INSTALL)/lib
+LIBS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --libs)
+LIBS += -lboinc_api -lboinc -L/usr/lib
+LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lGL -lGLU
+
+CPPFLAGS = -I$(FRAMEWORK_INSTALL)/include
+CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
+CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
+CPPFLAGS += -I$(BOINC_PREFIX)/include/BOINC -I/usr/include
+
 DEPS = Makefile
-OBJS = starlist.o snr_list.o pulsar_list.o AbstractGraphicsEngine.o GraphicsEngineFactory.o Starsphere.o StarsphereS5R3.o WindowManager.o ${RESOURCESPEC}.o Resource.o ResourceFactory.o BOINCClientAdapter.o EinsteinS5R3Adapter.o
+OBJS = Starsphere.o StarsphereS5R3.o EinsteinS5R3Adapter.o starlist.o snr_list.o pulsar_list.o $(RESOURCESPEC).o
 DEBUGFLAGSCPP = -pg -ggdb -O0
 RESOURCESPEC = resources
+
+# TODO: GraphicsEngineFactory obviously depends on the actual implementations (here starsphere)! need to change the structure! what about plugins?
+CPPFLAGS += -I$(STARSPHERE_SRC) -I$(STARSPHERE_SRC)/../framework
 
 # primary role based tagets
 default: release
@@ -48,58 +59,42 @@ release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
 release: LDFLAGS += -s
 
 # file based targets
-starsphere: $(DEPS) main.cpp $(OBJS)
-	$(CXX) -g ${CPPFLAGS} ${LDFLAGS} main.cpp -o starsphere ${OBJS} ${LIBS}
+starsphere: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
+	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere $(OBJS) $(LIBS)
 
-Starsphere.o: $(DEPS) Starsphere.cpp
-	$(CXX) -g ${CPPFLAGS} -c Starsphere.cpp
+Starsphere.o: $(DEPS) $(STARSPHERE_SRC)/Starsphere.cpp $(STARSPHERE_SRC)/Starsphere.h
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/Starsphere.cpp
 	
-StarsphereS5R3.o: $(DEPS) StarsphereS5R3.cpp
-	$(CXX) -g ${CPPFLAGS} -c StarsphereS5R3.cpp
+StarsphereS5R3.o: $(DEPS) $(STARSPHERE_SRC)/StarsphereS5R3.cpp $(STARSPHERE_SRC)/StarsphereS5R3.h
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/StarsphereS5R3.cpp
 
-AbstractGraphicsEngine.o: AbstractGraphicsEngine.cpp
-	$(CXX) -g ${CPPFLAGS} -c AbstractGraphicsEngine.cpp
-	
-GraphicsEngineFactory.o: GraphicsEngineFactory.cpp
-	$(CXX) -g ${CPPFLAGS} -c GraphicsEngineFactory.cpp
-	
-WindowManager.o: Makefile WindowManager.cpp
-	$(CXX) -g ${CPPFLAGS} -c WindowManager.cpp
-	
-BOINCClientAdapter.o: Makefile BOINCClientAdapter.cpp
-	$(CXX) -g ${CPPFLAGS} -c BOINCClientAdapter.cpp
-	
-EinsteinS5R3Adapter.o: Makefile EinsteinS5R3Adapter.cpp
-	$(CXX) -g ${CPPFLAGS} -c EinsteinS5R3Adapter.cpp
+EinsteinS5R3Adapter.o: Makefile $(STARSPHERE_SRC)/EinsteinS5R3Adapter.cpp $(STARSPHERE_SRC)/EinsteinS5R3Adapter.h
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/EinsteinS5R3Adapter.cpp
 
-starlist.o: $(DEPS) starlist.C
-	$(CXX) -g ${CPPFLAGS} -c starlist.C
+starlist.o: $(DEPS) $(STARSPHERE_SRC)/starlist.C
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/starlist.C
 
-snr_list.o: $(DEPS) snr_list.C
-	$(CXX) -g ${CPPFLAGS} -c snr_list.C
+snr_list.o: $(DEPS) $(STARSPHERE_SRC)/snr_list.C
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/snr_list.C
 
-pulsar_list.o: $(DEPS) pulsar_list.C
-	$(CXX) -g ${CPPFLAGS} -c pulsar_list.C
+pulsar_list.o: $(DEPS) $(STARSPHERE_SRC)/pulsar_list.C
+	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/pulsar_list.C
 
 # resource compiler
-ResourceFactory.o: ${RESOURCESPEC}.o Resource.o ResourceFactory.cpp ResourceFactory.h
-	$(CXX) -g ${CPPFLAGS} -c ResourceFactory.cpp -o ResourceFactory.o
-	
-Resource.o: Resource.cpp Resource.h
-	$(CXX) -g ${CPPFLAGS} -c Resource.cpp -o Resource.o
-
-${RESOURCESPEC}.o: ${RESOURCESPEC}.orc
-	orc/orc ${RESOURCESPEC}.orc ${RESOURCESPEC}.cpp
-	$(CXX) -g ${CPPFLAGS} -c ${RESOURCESPEC}.cpp -o ${RESOURCESPEC}.o
+$(RESOURCESPEC).o: $(STARSPHERE_SRC)/$(RESOURCESPEC).orc
+	$(STARSPHERE_INSTALL)/bin/orc $(STARSPHERE_SRC)/$(RESOURCESPEC).orc $(RESOURCESPEC).cpp
+	$(CXX) -g $(CPPFLAGS) -c $(RESOURCESPEC).cpp -o $(RESOURCESPEC).o
 
 
 # tools
 memcheck:
-	valgrind --tool=memcheck --track-fds=yes --time-stamp=yes --log-file=${PWD}/memcheck.out.%p --leak-check=full ${PWD}/starsphere
+	valgrind --tool=memcheck --track-fds=yes --time-stamp=yes --log-file=$(PWD)/memcheck.out.%p --leak-check=full $(PWD)/starsphere
 
 callgrind:
-	valgrind --tool=callgrind --track-fds=yes --time-stamp=yes ${PWD}/starsphere
+	valgrind --tool=callgrind --track-fds=yes --time-stamp=yes $(PWD)/starsphere
+
+install:
+	cp starsphere $(STARSPHERE_INSTALL)/bin
 
 clean:
-	rm -f ${RESOURCESPEC}.cpp $(OBJS) starsphere
-
+	rm -f $(RESOURCESPEC).cpp $(OBJS) starsphere

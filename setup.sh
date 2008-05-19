@@ -56,6 +56,9 @@ prepare_generic()
 	mkdir -p build/freetype2 >> $ROOT/setup.log
 	mkdir -p build/oglft >> $ROOT/setup.log
 	mkdir -p build/boinc >> $ROOT/setup.log
+	mkdir -p build/framework >> $ROOT/setup.log
+	mkdir -p build/orc >> $ROOT/setup.log
+	mkdir -p build/starsphere >> $ROOT/setup.log
 	
 	echo "Preparing install tree..." | tee -a $ROOT/setup.log
 	mkdir -p install/bin >> $ROOT/setup.log
@@ -180,7 +183,33 @@ build_mingw()
 
 build_starsphere()
 {
-	echo "Not yet implemented: build_starsphere()"
+	echo "Building Starsphere [ORC] (this may take a while)..." | tee -a $ROOT/setup.log
+	export ORC_SRC=$ROOT/src/orc
+	export ORC_INSTALL=$ROOT/install
+	cd $ROOT/build/orc
+	cp $ROOT/src/orc/Makefile .  >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed Starsphere [ORC]!" | tee -a $ROOT/setup.log
+
+	echo "Building Starsphere [Framework] (this may take a while)..." | tee -a $ROOT/setup.log
+	export FRAMEWORK_SRC=$ROOT/src/framework
+	export FRAMEWORK_INSTALL=$ROOT/install
+	cd $ROOT/build/framework
+	cp $ROOT/src/framework/Makefile .  >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed Starsphere [Framework]!" | tee -a $ROOT/setup.log
+
+	echo "Building Starsphere [Application] (this may take a while)..." | tee -a $ROOT/setup.log
+	export STARSPHERE_SRC=$ROOT/src/starsphere
+	export STARSPHERE_INSTALL=$ROOT/install
+	cd $ROOT/build/starsphere
+	cp $ROOT/src/starsphere/Makefile .  >> $ROOT/setup.log
+	cp $ROOT/src/starsphere/*.res .  >> $ROOT/setup.log
+	make >> $ROOT/setup.log
+	make install >> $ROOT/setup.log
+	echo "Successfully built and installed Starsphere [Application]!" | tee -a $ROOT/setup.log
 }
 
 build_linux()

@@ -18,11 +18,15 @@
 #                                                                         #
 ###########################################################################
 
+# path settings
+ORC_SRC?=$(PWD)
+ORC_INSTALL?=$(PWD)
+
 # config values
 CXX?=g++
 DEBUGFLAGSCPP=-DDEBUG -pg -ggdb -O0
-OBJS=ResourceCompiler.o orc.o
-DEPS=Makefile ResourceCompiler.h
+OBJS=ResourceCompiler.o
+DEPS=Makefile
 
 # primary role based tagets
 default: release
@@ -35,14 +39,14 @@ release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
 release: LDFLAGS += -s
 
 # file specific targets
-orc: $(DEPS) ResourceCompiler.cpp orc.cpp ${OBJS}
-	$(CXX) -g ${CPPFLAGS} ResourceCompiler.cpp orc.cpp -o orc
+orc: $(DEPS) $(ORC_SRC)/orc.cpp $(OBJS)
+	$(CXX) -g $(CPPFLAGS) $(ORC_SRC)/orc.cpp -o orc $(OBJS)
 
-orc.o: $(DEPS) orc.cpp
-	$(CXX) -g ${CPPFLAGS} -c orc.cpp
+ResourceCompiler.o: $(DEPS) $(ORC_SRC)/ResourceCompiler.cpp $(ORC_SRC)/ResourceCompiler.h
+	$(CXX) -g $(CPPFLAGS) -c $(ORC_SRC)/ResourceCompiler.cpp
 
-ResourceCompiler.o: $(DEPS) ResourceCompiler.cpp
-	$(CXX) -g ${CPPFLAGS} -c ResourceCompiler.cpp
+install:
+	cp orc $(ORC_INSTALL)/bin
 
 clean:
-	rm -f ${OBJS} orc
+	rm -f $(OBJS) orc

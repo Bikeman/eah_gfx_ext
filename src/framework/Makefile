@@ -1,0 +1,79 @@
+###########################################################################
+#   Copyright (C) 2008 by Oliver Bock                                     #
+#   oliver.bock[AT]aei.mpg.de                                             #
+#                                                                         #
+#   This file is part of Einstein@Home.                                   #
+#                                                                         #
+#   Einstein@Home is free software: you can redistribute it and/or modify #
+#   it under the terms of the GNU General Public License as published     #
+#   by the Free Software Foundation, version 2 of the License.            #
+#                                                                         #
+#   Einstein@Home is distributed in the hope that it will be useful,      #
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the          #
+#   GNU General Public License for more details.                          #
+#                                                                         #
+#   You should have received a copy of the GNU General Public License     #
+#   along with Einstein@Home. If not, see <http://www.gnu.org/licenses/>. #
+#                                                                         #
+###########################################################################
+
+# path settings
+FRAMEWORK_SRC?=$(PWD)
+FRAMEWORK_INSTALL?=$(PWD)
+
+# config values
+CXX?=g++
+
+# variables
+CPPFLAGS = $(shell $(FRAMEWORK_INSTALL)/bin/sdl-config --cflags)
+CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/freetype-config --cflags)
+CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I/usr/include
+
+DEPS = Makefile
+OBJS = AbstractGraphicsEngine.o GraphicsEngineFactory.o WindowManager.o Resource.o ResourceFactory.o BOINCClientAdapter.o
+DEBUGFLAGSCPP = -pg -ggdb -O0
+
+# TODO: GraphicsEngineFactory obviously depends on the actual implementations (here starsphere)! need to change the structure! what about plugins?
+CPPFLAGS += -I$(FRAMEWORK_SRC) -I$(FRAMEWORK_SRC)/../starsphere
+
+# primary role based tagets
+default: release
+debug: libframework.a
+memcheck: clean debug
+callgrind: clean debug
+release: clean libframework.a
+
+# target specific options
+debug: CPPFLAGS += $(DEBUGFLAGSCPP)
+release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
+release: LDFLAGS += -s
+
+# file based targets
+libframework.a: $(OBJS)
+	ar rcs libframework.a $(OBJS)
+
+AbstractGraphicsEngine.o: $(DEPS) $(FRAMEWORK_SRC)/AbstractGraphicsEngine.cpp $(FRAMEWORK_SRC)/AbstractGraphicsEngine.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/AbstractGraphicsEngine.cpp
+	
+GraphicsEngineFactory.o: $(DEPS) $(FRAMEWORK_SRC)/GraphicsEngineFactory.cpp $(FRAMEWORK_SRC)/GraphicsEngineFactory.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/GraphicsEngineFactory.cpp
+	
+WindowManager.o: $(DEPS) $(FRAMEWORK_SRC)/WindowManager.cpp $(FRAMEWORK_SRC)/WindowManager.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/WindowManager.cpp
+	
+BOINCClientAdapter.o: $(DEPS) $(FRAMEWORK_SRC)/BOINCClientAdapter.cpp $(FRAMEWORK_SRC)/BOINCClientAdapter.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/BOINCClientAdapter.cpp
+	
+ResourceFactory.o: $(DEPS) $(FRAMEWORK_SRC)/ResourceFactory.cpp $(FRAMEWORK_SRC)/ResourceFactory.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/ResourceFactory.cpp
+	
+Resource.o: $(DEPS) $(FRAMEWORK_SRC)/Resource.cpp $(FRAMEWORK_SRC)/Resource.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/Resource.cpp
+
+# tools
+install:
+	cp libframework.a $(ORC_INSTALL)/lib
+
+clean:
+	rm -f $(OBJS) libframework.a
