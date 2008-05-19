@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ###########################################################################
 #   Copyright (C) 2008 by Oliver Bock                                     #
@@ -29,17 +29,19 @@
 
 check_prerequisites()
 {
-	echo "Not yet implemented: check_prerequisites()"
-	# automake
-	# autoconf
-	# cmake
-	# wget
-	# C compiler
-	# libtool
-	# ar
-	# lex or flex
-	# yacc or bison or byacc
-	# m4
+	echo "Checking prerequisites..."
+	
+	# required toolchain
+	TOOLS="automake autoconf m4 cmake wget gcc g++ ld libtool ar lex yacc"
+
+	for tool in $TOOLS; do
+		if ! ( type $tool >/dev/null 2>&1 ); then
+			echo "Error! Missing \"$tool\" which is a required tool! Stopping..."
+			return 1
+		fi
+	done
+
+	return 0
 }
 
 
@@ -105,6 +107,8 @@ prepare_generic()
 		echo "Retrieving BOINC (this may take a while)..." | tee -a $ROOT/setup.log
 		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $ROOT/setup.log
 	fi
+
+	return 0
 }
 
 
@@ -130,6 +134,8 @@ prepare_win32()
 	# note: svn has no force/overwrite switch. the file might not be updated when patched
 	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $ROOT/setup.log
 	chmod +x x86-mingw32-build.sh >> $ROOT/setup.log
+
+	return 0
 }
 
 
@@ -176,12 +182,18 @@ build_generic()
 	make >> $ROOT/setup.log
 	make install >> $ROOT/setup.log
 	echo "Successfully built and installed BOINC!" | tee -a $ROOT/setup.log
+
+	return 0
 }
+
 
 build_mingw()
 {
 	echo "Not yet implemented: build_mingw()"
+
+	return 0
 }
+
 
 build_starsphere()
 {
@@ -212,27 +224,40 @@ build_starsphere()
 	make >> $ROOT/setup.log
 	make install >> $ROOT/setup.log
 	echo "Successfully built and installed Starsphere [Application]!" | tee -a $ROOT/setup.log
+
+	return 0
 }
+
 
 build_linux()
 {
 	build_generic
 	build_starsphere
+
+	return 0
 }
 
 
 build_mac()
 {
-	build_generic
-	build_starsphere
+	echo "Not yet implemented: build_mac()"
+
+# 	build_generic
+# 	build_starsphere
+
+	return 0
 }
 
 
 build_win32()
 {
-	build_mingw
-	build_generic
-	build_starsphere
+	echo "Not yet implemented: build_win32()"
+
+# 	build_mingw
+# 	build_generic
+# 	build_starsphere
+
+	return 0
 }
 
 
@@ -246,7 +271,10 @@ check_last_build()
 	fi
 
 	echo "$1" > .lastbuild
+
+	return 0
 }
+
 
 print_usage()
 {
@@ -262,6 +290,8 @@ print_usage()
 	echo "*************************"
 
 	echo "Wrong usage. Stopping!" >> $ROOT/setup.log
+
+	return 0
 }
 
 
@@ -299,23 +329,52 @@ case "$1" in
 		echo "Building mac version:" | tee -a $ROOT/setup.log
 		;;
 	"--win32")
-			TARGET=$TARGET_WIN32
-			check_last_build "$1"
-			echo "Building win32 version:" | tee -a $ROOT/setup.log
-			;;
+		TARGET=$TARGET_WIN32
+		check_last_build "$1"
+		echo "Building win32 version:" | tee -a $ROOT/setup.log
+		;;
 	*)
-			print_usage
-			exit 1
-			;;
+		print_usage
+		exit 1
+		;;
 esac
 
 # here we go...
 
 check_prerequisites
-prepare_generic
-
-if [ TARGET=$TARGET_LINUX ]; then
-	build_linux
+if [ ! $? -eq 0 ]; then
+	exit 1
 fi
+
+prepare_generic
+if [ ! $? -eq 0 ]; then
+	exit 1
+fi
+
+case $TARGET in
+	$TARGET_LINUX)
+		build_linux
+		if [ ! $? -eq 0 ]; then
+			exit 1
+		fi
+		;;
+	$TARGET_MAC)
+		build_mac
+		if [ ! $? -eq 0 ]; then
+			exit 1
+		fi
+		;;
+	$TARGET_WIN32)
+		build_win32
+		if [ ! $? -eq 0 ]; then
+			exit 1
+		fi
+		;;
+	*)
+		# should be unreachable
+		print_usage
+		exit 1
+		;;
+esac
 
 exit 0
