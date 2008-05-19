@@ -72,7 +72,7 @@ prepare_generic()
 		echo "Updating SDL..." | tee -a $ROOT/setup.log
 		svn update >> $ROOT/setup.log
 	else
-		echo "Retrieving SDL..." | tee -a $ROOT/setup.log
+		echo "Retrieving SDL (this may take a while)..." | tee -a $ROOT/setup.log
 		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $ROOT/setup.log
 	fi
 	
@@ -82,7 +82,7 @@ prepare_generic()
 		cvs update -C >> $ROOT/setup.log 2>&1
 	else
 		cd ..
-		echo "Retrieving Freetype2..." | tee -a $ROOT/setup.log
+		echo "Retrieving Freetype2 (this may take a while)..." | tee -a $ROOT/setup.log
 		cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/freetype checkout -r VER-2-3-5-REAL freetype2 >> $ROOT/setup.log 2>&1
 	fi
 	
@@ -91,7 +91,7 @@ prepare_generic()
 		echo "Updating OGLFT..." | tee -a $ROOT/setup.log
 		svn update >> ../../setup.log
 	else
-		echo "Retrieving OGLFT..." | tee -a $ROOT/setup.log
+		echo "Retrieving OGLFT (this may take a while)..." | tee -a $ROOT/setup.log
 		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $ROOT/setup.log
 	fi
 	
@@ -100,7 +100,7 @@ prepare_generic()
 		echo "Updating BOINC..." | tee -a $ROOT/setup.log
 		svn update >> $ROOT/setup.log
 	else
-		echo "Retrieving BOINC..." | tee -a $ROOT/setup.log
+		echo "Retrieving BOINC (this may take a while)..." | tee -a $ROOT/setup.log
 		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $ROOT/setup.log
 	fi
 }
@@ -119,7 +119,7 @@ prepare_win32()
 		cvs update -C >> $ROOT/setup.log 2>&1
 	else
 		cd ..
-		echo "Retrieving MinGW build script..." | tee -a $ROOT/setup.log
+		echo "Retrieving MinGW build script (this may take a while)..." | tee -a $ROOT/setup.log
 		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $ROOT/setup.log 2>&1
 	fi
 	
@@ -146,7 +146,7 @@ build_generic()
 	echo "Building Freetype2 (this may take a while)..." | tee -a $ROOT/setup.log
 	chmod +x autogen.sh >> $ROOT/setup.log
 	chmod +x configure >> $ROOT/setup.log
-	#./autogen.sh >> $ROOT/setup.log
+	./autogen.sh >> $ROOT/setup.log
 	cd $ROOT/build/freetype2
 	# note: freetype (or sdl?) probably doesn't need *no* configure when static -> ansi build, see readme!
 	$ROOT/3rdparty/freetype2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $ROOT/setup.log
@@ -236,9 +236,9 @@ build_win32()
 
 check_last_build()
 {
-	LASTBUILD=`cat .lastbuild`
+	LASTBUILD=`cat .lastbuild 2>/dev/null`
 
-	if [ "$LASTBUILD" != "$1" ]; then
+	if [[ ( -f .lastbuild ) && ( "$LASTBUILD" != "$1" ) ]]; then
 		# TODO: clean build dirs when different target!
 		echo "Not yet implemented: cleanup in check_lastbuild()"
 	fi
