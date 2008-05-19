@@ -1,0 +1,41 @@
+--- x86-mingw32-build.sh.conf
++++ x86-mingw32-build.sh.conf.new	2008-05-16 16:04:14.000000000 +0200
+@@ -35,16 +35,16 @@
+ #    the `x86-mingw32-build.sh.hosts' file for the `mirror' field
+ #    in the following URL, to establish a default download host.
+ #
+-     assume DOWNLOAD_HOST     http://mirror.dl.sourceforge.net/mingw
++     assume DOWNLOAD_HOST     http://mesh.dl.sourceforge.net/mingw
+ #
+ # 3) Directories to use for temporary working space, package storage,
+ #    and ultimate compiler installation.  You should adjust these to
+ #    match your own host configuration; note that you MUST have WRITE
+ #    permission for each directory specified.
+ #
+-     assume WORKING_DIR                   $HOME/tmp/mingw-3.4.5
+-     assume PACKAGE_DIR                   $HOME/packages/mingw-3.4.5
+-     assume INSTALL_DIR                   $HOME/mingw
++     assume WORKING_DIR                   `pwd`/../../../build/mingw
++     assume PACKAGE_DIR                   `pwd`/../packages
++     assume INSTALL_DIR                   `pwd`/../../../install/mingw
+ #
+ # 4) Package versions, from which the compiler will be built.
+ #
+@@ -93,12 +93,12 @@
+ #    the corresponding package is available in the PACKAGE_DIR, or
+ #    if it is selected for download.
+ #
+-     option GCC_LANGUAGE_OPTIONS          ada
++#    option GCC_LANGUAGE_OPTIONS          ada
+      option GCC_LANGUAGE_OPTIONS          c++
+-     option GCC_LANGUAGE_OPTIONS          d
+-     option GCC_LANGUAGE_OPTIONS          f77
+-     option GCC_LANGUAGE_OPTIONS          java
+-     option GCC_LANGUAGE_OPTIONS          objc
++#    option GCC_LANGUAGE_OPTIONS          d
++#    option GCC_LANGUAGE_OPTIONS          f77
++#    option GCC_LANGUAGE_OPTIONS          java
++#    option GCC_LANGUAGE_OPTIONS          objc
+ #
+ # 8) User preferences for configuration options.  These have been
+ #    preconfigured to match the setup of the prebuilt compiler suite,
