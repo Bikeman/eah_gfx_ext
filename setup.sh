@@ -35,6 +35,8 @@ check_prerequisites()
 	# cmake
 	# wget
 	# C compiler
+	# libtool
+	# ar
 	# lex or flex
 	# yacc or bison or byacc
 	# m4

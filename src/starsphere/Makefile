@@ -34,7 +34,7 @@ LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs
 CPPFLAGS = -I$(FRAMEWORK_INSTALL)/include
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
-CPPFLAGS += -I$(BOINC_PREFIX)/include/BOINC -I/usr/include
+CPPFLAGS += -I$(STARSPHERE_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile
 OBJS = Starsphere.o StarsphereS5R3.o EinsteinS5R3Adapter.o starlist.o snr_list.o pulsar_list.o $(RESOURCESPEC).o
