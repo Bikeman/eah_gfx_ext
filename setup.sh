@@ -50,8 +50,6 @@ prepare_generic()
 	cd $ROOT
 
 	echo "Preparing source tree..." | tee -a $ROOT/setup.log
-	mkdir -p 3rdparty/sdl >> $ROOT/setup.log
-	mkdir -p 3rdparty/freetype2 >> $ROOT/setup.log
 	mkdir -p 3rdparty/oglft >> $ROOT/setup.log
 	mkdir -p 3rdparty/boinc >> $ROOT/setup.log
 	
@@ -71,6 +69,7 @@ prepare_generic()
 	
 	# prepare additional sources
 	
+	mkdir -p 3rdparty/sdl >> $ROOT/setup.log
 	cd $ROOT/3rdparty/sdl
 	if [ -d .svn ]; then
 		echo "Updating SDL..." | tee -a $ROOT/setup.log
@@ -79,16 +78,20 @@ prepare_generic()
 		echo "Retrieving SDL (this may take a while)..." | tee -a $ROOT/setup.log
 		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $ROOT/setup.log
 	fi
+
+# 	cd $ROOT/3rdparty
+# 	echo "Retrieving SDL (this may take a while)..." | tee -a $ROOT/setup.log
+# 	wget http://www.libsdl.org/release/SDL-1.2.14.tar.gz >> $ROOT/setup.log 2>&1
+# 	tar -xzf SDL-1.2.14.tar.gz >> $ROOT/setup.log
+# 	rm SDL-1.2.14.tar.gz >> $ROOT/setup.log
+# 	mv SDL-1.2.14 sdl >> $ROOT/setup.log
 	
-	cd $ROOT/3rdparty/freetype2
-	if [ -d CVS ]; then
-		echo "Updating Freetype2..." | tee -a $ROOT/setup.log
-		cvs update -C >> $ROOT/setup.log 2>&1
-	else
-		cd ..
-		echo "Retrieving Freetype2 (this may take a while)..." | tee -a $ROOT/setup.log
-		cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/freetype checkout -r VER-2-3-5-REAL freetype2 >> $ROOT/setup.log 2>&1
-	fi
+	cd $ROOT/3rdparty
+	echo "Retrieving Freetype2 (this may take a while)..." | tee -a $ROOT/setup.log
+	wget http://mesh.dl.sourceforge.net/sourceforge/freetype/freetype-2.3.5.tar.bz2 >> $ROOT/setup.log 2>&1
+	tar -xjf freetype-2.3.5.tar.bz2 >> $ROOT/setup.log
+	rm freetype-2.3.5.tar.bz2 >> $ROOT/setup.log
+	mv freetype-2.3.5 freetype2 >> $ROOT/setup.log
 	
 	cd $ROOT/3rdparty/oglft
 	if [ -d .svn ]; then
@@ -163,9 +166,10 @@ build_generic()
 	echo "Successfully built and installed Freetype2!" | tee -a $ROOT/setup.log
 
 	cd $ROOT/3rdparty/oglft/liboglft
-	echo "Building OGLFT (this may take a while)..." | tee -a $ROOT/setup.log
+	echo "Building OGLFT..." | tee -a $ROOT/setup.log
 	# note: svn has no force/overwrite switch. the file might not be updated when patched
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $ROOT/setup.log
+	# TODO: patch CMakeLists.txt in case FindFreetype.cmake is not available!
 	cd $ROOT/build/oglft
 	cmake $ROOT/3rdparty/oglft >> $ROOT/setup.log
 	make >> $ROOT/setup.log
@@ -197,7 +201,7 @@ build_mingw()
 
 build_starsphere()
 {
-	echo "Building Starsphere [ORC] (this may take a while)..." | tee -a $ROOT/setup.log
+	echo "Building Starsphere [ORC]..." | tee -a $ROOT/setup.log
 	export ORC_SRC=$ROOT/src/orc
 	export ORC_INSTALL=$ROOT/install
 	cd $ROOT/build/orc
@@ -206,7 +210,7 @@ build_starsphere()
 	make install >> $ROOT/setup.log
 	echo "Successfully built and installed Starsphere [ORC]!" | tee -a $ROOT/setup.log
 
-	echo "Building Starsphere [Framework] (this may take a while)..." | tee -a $ROOT/setup.log
+	echo "Building Starsphere [Framework]..." | tee -a $ROOT/setup.log
 	export FRAMEWORK_SRC=$ROOT/src/framework
 	export FRAMEWORK_INSTALL=$ROOT/install
 	cd $ROOT/build/framework
@@ -215,7 +219,7 @@ build_starsphere()
 	make install >> $ROOT/setup.log
 	echo "Successfully built and installed Starsphere [Framework]!" | tee -a $ROOT/setup.log
 
-	echo "Building Starsphere [Application] (this may take a while)..." | tee -a $ROOT/setup.log
+	echo "Building Starsphere [Application]..." | tee -a $ROOT/setup.log
 	export STARSPHERE_SRC=$ROOT/src/starsphere
 	export STARSPHERE_INSTALL=$ROOT/install
 	cd $ROOT/build/starsphere
@@ -258,6 +262,18 @@ build_win32()
 # 	build_starsphere
 
 	return 0
+}
+
+
+distclean()
+{
+	cd $ROOT
+
+	rm -rf 3rdparty
+	rm -rf build
+	rm -rf install
+
+	rm -f .lastbuild
 }
 
 
@@ -332,6 +348,10 @@ case "$1" in
 		TARGET=$TARGET_WIN32
 		check_last_build "$1"
 		echo "Building win32 version:" | tee -a $ROOT/setup.log
+		;;
+	"--distclean")
+		distclean
+		exit 0
 		;;
 	*)
 		print_usage
