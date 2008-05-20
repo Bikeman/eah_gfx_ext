@@ -26,7 +26,7 @@ STARSPHERE_INSTALL?=$(PWD)
 CXX ?= g++
 
 # variables
-LIBS = -Wl,-Bstatic -lframework -lOGLFT -L$(STARSPHERE_INSTALL)/lib
+LIBS = -Wl,-Bstatic -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --libs)
 LIBS += -lboinc_api -lboinc -L/usr/lib
 LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lGL -lGLU
