@@ -22,30 +22,28 @@
 
 ### TODOs #################################################################
 
-# error level checking (break in case of error, always 2>&1 for make logging)
 # more refactoring (every lib in dedicated function? per traget?)
 
 ### globals ###############################################################
 
 ROOT=`pwd`
-DATE=`date`
-LOGFILE=$ROOT/setup.log
+LOGFILE=$ROOT/build.log
 TARGET=0
 
 ### functions #############################################################
 
 failure()
 {
-	echo "************************************" | tee -a 
-	echo "Error detected! Stopping setup run!" | tee -a $LOGFILE
-	echo "$DATE" | tee -a $LOGFILE
+	echo "************************************" | tee -a $LOGFILE
+	echo "Error detected! Stopping build!" | tee -a $LOGFILE
+	echo "`date`" | tee -a $LOGFILE
 
     if [ -f "$LOGFILE" ]; then
 		echo "------------------------------------"
 		echo "Please check logfile: `basename $LOGFILE`"
 		echo "These are the final ten lines:"
 		echo "------------------------------------"
-		tail -10 $LOGFILE
+		tail -n 14 $LOGFILE | head -n 10 -
     fi
 
 	echo "************************************" | tee -a $LOGFILE
@@ -55,14 +53,14 @@ failure()
 
 check_prerequisites()
 {
-	echo "Checking prerequisites..."
+	echo "Checking prerequisites..." | tee -a $LOGFILE
 	
 	# required toolchain
 	TOOLS="automake autoconf m4 cmake wget gcc g++ ld libtool ar lex yacc"
 
 	for tool in $TOOLS; do
 		if ! ( type $tool >/dev/null 2>&1 ); then
-			echo "Error! Missing \"$tool\" which is a required tool! Stopping..."
+			echo "Missing \"$tool\" which is a required tool!" | tee -a $LOGFILE
 			return 1
 		fi
 	done
@@ -71,70 +69,101 @@ check_prerequisites()
 }
 
 
+prepare_source_tree()
+{
+	echo "Preparing source tree..." | tee -a $LOGFILE
+	mkdir -p 3rdparty/oglft >> $LOGFILE || failure
+	mkdir -p 3rdparty/boinc >> $LOGFILE || failure
+
+	return 0
+}
+
+
+prepare_build_tree()
+{
+	echo "Preparing build tree..." | tee -a $LOGFILE
+	mkdir -p build/sdl >> $LOGFILE || failure
+	mkdir -p build/freetype2 >> $LOGFILE || failure
+	mkdir -p build/oglft >> $LOGFILE || failure
+	mkdir -p build/boinc >> $LOGFILE || failure
+	mkdir -p build/framework >> $LOGFILE || failure
+	mkdir -p build/orc >> $LOGFILE || failure
+	mkdir -p build/starsphere >> $LOGFILE || failure
+
+	return 0
+}
+
+
+prepare_install_tree()
+{
+	echo "Preparing install tree..." | tee -a $LOGFILE
+	mkdir -p install/bin >> $LOGFILE || failure
+	mkdir -p install/include >> $LOGFILE || failure
+	mkdir -p install/lib >> $LOGFILE || failure
+
+	return 0
+}
+
+
 prepare_generic()
 {
-	cd $ROOT
+	prepare_source_tree || failure
+	prepare_build_tree || failure
+	prepare_install_tree || failure
 
-	echo "Preparing source tree..." | tee -a $LOGFILE
-	mkdir -p 3rdparty/oglft >> $LOGFILE
-	mkdir -p 3rdparty/boinc >> $LOGFILE
-	
-	echo "Preparing build tree..." | tee -a $LOGFILE
-	mkdir -p build/sdl >> $LOGFILE
-	mkdir -p build/freetype2 >> $LOGFILE
-	mkdir -p build/oglft >> $LOGFILE
-	mkdir -p build/boinc >> $LOGFILE
-	mkdir -p build/framework >> $LOGFILE
-	mkdir -p build/orc >> $LOGFILE
-	mkdir -p build/starsphere >> $LOGFILE
-	
-	echo "Preparing install tree..." | tee -a $LOGFILE
-	mkdir -p install/bin >> $LOGFILE
-	mkdir -p install/include >> $LOGFILE
-	mkdir -p install/lib >> $LOGFILE
-	
 	# prepare additional sources
-	
-	mkdir -p 3rdparty/sdl >> $LOGFILE
-	cd $ROOT/3rdparty/sdl
+
+	cd $ROOT || failure
+	mkdir -p 3rdparty/sdl >> $LOGFILE 2>&1 || failure
+	cd $ROOT/3rdparty/sdl || failure
 	if [ -d .svn ]; then
-		echo "Updating SDL..." | tee -a $LOGFILE
-		svn update >> $LOGFILE
+		echo "Updating SDL..." | tee -a $LOGFIL
+		# make sure local changes (patches) are reverted, hence also updated
+		svn revert -R . >> $LOGFILE 2>&1 || failure
+		svn update >> $LOGFILE 2>&1 || failure
 	else
 		echo "Retrieving SDL (this may take a while)..." | tee -a $LOGFILE
-		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $LOGFILE
+		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $LOGFILE 2>&1 || failure
 	fi
 
-# 	cd $ROOT/3rdparty
+# 	cd $ROOT/3rdparty || failure
 # 	echo "Retrieving SDL (this may take a while)..." | tee -a $LOGFILE
-# 	wget http://www.libsdl.org/release/SDL-1.2.14.tar.gz >> $LOGFILE 2>&1
-# 	tar -xzf SDL-1.2.14.tar.gz >> $LOGFILE
-# 	rm SDL-1.2.14.tar.gz >> $LOGFILE
-# 	mv SDL-1.2.14 sdl >> $LOGFILE
+# 	wget http://www.libsdl.org/release/SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
+# 	tar -xzf SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
+# 	rm SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
+# 	substitute old source tree
+# 	rm -rf sdl >> $LOGFILE 2>&1 || failure
+# 	mv SDL-1.2.14 sdl >> $LOGFILE 2>&1 || failure
 	
-	cd $ROOT/3rdparty
+	cd $ROOT/3rdparty || failure
 	echo "Retrieving Freetype2 (this may take a while)..." | tee -a $LOGFILE
-	wget http://mesh.dl.sourceforge.net/sourceforge/freetype/freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1
-	tar -xjf freetype-2.3.5.tar.bz2 >> $LOGFILE
-	rm freetype-2.3.5.tar.bz2 >> $LOGFILE
-	mv freetype-2.3.5 freetype2 >> $LOGFILE
+	wget http://mesh.dl.sourceforge.net/sourceforge/freetype/freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
+	tar -xjf freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
+	rm freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
+	# substitute old source tree
+	rm -rf freetype2 >> $LOGFILE 2>&1 || failure
+	mv freetype-2.3.5 freetype2 >> $LOGFILE 2>&1 || failure
 	
-	cd $ROOT/3rdparty/oglft
+	cd $ROOT/3rdparty/oglft || failure
 	if [ -d .svn ]; then
 		echo "Updating OGLFT..." | tee -a $LOGFILE
-		svn update >> ../../setup.log
+		# make sure local changes (patches) are reverted, hence also updated
+		svn revert -R . >> $LOGFILE  2>&1 || failure
+		svn update >> $LOGFILE  2>&1 || failure
 	else
 		echo "Retrieving OGLFT (this may take a while)..." | tee -a $LOGFILE
-		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $LOGFILE
+		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $LOGFILE 2>&1 || failure
 	fi
 	
-	cd $ROOT/3rdparty/boinc
+	cd $ROOT/3rdparty/boinc || failure
 	if [ -d .svn ]; then
 		echo "Updating BOINC..." | tee -a $LOGFILE
-		svn update >> $LOGFILE
+		# make sure local changes (patches) are reverted, hence also updated
+		svn revert -R . >> $LOGFILE  2>&1 || failure
+		svn update >> $LOGFILE  2>&1 || failure
 	else
 		echo "Retrieving BOINC (this may take a while)..." | tee -a $LOGFILE
-		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $LOGFILE
+		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $LOGFILE 2>&1 || failure
 	fi
 
 	return 0
@@ -143,26 +172,26 @@ prepare_generic()
 
 prepare_win32()
 {
-	cd $ROOT
+	cd $ROOT || failure
 
 	echo "Preparing MinGW source tree..." | tee -a $LOGFILE
-	mkdir -p 3rdparty/mingw/xscripts >> $LOGFILE
-	cd 3rdparty/mingw/xscripts
+	mkdir -p 3rdparty/mingw/xscripts >> $LOGFILE || failure
+	cd 3rdparty/mingw/xscripts || failure
 
 	if [ -d CVS ]; then
 		echo "Updating MinGW build script..." | tee -a $LOGFILE
-		cvs update -C >> $LOGFILE 2>&1
+		cvs update -C >> $LOGFILE 2>&1 || failure
 	else
-		cd ..
+		cd .. || failure
 		echo "Retrieving MinGW build script (this may take a while)..." | tee -a $LOGFILE
-		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $LOGFILE 2>&1
+		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $LOGFILE 2>&1 || failure
 	fi
 	
-	cd $ROOT/3rdparty/mingw/xscripts
+	cd $ROOT/3rdparty/mingw/xscripts || failure
 	echo "Preparing MinGW build script..." | tee -a $LOGFILE
 	# note: svn has no force/overwrite switch. the file might not be updated when patched
-	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $LOGFILE
-	chmod +x x86-mingw32-build.sh >> $LOGFILE
+	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $LOGFILE || failure
+	chmod +x x86-mingw32-build.sh >> $LOGFILE || failure
 
 	return 0
 }
@@ -170,53 +199,53 @@ prepare_win32()
 
 build_generic()
 {
-	cd $ROOT/3rdparty/sdl
+	cd $ROOT/3rdparty/sdl || failure
 	echo "Building SDL (this may take a while)..." | tee -a $LOGFILE
-	./autogen.sh >> $LOGFILE
-	cd $ROOT/build/sdl
-	$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	./autogen.sh >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/sdl || failure
+	$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed SDL!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/freetype2
+	cd $ROOT/3rdparty/freetype2 || failure
 	echo "Building Freetype2 (this may take a while)..." | tee -a $LOGFILE
-	chmod +x autogen.sh >> $LOGFILE
-	chmod +x configure >> $LOGFILE
-	./autogen.sh >> $LOGFILE
-	cd $ROOT/build/freetype2
+	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
+	./autogen.sh >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/freetype2 || failure
 	# note: freetype (or sdl?) probably doesn't need *no* configure when static -> ansi build, see readme!
-	$ROOT/3rdparty/freetype2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	$ROOT/3rdparty/freetype2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Freetype2!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/oglft
+	cd $ROOT/3rdparty/oglft || failure
 	echo "Patching OGLFT..." | tee -a $LOGFILE
 	# note: svn has no force/overwrite switch. patched files might not be updated
 	# patch: use fixed settings for freetype, deactivate FindFreetype
 	FREETYPE2_INCLUDE_DIR="$ROOT/install/include"
 	FREETYPE2_LIBRARIES="$ROOT/install/lib/liboglft.a"
-	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.oglft.patch >> $LOGFILE
+	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.oglft.patch >> $LOGFILE 2>&1 || failure
 	# patch: build static lib instead of shared
-	cd $ROOT/3rdparty/oglft/liboglft
-	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE
+	cd $ROOT/3rdparty/oglft/liboglft || failure
+	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
 	echo "Building OGLFT..." | tee -a $LOGFILE
-	cd $ROOT/build/oglft
-	cmake -DFREETYPE2_INCLUDE_DIR="$FREETYPE2_INCLUDE_DIR" -DFREETYPE2_LIBRARIES="$FREETYPE2_LIBRARIES" $ROOT/3rdparty/oglft >> $LOGFILE
-	make >> $LOGFILE
-	mkdir -p $ROOT/install/include/oglft >> $LOGFILE
-	cp OGLFT.h $ROOT/install/include/oglft >> $LOGFILE
-	cp liboglft/liboglft.a $ROOT/install/lib >> $LOGFILE
+	cd $ROOT/build/oglft || failure
+	cmake -DFREETYPE2_INCLUDE_DIR="$FREETYPE2_INCLUDE_DIR" -DFREETYPE2_LIBRARIES="$FREETYPE2_LIBRARIES" $ROOT/3rdparty/oglft >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	mkdir -p $ROOT/install/include/oglft >> $LOGFILE 2>&1 || failure
+	cp OGLFT.h $ROOT/install/include/oglft >> $LOGFILE 2>&1 || failure
+	cp liboglft/liboglft.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed OGLFT!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/boinc
+	cd $ROOT/3rdparty/boinc || failure
 	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
-	./_autosetup >> $LOGFILE
-	cd $ROOT/build/boinc
-	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	./_autosetup >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/boinc || failure
+	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed BOINC!" | tee -a $LOGFILE
 
 	return 0
@@ -234,31 +263,31 @@ build_mingw()
 build_starsphere()
 {
 	echo "Building Starsphere [ORC]..." | tee -a $LOGFILE
-	export ORC_SRC=$ROOT/src/orc
-	export ORC_INSTALL=$ROOT/install
-	cd $ROOT/build/orc
-	cp $ROOT/src/orc/Makefile .  >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	export ORC_SRC=$ROOT/src/orc || failure
+	export ORC_INSTALL=$ROOT/install || failure
+	cd $ROOT/build/orc || failure
+	cp $ROOT/src/orc/Makefile . >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [ORC]!" | tee -a $LOGFILE
 
 	echo "Building Starsphere [Framework]..." | tee -a $LOGFILE
-	export FRAMEWORK_SRC=$ROOT/src/framework
-	export FRAMEWORK_INSTALL=$ROOT/install
-	cd $ROOT/build/framework
-	cp $ROOT/src/framework/Makefile .  >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	export FRAMEWORK_SRC=$ROOT/src/framework || failure
+	export FRAMEWORK_INSTALL=$ROOT/install || failure
+	cd $ROOT/build/framework || failure
+	cp $ROOT/src/framework/Makefile . >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Framework]!" | tee -a $LOGFILE
 
 	echo "Building Starsphere [Application]..." | tee -a $LOGFILE
-	export STARSPHERE_SRC=$ROOT/src/starsphere
-	export STARSPHERE_INSTALL=$ROOT/install
-	cd $ROOT/build/starsphere
-	cp $ROOT/src/starsphere/Makefile .  >> $LOGFILE
-	cp $ROOT/src/starsphere/*.res .  >> $LOGFILE
-	make >> $LOGFILE
-	make install >> $LOGFILE
+	export STARSPHERE_SRC=$ROOT/src/starsphere || failure
+	export STARSPHERE_INSTALL=$ROOT/install || failure
+	cd $ROOT/build/starsphere || failure
+	cp $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
+	cp $ROOT/src/starsphere/*.res . >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Application]!" | tee -a $LOGFILE
 
 	return 0
@@ -267,8 +296,8 @@ build_starsphere()
 
 build_linux()
 {
-	build_generic
-	build_starsphere
+	build_generic || failure
+	build_starsphere || failure
 
 	return 0
 }
@@ -299,27 +328,32 @@ build_win32()
 
 distclean()
 {
-	cd $ROOT
+	cd $ROOT || failure
 
-	rm -rf 3rdparty
-	rm -rf build
-	rm -rf install
+	echo "Purging build system..." | tee -a $LOGFILE
 
-	rm -f .lastbuild
+	rm -rf 3rdparty || failure
+	rm -rf build || failure
+	rm -rf install || failure
+
+	rm -f .lastbuild || failure
 }
 
 
 check_last_build()
 {
+	echo "Checking previous build target..." | tee -a $LOGFILE
+
 	LASTBUILD=`cat .lastbuild 2>/dev/null`
 
 	if [[ ( -f .lastbuild ) && ( "$LASTBUILD" != "$1" ) ]]; then
-		cd $ROOT
-		rm -rf build
-		rm -rf install
+		cd $ROOT || failure
+		echo "Build target changed! Purging build and install trees..." | tee -a $LOGFILE
+		rm -rf build >> $LOGFILE || failure
+		rm -rf install >> $LOGFILE || failure
 	fi
 
-	echo "$1" > .lastbuild
+	echo "$1" > .lastbuild || failure
 
 	return 0
 }
@@ -350,10 +384,10 @@ TARGET_LINUX=1
 TARGET_MAC=2
 TARGET_WIN32=3
 
-echo "************************************" >> $LOGFILE
-echo "Starting new setup run!" >> $LOGFILE
-echo "$DATE" >> $LOGFILE
-echo "************************************" >> $LOGFILE
+echo "************************************" | tee -a $LOGFILE
+echo "Starting new build!" | tee -a $LOGFILE
+echo "`date`" | tee -a $LOGFILE
+echo "************************************" | tee -a $LOGFILE
 
 # crude command line parsing :-)
 
@@ -365,21 +399,21 @@ fi
 case "$1" in
 	"--linux")
 		TARGET=$TARGET_LINUX
-		check_last_build "$1"
+		check_last_build "$1" || failure
 		echo "Building linux version:" | tee -a $LOGFILE
 		;;
 	"--mac")
 		TARGET=$TARGET_MAC
-		check_last_build "$1"
+		check_last_build "$1" || failure
 		echo "Building mac version:" | tee -a $LOGFILE
 		;;
 	"--win32")
 		TARGET=$TARGET_WIN32
-		check_last_build "$1"
+		check_last_build "$1" || failure
 		echo "Building win32 version:" | tee -a $LOGFILE
 		;;
 	"--distclean")
-		distclean
+		distclean || failure
 		exit 0
 		;;
 	*)
@@ -390,34 +424,18 @@ esac
 
 # here we go...
 
-check_prerequisites
-if [ ! $? -eq 0 ]; then
-	exit 1
-fi
-
-prepare_generic
-if [ ! $? -eq 0 ]; then
-	exit 1
-fi
+check_prerequisites || failure
+prepare_generic || failure
 
 case $TARGET in
 	$TARGET_LINUX)
-		build_linux
-		if [ ! $? -eq 0 ]; then
-			exit 1
-		fi
+		build_linux || failure
 		;;
 	$TARGET_MAC)
-		build_mac
-		if [ ! $? -eq 0 ]; then
-			exit 1
-		fi
+		build_mac || failure
 		;;
 	$TARGET_WIN32)
-		build_win32
-		if [ ! $? -eq 0 ]; then
-			exit 1
-		fi
+		build_win32 || failure
 		;;
 	*)
 		# should be unreachable
@@ -425,5 +443,10 @@ case $TARGET in
 		exit 1
 		;;
 esac
+
+echo "************************************" | tee -a $LOGFILE
+echo "Build finished successfully!" | tee -a $LOGFILE
+echo "`date`" | tee -a $LOGFILE
+echo "************************************" | tee -a $LOGFILE
 
 exit 0
