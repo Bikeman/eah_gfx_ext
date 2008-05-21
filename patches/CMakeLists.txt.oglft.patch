@@ -1,0 +1,10 @@
+--- CMakeLists.txt
++++ CMakeLists.txt.new	2008-05-21 14:11:05.000000000 +0200
+@@ -4,7 +4,6 @@
+ set( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
+ 
+ find_package( OpenGL REQUIRED )
+-find_package( Freetype REQUIRED )
+ 
+ if( ENABLE_QT )
+   find_package( Qt REQUIRED )
