@@ -225,13 +225,18 @@ build_generic()
 	# note: svn has no force/overwrite switch. patched files might not be updated
 	# patch: use fixed settings for freetype, deactivate FindFreetype
 	FREETYPE2_INCLUDE_DIR="$ROOT/install/include"
-	FREETYPE2_LIBRARIES="$ROOT/install/lib/liboglft.a"
+	FREETYPE2_LIBRARIES="$ROOT/install/lib/libfreetype.a"
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.oglft.patch >> $LOGFILE 2>&1 || failure
 	# patch: build static lib instead of shared
 	cd $ROOT/3rdparty/oglft/liboglft || failure
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
+	if [ "$1" == "$TARGET_MAC" ]; then
+		# patch: enable Mac OS support
+		patch OGLFT.h.cmake < $ROOT/patches/OGLFT.h.cmake.macos.patch >> $LOGFILE 2>&1 || failure
+	fi
 	echo "Building OGLFT..." | tee -a $LOGFILE
 	cd $ROOT/build/oglft || failure
+	# TODO: do we wanna create universal binaries on mac? If so, add -DCMAKE_OSX_ARCHITECTURES=ppc;i386
 	cmake -DFREETYPE2_INCLUDE_DIR="$FREETYPE2_INCLUDE_DIR" -DFREETYPE2_LIBRARIES="$FREETYPE2_LIBRARIES" $ROOT/3rdparty/oglft >> $LOGFILE 2>&1 || failure
 	make >> $LOGFILE 2>&1 || failure
 	mkdir -p $ROOT/install/include/oglft >> $LOGFILE 2>&1 || failure
@@ -284,8 +289,12 @@ build_starsphere()
 	export STARSPHERE_SRC=$ROOT/src/starsphere || failure
 	export STARSPHERE_INSTALL=$ROOT/install || failure
 	cd $ROOT/build/starsphere || failure
-	cp $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
 	cp $ROOT/src/starsphere/*.res . >> $LOGFILE 2>&1 || failure
+	if [ "$1" != "$TARGET_MAC" ]; then
+		cp $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
+	else
+		cp $ROOT/src/starsphere/Makefile.macos Makefile >> $LOGFILE 2>&1 || failure
+	fi
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Application]!" | tee -a $LOGFILE
@@ -305,10 +314,8 @@ build_linux()
 
 build_mac()
 {
-	echo "Not yet implemented: build_mac()"
-
-# 	build_generic
-# 	build_starsphere
+	build_generic $TARGET_MAC || failure
+	build_starsphere $TARGET_MAC || failure
 
 	return 0
 }
