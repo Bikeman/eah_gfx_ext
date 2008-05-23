@@ -230,10 +230,6 @@ build_generic()
 	# patch: build static lib instead of shared
 	cd $ROOT/3rdparty/oglft/liboglft || failure
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
-	if [ "$1" == "$TARGET_MAC" ]; then
-		# patch: enable Mac OS support
-		patch OGLFT.h.cmake < $ROOT/patches/OGLFT.h.cmake.macos.patch >> $LOGFILE 2>&1 || failure
-	fi
 	echo "Building OGLFT..." | tee -a $LOGFILE
 	cd $ROOT/build/oglft || failure
 	# TODO: do we wanna create universal binaries on mac? If so, add -DCMAKE_OSX_ARCHITECTURES=ppc;i386
