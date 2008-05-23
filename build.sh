@@ -43,7 +43,7 @@ failure()
 		echo "Please check logfile: `basename $LOGFILE`"
 		echo "These are the final ten lines:"
 		echo "------------------------------------"
-		tail -n 14 $LOGFILE | head -n 10 -
+		tail -n 14 $LOGFILE | head -n 10
     fi
 
 	echo "************************************" | tee -a $LOGFILE
