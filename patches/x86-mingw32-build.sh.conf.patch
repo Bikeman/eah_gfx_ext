@@ -17,7 +17,7 @@
 -     assume INSTALL_DIR                   $HOME/mingw
 +     assume WORKING_DIR                   `pwd`/../../../build/mingw
 +     assume PACKAGE_DIR                   `pwd`/../packages
-+     assume INSTALL_DIR                   `pwd`/../../../install/mingw
++     assume INSTALL_DIR                   `pwd`/../../../install
  #
  # 4) Package versions, from which the compiler will be built.
  #
