@@ -1,0 +1,33 @@
+--- boinc_win.h
++++ boinc_win.h	2008-06-03 17:35:38.000000000 +0200
+@@ -110,7 +110,7 @@
+ 
+ #include <commctrl.h>
+ #include <raserror.h>
+-#include <dbghelp.h>
++#include <imagehlp.h>
+ #include <tlhelp32.h>
+ 
+ #include <io.h>
+@@ -143,7 +143,7 @@
+ // C headers
+ #include <sys/stat.h>
+ #include <sys/types.h>
+-#include <fcntl.h>
++// #include <fcntl.h>
+ #include <malloc.h>
+ 
+ #if !defined(__MINGW32__) && !defined(__CYGWIN32__)
+@@ -238,9 +238,9 @@
+ #endif
+ void __cdecl _fpreset (void);
+ void __cdecl fpreset (void);
+-#define SetClassLongPtr SetClassLong
+-#define GCLP_HICON GCL_HICON
+-#define GCLP_HICONSM GCL_HICONSM
++// #define SetClassLongPtr SetClassLong
++// #define GCLP_HICON GCL_HICON
++// #define GCLP_HICONSM GCL_HICONSM
+ #ifdef __cplusplus
+ }
+ #endif

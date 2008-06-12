@@ -1,0 +1,11 @@
+--- exports.mk
++++ exports.mk.new	2008-06-02 12:24:03.000000000 +0200
+@@ -61,7 +61,7 @@
+   # debuggers, to the EXPORTS_LIST.
+   #
+   $(EXPORTS_LIST): $(APINAMES_EXE) $(PUBLIC_HEADERS)
+-	  $(subst /,$(SEP),$(APINAMES_EXE)) -o$@ $(APINAMES_OPTIONS) $(PUBLIC_HEADERS)
++#	  $(subst /,$(SEP),$(APINAMES_EXE)) -o$@ $(APINAMES_OPTIONS) $(PUBLIC_HEADERS)
+ 	  @echo TT_New_Context >> $(EXPORTS_LIST)
+ 	  @echo TT_RunIns >> $(EXPORTS_LIST)
+ 

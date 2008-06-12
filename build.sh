@@ -27,6 +27,8 @@
 ### globals ###############################################################
 
 ROOT=`pwd`
+PATH_ORG="$PATH"
+PATH_MINGW="$PATH"
 LOGFILE=$ROOT/build.log
 TARGET=0
 
@@ -126,8 +128,8 @@ prepare_generic()
 		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $LOGFILE 2>&1 || failure
 	fi
 
-# 	cd $ROOT/3rdparty || failure
 # 	echo "Retrieving SDL (this may take a while)..." | tee -a $LOGFILE
+# 	cd $ROOT/3rdparty || failure
 # 	wget http://www.libsdl.org/release/SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
 # 	tar -xzf SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
 # 	rm SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
@@ -135,8 +137,8 @@ prepare_generic()
 # 	rm -rf sdl >> $LOGFILE 2>&1 || failure
 # 	mv SDL-1.2.14 sdl >> $LOGFILE 2>&1 || failure
 	
-	cd $ROOT/3rdparty || failure
 	echo "Retrieving Freetype2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty || failure
 	wget http://mesh.dl.sourceforge.net/sourceforge/freetype/freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
 	tar -xjf freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
 	rm freetype-2.3.5.tar.bz2 >> $LOGFILE 2>&1 || failure
@@ -187,8 +189,8 @@ prepare_win32()
 		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $LOGFILE 2>&1 || failure
 	fi
 	
-	cd $ROOT/3rdparty/mingw/xscripts || failure
 	echo "Preparing MinGW build script..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/mingw/xscripts || failure
 	# note: svn has no force/overwrite switch. the file might not be updated when patched
 	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $LOGFILE || failure
 	chmod +x x86-mingw32-build.sh >> $LOGFILE || failure
@@ -199,8 +201,8 @@ prepare_win32()
 
 build_generic()
 {
-	cd $ROOT/3rdparty/sdl || failure
 	echo "Building SDL (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/sdl || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/sdl || failure
 	$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
@@ -208,8 +210,8 @@ build_generic()
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed SDL!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/freetype2 || failure
 	echo "Building Freetype2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/freetype2 || failure
 	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
 	chmod +x configure >> $LOGFILE 2>&1 || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
@@ -220,8 +222,8 @@ build_generic()
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Freetype2!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/oglft || failure
 	echo "Patching OGLFT..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/oglft || failure
 	# note: svn has no force/overwrite switch. patched files might not be updated
 	# patch: use fixed settings for freetype, deactivate FindFreetype
 	FREETYPE2_INCLUDE_DIR="$ROOT/install/include"
@@ -240,8 +242,8 @@ build_generic()
 	cp liboglft/liboglft.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed OGLFT!" | tee -a $LOGFILE
 
-	cd $ROOT/3rdparty/boinc || failure
 	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/boinc || failure
 	./_autosetup >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc || failure
 	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
@@ -253,9 +255,122 @@ build_generic()
 }
 
 
+build_generic_win32()
+{
+	# general config
+	PREFIX=$ROOT/install
+	TARGET_HOST=i586-pc-mingw32
+	BUILD_HOST=i386-linux
+	PATH_MINGW="$PREFIX/bin:$PREFIX/$TARGET_HOST/bin:$PATH"
+	PATH="$PATH_MINGW"
+	export PATH
+
+	echo "Building SDL (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/sdl || failure
+	./autogen.sh >> $LOGFILE 2>&1 || failure
+	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-sdl-config" ]; then
+		SDL_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-sdl-config"
+		export SDL_CONFIG
+		echo "Cross-compile SDL_CONFIG: $SDL_CONFIG" >> $LOGFILE
+	fi
+	cd $ROOT/build/sdl || failure
+	$ROOT/3rdparty/sdl/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$PREFIX --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed SDL!" | tee -a $LOGFILE
+
+	echo "Patching Freetype2..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/freetype2/builds || failure
+	# patch: deactivating invocation of apinames (would run win32 binary on linux host)
+	patch < $ROOT/patches/freetype2.exports.mk.patch >> $LOGFILE 2>&1 || failure
+	echo "Building Freetype2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/freetype2 || failure
+	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
+	./autogen.sh >> $LOGFILE 2>&1 || failure
+	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-freetype-config" ]; then
+		FT_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-freetype-config"
+		export FT_CONFIG
+		echo "Cross-compile FT_CONFIG: $FT_CONFIG" >> $LOGFILE
+	fi
+	cd $ROOT/build/freetype2 || failure
+	# note: freetype (or sdl?) probably doesn't need *no* configure when static -> ansi build, see readme!
+	$ROOT/3rdparty/freetype2/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$PREFIX --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed Freetype2!" | tee -a $LOGFILE
+
+	echo "Patching OGLFT..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/oglft || failure
+	# note: svn has no force/overwrite switch. patched files might not be updated
+	# patch: use fixed settings for freetype, deactivate FindFreetype
+	FREETYPE2_INCLUDE_DIR="$ROOT/install/include"
+	FREETYPE2_LIBRARIES="$ROOT/install/lib/libfreetype.a"
+	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.oglft.patch >> $LOGFILE 2>&1 || failure
+	# patch: build static lib instead of shared
+	cd $ROOT/3rdparty/oglft/liboglft || failure
+	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
+	## patch: include windows.h for all WIN32 builds (not only MSVC) -> already submitted upstream!!!!
+	#patch OGLFT.h.cmake < $ROOT/patches/OGLFT.h.cmake.patch >> $LOGFILE 2>&1 || failure
+	cp $ROOT/patches/toolchain-linux-mingw.oglft.cmake $ROOT/build/oglft >> $LOGFILE 2>&1 || failure
+	export OGLFT_INSTALL=$ROOT/install
+	echo "Building OGLFT..." | tee -a $LOGFILE
+	cd $ROOT/build/oglft || failure
+	cmake -DCMAKE_TOOLCHAIN_FILE="toolchain-linux-mingw.oglft.cmake" -DFREETYPE2_INCLUDE_DIR="$FREETYPE2_INCLUDE_DIR" -DFREETYPE2_LIBRARIES="$FREETYPE2_LIBRARIES" $ROOT/3rdparty/oglft >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	mkdir -p $ROOT/install/include/oglft >> $LOGFILE 2>&1 || failure
+	cp OGLFT.h $ROOT/install/include/oglft >> $LOGFILE 2>&1 || failure
+	cp liboglft/liboglft.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed OGLFT!" | tee -a $LOGFILE
+
+	echo "Patching BOINC..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/boinc/lib || failure
+	# patch: fix a couple of BOINC vs. MinGW issues
+	patch boinc_win.h < $ROOT/patches/boinc.boinc_win.h.minggw.patch >> $LOGFILE 2>&1 || failure
+	patch stackwalker_win.cpp < $ROOT/patches/boinc.stackwalker_win.cpp.minggw.patch >> $LOGFILE 2>&1 || failure
+	patch filesys.C < $ROOT/patches/boinc.filesys.C.mingw.patch >> $LOGFILE 2>&1 || failure
+	# patch: add graphics2 and customize build path (see below)
+	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/boinc || failure
+	./_autosetup >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/boinc || failure
+	$ROOT/3rdparty/boinc/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$ROOT/install --includedir=$ROOT/install/include --oldincludedir=$ROOT/install/include --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
+# # 	make >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/boinc/api || failure
+	cp $ROOT/3rdparty/boinc/api/Makefile.mingw . >> $LOGFILE 2>&1 || failure
+	patch Makefile.mingw < $ROOT/patches/boinc.Makefile.mingw.patch >> $LOGFILE 2>&1 || failure
+	export BOINC_SRC=$ROOT/3rdparty/boinc || failure
+	cd $ROOT/build/boinc || failure
+	make -f api/Makefile.mingw >> $LOGFILE 2>&1 || failure
+# 	make install >> $LOGFILE 2>&1 || failure
+# 	cp $ROOT/build/boinc/config.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+# 	cp $ROOT/build/boinc/version.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/build/boinc/libboinc.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
+	mkdir -p $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/boinc_api.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/graphics2.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/app_ipc.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/miofile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/mfile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/parse.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/util.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed BOINC!" | tee -a $LOGFILE
+}
+
+
 build_mingw()
 {
-	echo "Not yet implemented: build_mingw()"
+	TARGET_HOST=i586-pc-mingw32
+
+	echo "Building MinGW (this will take quite a while)..." | tee -a $LOGFILE
+	# note: the script's current config for unattended setup expects it to be run from three levels below root!
+	cd $ROOT/3rdparty/mingw/xscripts || failure
+	./x86-mingw32-build.sh --unattended $TARGET_HOST >> $LOGFILE 2>&1 || failure
 
 	return 0
 }
@@ -263,6 +378,9 @@ build_mingw()
 
 build_starsphere()
 {
+	# make sure ORC is always compiled for host platform (it's exexuted during starsphere build!)
+	export PATH=$PATH_ORG
+
 	echo "Building Starsphere [ORC]..." | tee -a $LOGFILE
 	export ORC_SRC=$ROOT/src/orc || failure
 	export ORC_INSTALL=$ROOT/install || failure
@@ -272,11 +390,22 @@ build_starsphere()
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [ORC]!" | tee -a $LOGFILE
 
+	# set main include directory
+	if [ "$1" == "$TARGET_WIN32" ]; then
+		export PATH=$PATH_MINGW
+	else
+		export PATH=$PATH_ORG
+	fi
+
 	echo "Building Starsphere [Framework]..." | tee -a $LOGFILE
 	export FRAMEWORK_SRC=$ROOT/src/framework || failure
 	export FRAMEWORK_INSTALL=$ROOT/install || failure
 	cd $ROOT/build/framework || failure
-	cp $ROOT/src/framework/Makefile . >> $LOGFILE 2>&1 || failure
+	if [ "$1" == "$TARGET_WIN32" ]; then
+		cp -f $ROOT/src/framework/Makefile.mingw Makefile >> $LOGFILE 2>&1 || failure
+	else
+		cp -f $ROOT/src/framework/Makefile . >> $LOGFILE 2>&1 || failure
+	fi
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Framework]!" | tee -a $LOGFILE
@@ -286,10 +415,12 @@ build_starsphere()
 	export STARSPHERE_INSTALL=$ROOT/install || failure
 	cd $ROOT/build/starsphere || failure
 	cp $ROOT/src/starsphere/*.res . >> $LOGFILE 2>&1 || failure
-	if [ "$1" != "$TARGET_MAC" ]; then
-		cp $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
+	if [ "$1" == "$TARGET_MAC" ]; then
+		cp -f $ROOT/src/starsphere/Makefile.macos Makefile >> $LOGFILE 2>&1 || failure
+	elif [ "$1" == "$TARGET_WIN32" ]; then
+		cp -f $ROOT/src/starsphere/Makefile.mingw Makefile >> $LOGFILE 2>&1 || failure
 	else
-		cp $ROOT/src/starsphere/Makefile.macos Makefile >> $LOGFILE 2>&1 || failure
+		cp -f $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
 	fi
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
@@ -319,11 +450,10 @@ build_mac()
 
 build_win32()
 {
-	echo "Not yet implemented: build_win32()"
-
-# 	build_mingw
-# 	build_generic
-# 	build_starsphere
+	prepare_win32 || failure
+	build_mingw || failure
+	build_generic_win32 || failure
+	build_starsphere $TARGET_WIN32
 
 	return 0
 }

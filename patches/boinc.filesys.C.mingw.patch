@@ -1,0 +1,15 @@
+--- filesys.C
++++ filesys.C.new	2008-06-11 15:38:25.000000000 +0200
+@@ -21,10 +21,11 @@
+ #include "boinc_win.h"
+ #endif
+ 
++#include <fcntl.h>
++
+ #if !defined(_WIN32) || defined(__CYGWIN32__)
+ #include "config.h"
+ #include <cstdio>
+-#include <fcntl.h>
+ #include <cerrno>
+ #include <sys/stat.h>
+ #include <sys/file.h>
