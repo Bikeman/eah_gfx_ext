@@ -28,7 +28,7 @@ CXX?=g++
 # variables
 CPPFLAGS = $(shell $(FRAMEWORK_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/freetype-config --cflags)
-CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I$(FRAMEWORK_INSTALL)/include
+CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/boinc -I$(FRAMEWORK_INSTALL)/include
 
 DEPS = Makefile
 OBJS = AbstractGraphicsEngine.o GraphicsEngineFactory.o WindowManager.o Resource.o ResourceFactory.o BOINCClientAdapter.o

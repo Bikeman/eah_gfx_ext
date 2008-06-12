@@ -127,15 +127,6 @@ prepare_generic()
 		echo "Retrieving SDL (this may take a while)..." | tee -a $LOGFILE
 		svn checkout http://svn.libsdl.org/branches/SDL-1.2 . >> $LOGFILE 2>&1 || failure
 	fi
-
-# 	echo "Retrieving SDL (this may take a while)..." | tee -a $LOGFILE
-# 	cd $ROOT/3rdparty || failure
-# 	wget http://www.libsdl.org/release/SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
-# 	tar -xzf SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
-# 	rm SDL-1.2.14.tar.gz >> $LOGFILE 2>&1 || failure
-# 	substitute old source tree
-# 	rm -rf sdl >> $LOGFILE 2>&1 || failure
-# 	mv SDL-1.2.14 sdl >> $LOGFILE 2>&1 || failure
 	
 	echo "Retrieving Freetype2 (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty || failure
@@ -310,8 +301,6 @@ build_generic_win32()
 	# patch: build static lib instead of shared
 	cd $ROOT/3rdparty/oglft/liboglft || failure
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
-	## patch: include windows.h for all WIN32 builds (not only MSVC) -> already submitted upstream!!!!
-	#patch OGLFT.h.cmake < $ROOT/patches/OGLFT.h.cmake.patch >> $LOGFILE 2>&1 || failure
 	cp $ROOT/patches/toolchain-linux-mingw.oglft.cmake $ROOT/build/oglft >> $LOGFILE 2>&1 || failure
 	export OGLFT_INSTALL=$ROOT/install
 	echo "Building OGLFT..." | tee -a $LOGFILE
@@ -334,31 +323,28 @@ build_generic_win32()
 	cd $ROOT/3rdparty/boinc || failure
 	./_autosetup >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc || failure
+	# note: configure is still required but we don't use the generated Makefile
 	$ROOT/3rdparty/boinc/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$ROOT/install --includedir=$ROOT/install/include --oldincludedir=$ROOT/install/include --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
-# # 	make >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc/api || failure
 	cp $ROOT/3rdparty/boinc/api/Makefile.mingw . >> $LOGFILE 2>&1 || failure
 	patch Makefile.mingw < $ROOT/patches/boinc.Makefile.mingw.patch >> $LOGFILE 2>&1 || failure
 	export BOINC_SRC=$ROOT/3rdparty/boinc || failure
 	cd $ROOT/build/boinc || failure
 	make -f api/Makefile.mingw >> $LOGFILE 2>&1 || failure
-# 	make install >> $LOGFILE 2>&1 || failure
-# 	cp $ROOT/build/boinc/config.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-# 	cp $ROOT/build/boinc/version.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/build/boinc/libboinc.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
-	mkdir -p $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/api/boinc_api.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/api/graphics2.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/app_ipc.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/miofile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/mfile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/parse.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/util.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	mkdir -p $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/boinc_api.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/graphics2.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/app_ipc.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/miofile.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/mfile.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/parse.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/util.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed BOINC!" | tee -a $LOGFILE
 }
 
