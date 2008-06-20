@@ -156,7 +156,7 @@ prepare_generic()
 		svn update >> $LOGFILE  2>&1 || failure
 	else
 		echo "Retrieving BOINC (this may take a while)..." | tee -a $LOGFILE
-		svn checkout http://boinc.berkeley.edu/svn/trunk/boinc . >> $LOGFILE 2>&1 || failure
+		svn checkout http://boinc.berkeley.edu/svn/branches/boinc_core_release_6_2 . >> $LOGFILE 2>&1 || failure
 	fi
 
 	return 0
@@ -316,7 +316,6 @@ build_generic_win32()
 	cd $ROOT/3rdparty/boinc/lib || failure
 	# patch: fix a couple of BOINC vs. MinGW issues
 	patch boinc_win.h < $ROOT/patches/boinc.boinc_win.h.minggw.patch >> $LOGFILE 2>&1 || failure
-	patch stackwalker_win.cpp < $ROOT/patches/boinc.stackwalker_win.cpp.minggw.patch >> $LOGFILE 2>&1 || failure
 	patch filesys.C < $ROOT/patches/boinc.filesys.C.mingw.patch >> $LOGFILE 2>&1 || failure
 	# patch: add graphics2 and customize build path (see below)
 	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
@@ -332,19 +331,19 @@ build_generic_win32()
 	cd $ROOT/build/boinc || failure
 	make -f api/Makefile.mingw >> $LOGFILE 2>&1 || failure
 	cp $ROOT/build/boinc/libboinc.a $ROOT/install/lib >> $LOGFILE 2>&1 || failure
-	mkdir -p $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/api/boinc_api.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/api/graphics2.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/app_ipc.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/miofile.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/mfile.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/parse.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
-	cp $ROOT/3rdparty/boinc/lib/util.h $ROOT/install/include/boinc >> $LOGFILE 2>&1 || failure
+	mkdir -p $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/boinc_api.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/api/graphics2.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/app_ipc.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/miofile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/mfile.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/parse.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/util.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed BOINC!" | tee -a $LOGFILE
 }
 
