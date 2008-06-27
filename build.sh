@@ -196,7 +196,11 @@ build_generic()
 	cd $ROOT/3rdparty/sdl || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/sdl || failure
-	$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	if [ "$1" == "$TARGET_MAC" ]; then
+		$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --enable-video-x11=no >> $LOGFILE 2>&1 || failure
+	else
+		$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure	
+	fi
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed SDL!" | tee -a $LOGFILE
