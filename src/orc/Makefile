@@ -24,6 +24,12 @@ ORC_INSTALL?=$(PWD)
 
 # config values
 CXX?=g++
+
+# variables
+CPPFLAGS += -I/usr/include
+LDFLAGS +=
+LIBS += -L/usr/lib
+
 DEBUGFLAGSCPP=-DDEBUG -pg -ggdb -O0
 OBJS=ResourceCompiler.o
 DEPS=Makefile
@@ -40,7 +46,7 @@ release: LDFLAGS += -s
 
 # file specific targets
 orc: $(DEPS) $(ORC_SRC)/orc.cpp $(OBJS)
-	$(CXX) -g $(CPPFLAGS) $(ORC_SRC)/orc.cpp -o orc $(OBJS)
+	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(ORC_SRC)/orc.cpp -o orc $(OBJS) $(LIBS)
 
 ResourceCompiler.o: $(DEPS) $(ORC_SRC)/ResourceCompiler.cpp $(ORC_SRC)/ResourceCompiler.h
 	$(CXX) -g $(CPPFLAGS) -c $(ORC_SRC)/ResourceCompiler.cpp
