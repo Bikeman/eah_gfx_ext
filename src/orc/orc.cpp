@@ -18,6 +18,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstdlib>
+#include <string>
+#include <iostream>
+
 #include "ResourceCompiler.h"
 
 void printUsage() {

@@ -21,6 +21,7 @@
 #ifndef RESOURCECOMPILER_H_
 #define RESOURCECOMPILER_H_
 
+#include <cstdlib>
 #include <string>
 #include <map>
 #include <vector>

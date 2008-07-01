@@ -18,6 +18,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstdlib>
 #include <iostream>
 
 #include "WindowManager.h"
