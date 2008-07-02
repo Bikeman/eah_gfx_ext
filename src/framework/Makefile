@@ -47,7 +47,7 @@ release: clean libframework.a
 # target specific options
 debug: CPPFLAGS += $(DEBUGFLAGSCPP)
 release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
-release: LDFLAGS += -s
+release: LDFLAGS +=
 
 # file based targets
 libframework.a: $(OBJS)

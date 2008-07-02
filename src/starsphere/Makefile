@@ -56,7 +56,7 @@ debug: CPPFLAGS += $(DEBUGFLAGSCPP)
 memcheck: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
 callgrind: CPPFLAGS += $(DEBUGFLAGSCPP) -DDEBUG_VALGRIND
 release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
-release: LDFLAGS += -s
+release: LDFLAGS +=
 
 # file based targets
 starsphere: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)

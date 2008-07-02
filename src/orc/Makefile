@@ -42,7 +42,7 @@ release: clean orc
 # target specific options
 debug: CPPFLAGS += $(DEBUGFLAGSCPP)
 release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
-release: LDFLAGS += -s
+release: LDFLAGS +=
 
 # file specific targets
 orc: $(DEPS) $(ORC_SRC)/orc.cpp $(OBJS)
