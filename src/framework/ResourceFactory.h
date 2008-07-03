@@ -28,6 +28,11 @@
 #include "Resource.h"
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief This factory instantiates %Resource objects using a given identifier
  * 
  * During contruction of the factory object itself it loads all available resources into
@@ -111,5 +116,9 @@ extern const unsigned int c_ResourceIndex[][2];
  * Maybe we should wrap a class around the generated resources?
  */
 extern const unsigned char c_ResourceStorage[];
+
+/**
+ * @}
+ */
 
 #endif /*RESOURCEFACTORY_H_*/

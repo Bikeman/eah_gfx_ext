@@ -31,6 +31,11 @@
 using namespace std;
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief Adapter class which facilitates communications with the BOINC client
  * 
  * This adapter class can be used to query the BOINC core client for information
@@ -201,5 +206,9 @@ private:
 	 */
 	APP_INIT_DATA m_UserData;
 };
+
+/**
+ * @}
+ */
 
 #endif /*BOINCCLIENTADAPTER_H_*/

@@ -27,6 +27,11 @@
 using namespace std;
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief Class that serves as storage container for arbitrary binary data resources
  * 
  * Instances of this class are returned by ResourceFactory and hold any kind of binary data
@@ -78,5 +83,9 @@ private:
 	/// The data storage container of this resource
 	const vector<unsigned char> m_Data;
 };
+
+/**
+ * @}
+ */
 
 #endif /*RESOURCE_H_*/

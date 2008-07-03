@@ -30,6 +30,11 @@ using namespace std;
 #define PI 3.14159265
 
 /**
+ * \addtogroup starsphere Starsphere
+ * @{
+ */
+
+/**
  * \brief Adapter class which facilitates communications with the \b Einstein\@Home S5R3 application
  * 
  * This adapter class can be used to query the \b Einstein\@Home S5R3 application
@@ -117,5 +122,9 @@ private:
 	/// Amount of CPU time consumed for the work unit during the active session
 	double m_WUCPUTime;	
 };
+
+/**
+ * @}
+ */
 
 #endif /*EINSTEINS5R3ADAPTER_H_*/

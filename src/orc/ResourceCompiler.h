@@ -33,6 +33,11 @@
 using namespace std;
 
 /**
+ * \addtogroup orc Open Resource Compiler
+ * @{
+ */
+
+/**
  * \brief Helper class that converts binary resources into source code ready for compilation
  * 
  * This "compiler" takes a resource specification file, opens and loads the physical
@@ -120,5 +125,9 @@ private:
 	/// %Resource cache (identified by logical resource name)
 	map<string, vector<unsigned char> > m_ResourceDataMap;
 };
+
+/**
+ * @}
+ */
 
 #endif /*RESOURCECOMPILER_H_*/

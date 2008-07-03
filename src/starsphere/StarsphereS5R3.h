@@ -29,6 +29,11 @@
 using namespace std;
 
 /**
+ * \addtogroup starsphere Starsphere
+ * @{
+ */
+
+/**
  * \brief Specialized rendering engine for the S5R3 science run
  * 
  * This class comprises the specialized parts of the Starsphere rendering engine.
@@ -132,5 +137,9 @@ private:
 	/// HUD configuration setting (vertical start postion for the bottom part, line 4)
 	GLfloat m_Y4StartPosBottom;
 };
+
+/**
+ * @}
+ */
 
 #endif /*STARSPHERES5R3_H_*/

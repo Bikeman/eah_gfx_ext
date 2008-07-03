@@ -35,6 +35,11 @@
 using namespace std;
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief This class is responsible for the application's window and event management.
  * 
  * %WindowManager provides an initialized OpenGL context needed by any given
@@ -232,5 +237,9 @@ private:
     /// The event observer registry
     list<AbstractGraphicsEngine *> eventObservers;
 };
+
+/**
+ * @}
+ */
 
 #endif /*WINDOWMANAGER_H_*/

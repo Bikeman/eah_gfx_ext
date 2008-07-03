@@ -25,6 +25,11 @@
 #include "StarsphereS5R3.h"
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief Factory to create graphics engines
  *
  * \author Oliver Bock\n
@@ -68,5 +73,9 @@ private:
 	/// Contructor (private since this a purely static factory)
 	GraphicsEngineFactory();
 };
+
+/**
+ * @}
+ */
 
 #endif /*GRAPHICSENGINEFACTORY_H_*/

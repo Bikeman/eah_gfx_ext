@@ -41,7 +41,6 @@
 
 #include "AbstractGraphicsEngine.h"
 
-
 /* SIN and COS take arguments in DEGREES */
 #define PI 3.14159265
 #define PI2 (2*PI)
@@ -58,6 +57,10 @@
 
 using namespace std;
 
+/**
+ * \addtogroup starsphere Starsphere
+ * @{
+ */
 
 /**
  * \brief %Starsphere rendering engine for \b Einstein\@Home
@@ -255,5 +258,9 @@ extern int Npulsars;
 /* SNR coordinates are in snr_list.C */
 extern float SNR_info[][2];
 extern int NSNRs;
+
+/**
+ * @}
+ */
 
 #endif /*STARSPHERE_H_*/

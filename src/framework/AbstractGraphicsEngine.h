@@ -25,6 +25,11 @@
 #include "Resource.h"
 
 /**
+ * \addtogroup framwork Framework
+ * @{
+ */
+
+/**
  * \brief This abstract class provides common features for all graphics engines
  * 
  * All graphics engines (Open GL visualisation code) have to be derived from this class.
@@ -182,5 +187,9 @@ protected:
 	/// BOINC client adapter instance for information retrieval
 	BOINCClientAdapter m_BoincAdapter;
 };
+
+/**
+ * @}
+ */
 
 #endif /*ABSTRACTGRAPHICSENGINE_H_*/
