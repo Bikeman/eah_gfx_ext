@@ -145,7 +145,7 @@ prepare_generic()
 		svn update >> $LOGFILE  2>&1 || failure
 	else
 		echo "Retrieving OGLFT (this may take a while)..." | tee -a $LOGFILE
-		svn checkout https://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $LOGFILE 2>&1 || failure
+		svn checkout http://oglft.svn.sourceforge.net/svnroot/oglft/trunk . >> $LOGFILE 2>&1 || failure
 	fi
 	
 	cd $ROOT/3rdparty/boinc || failure
