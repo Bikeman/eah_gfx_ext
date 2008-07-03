@@ -75,8 +75,7 @@ using namespace std;
  * of this engine.
  * 
  * \todo The code of this implementaion is based on the former version of %Starsphere
- * by Bruce Allen, David Hammer and Eric Myers. Due to this there's still
- * some refactoring and code cleanup left to be done.
+ * and there's still some refactoring, code cleanup and documenting left to be done.
  * 
  * \author Oliver Bock\n
  * Max-Planck-Institute for Gravitational Physics\n

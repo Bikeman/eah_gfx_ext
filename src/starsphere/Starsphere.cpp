@@ -217,7 +217,7 @@ void Starsphere::make_constellations()
 }
 
 /**
- * Create markers on sky sphere for LLO, LHO, and GEO
+ * Create markers on sky sphere for LLO, LHO, GEO and VIRGO
  * IFO corner positions are from Myers' personal GPS and are +/- 100m
  */
 

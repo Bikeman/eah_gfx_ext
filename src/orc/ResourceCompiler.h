@@ -38,11 +38,13 @@ using namespace std;
  * This "compiler" takes a resource specification file, opens and loads the physical
  * files and converts their contents into normal C/C++ source code. The source code
  * comprises three arrays which can be subsequently compiled into object code which is
- * then referenced by ResourceFactory using external linkage.
+ * then referenced by ResourceFactory using external linkage.\n
  * \n
  * %Resource specification file format:
+ * - Simple text file (*.orc)
  * - Each line describes one resource
- * - The descriptor has to look like this: LogicalResourceName|PhysicalResourceName
+ * - The descriptor has to look like this: <code>LogicalResourceName|PhysicalResourceName</code>
+ * - <code>PhysicalResourceName</code> is the actual file name of the resource
  * - Lines starting with # are treated as comments
  * - Empty lines are ignored
  * 
