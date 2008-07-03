@@ -58,7 +58,7 @@ check_prerequisites()
 	echo "Checking prerequisites..." | tee -a $LOGFILE
 	
 	# required toolchain
-	TOOLS="automake autoconf m4 cmake wget gcc g++ ld libtool ar lex yacc"
+	TOOLS="automake autoconf m4 cmake wget svn cvs tar gcc g++ ld libtool ar lex yacc"
 
 	for tool in $TOOLS; do
 		if ! ( type $tool >/dev/null 2>&1 ); then
