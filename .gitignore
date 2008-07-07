@@ -1,0 +1,5 @@
+build
+3rdparty
+install
+doc/html
+doc/*.tag
