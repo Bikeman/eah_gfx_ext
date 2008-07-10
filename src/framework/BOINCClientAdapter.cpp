@@ -88,6 +88,24 @@ string BOINCClientAdapter::applicationInformation() const
 	return m_SharedMemoryAreaContents;
 }
 
+string BOINCClientAdapter::projectInformation() const
+{
+	// TODO: check if we have to add the <project_specific> tag!
+	return m_UserData.project_preferences;
+}
+
+int BOINCClientAdapter::graphicsFrameRate() const
+{
+	// TODO: parse projectInformation() when available
+	return 20;
+}
+
+BOINCClientAdapter::GraphicsQualitySetting BOINCClientAdapter::graphicsQualitySetting() const
+{
+	// TODO: parse projectInformation() when available
+	return BOINCClientAdapter::LowGraphicsQualitySetting;
+}
+
 string BOINCClientAdapter::coreVersion() const
 {
 	stringstream buffer;

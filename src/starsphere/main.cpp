@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	}
     
     // initialize window manager 
-    if(!window.initialize()) {
+    if(!window.initialize(800, 600, graphics->frameRate())) {
     	cerr << "Window manager could not be initialized!" << endl;
     	delete graphics;
         exit(1);

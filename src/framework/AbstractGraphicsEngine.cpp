@@ -28,6 +28,12 @@ AbstractGraphicsEngine::~AbstractGraphicsEngine()
 {
 }
 
+int AbstractGraphicsEngine::frameRate()
+{
+	m_BoincAdapter.refresh();
+	return m_BoincAdapter.graphicsFrameRate();
+}
+
 void AbstractGraphicsEngine::refreshLocalBOINCInformation()
 {
 	m_BoincAdapter.refresh();

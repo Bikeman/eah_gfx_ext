@@ -721,20 +721,22 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glClearColor(0.0, 0.0, 0.0, 0.0); // background is black
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
-
-	// some polishing
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	
+	// enable opt-in quality feature
+	if(m_BoincAdapter.graphicsQualitySetting() == BOINCClientAdapter::HighGraphicsQualitySetting) {
+		// some polishing
+		glShadeModel(GL_SMOOTH);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+	}
 	
 	// FSAA will be enabled explicitly when needed!
 	glDisable(GL_MULTISAMPLE_ARB);
 
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glHint(GL_FOG_HINT, GL_DONT_CARE);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
+	// we need alpha blending for proper font rendering
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -743,10 +745,16 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 
-	// fog aids depth perception
-	glEnable(GL_FOG);
-	glFogi(GL_FOG_MODE, GL_EXP2);
-	glFogf(GL_FOG_DENSITY, 0.085);
+	// enable opt-in quality feature
+	if(m_BoincAdapter.graphicsQualitySetting() == BOINCClientAdapter::MediumGraphicsQualitySetting ||
+	   m_BoincAdapter.graphicsQualitySetting() == BOINCClientAdapter::HighGraphicsQualitySetting)
+	{
+		// fog aids depth perception
+		glEnable(GL_FOG);
+		glFogi(GL_FOG_MODE, GL_EXP2);
+		glFogf(GL_FOG_DENSITY, 0.085);
+		glHint(GL_FOG_HINT, GL_DONT_CARE);
+	}
 
 	// create pre-drawn display lists
 	make_stars();

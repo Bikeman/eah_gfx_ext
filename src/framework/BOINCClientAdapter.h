@@ -53,6 +53,18 @@ public:
 	
 	/// Destructor
 	virtual ~BOINCClientAdapter();
+	
+	/**
+	 * \brief Defined quality settings for graphics applications
+	 * 
+	 * \see graphicsQualitySetting
+	 * \see graphicsFrameRate
+	 */ 	
+	enum GraphicsQualitySetting {
+		LowGraphicsQualitySetting = 1,
+		MediumGraphicsQualitySetting = 2,
+		HighGraphicsQualitySetting = 4
+	};
 
 	/**
 	 * \brief Initializes the BOINC client adapter instance
@@ -158,9 +170,72 @@ public:
     /**
      * \brief Retrieves information provided by the running science application
      * 
-     * \return The application specific information string (i.e. XML)
+     * \return The application specific information string (i.e. XML) found in APP_INIT_DATA
+     * 
+     * \see m_UserData
      */
     string applicationInformation() const;
+    
+    /**
+     * \brief Retrieves specific information provided by the currently active project
+     * 
+	 * All projects using this framework are highly recommended to adhere to the following XML schema
+	 * (not yet literally a XML schema, will be provided later) with respect to graphics settings:
+     *
+     \verbatim
+     <project_specific>
+     	<graphics fps="20" quality="low">
+     		<starsphere>
+     			<feature id="globe" enabled="true" />
+     		</starsphere>
+     		<waverider>
+     			<feature id="sound" enabled="false" />
+     		</waverider>
+     	</graphics>	
+     </project_specific> 
+     \endverbatim
+     * 
+     * The \c graphics tag and its two attributes \b must be provided as shown above where
+     * the \c fps attribute contains the frame rate as integer value and \c quality contains
+     * a lowercase string value describing the quality setting to be used (supported values: \c low,
+     * \c medium, \c high). Please note that the children of the \c graphics tag are just examples
+     * of how graphics application specific settings (e.g. features) should be stored per implementation.
+	 *
+     * \return The project specific information string (i.e. XML) found in \c APP_INIT_DATA
+     * 
+     * \see m_UserData
+     * \see GraphicsQualitySetting
+     * \see graphicsFrameRate
+     * \see graphicsQualitySetting
+     */
+    string projectInformation() const;
+    
+    /**
+     * \brief Retrieves the frame rate at which the project's graphics application should be rendered
+     * 
+     * This setting is given by the \c fps attribute of the \c graphics tag that's
+     * part of the \c project_specific XML tag. 
+     * 
+     * \return The frame rate to be used for rendering
+     * 
+     * \see projectInformation
+     * \see m_UserData
+     */
+    int graphicsFrameRate() const;
+    
+    /**
+     * \brief Retrieves the quality setting at which the project's graphics application should be rendered
+     * 
+     * This setting is given by the \c quality attribute of the \c graphics tag that's
+     * part of the \c project_specific XML tag.
+     * 
+     * \return The quality setting to be used for rendering
+     *
+     * \see GraphicsQualitySetting 
+     * \see projectInformation
+     * \see m_UserData
+     */
+    GraphicsQualitySetting graphicsQualitySetting() const;
 
 private:
     /**
@@ -202,7 +277,8 @@ private:
 	/**
 	 * \brief Information structure returned by the BOINC client API.
 	 * 
-	 * It contains initial information about the current work unit computation session.
+	 * It contains information about the currently active project, science application,
+	 * user account, work unit and computation session.
 	 */
 	APP_INIT_DATA m_UserData;
 };

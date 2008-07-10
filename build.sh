@@ -538,6 +538,12 @@ case "$1" in
 		distclean || failure
 		exit 0
 		;;
+	"--starsphere")
+		# "hidden" bonus option :-)
+		TARGET=$TARGET_LINUX
+		build_starsphere || failure
+		exit 0
+		;;
 	*)
 		print_usage
 		exit 1

@@ -166,6 +166,15 @@ public:
 	 * \see refreshLocalBOINCInformation()
 	 */
 	virtual void refreshBOINCInformation() = 0;
+	
+    /**
+     * \brief Retrieves the frame rate at which the graphics engine should be invoked for rendering
+     * 
+     * \return The frame rate to be used for rendering
+     * 
+     * \see BOINCClientAdapter::graphicsFrameRate()
+     */
+    int frameRate();
 
 protected:
 	/**

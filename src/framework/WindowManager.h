@@ -70,10 +70,11 @@ public:
 	 * 
 	 * \param width The optional initial width of the main window
 	 * \param height The optional initial height of the main window
+	 * \param frameRate The optional initial frame rate to be used
 	 * 
 	 * \return TRUE if successfull, otherwise FALSE
 	 */
-	bool initialize(const int width = 1024, const int height = 768);
+	bool initialize(const int width = 800, const int height = 600, const int frameRate = 20);
 	
 	/**
 	 * \brief Registeres a new event observer
@@ -188,6 +189,9 @@ private:
 	 * when more than one instance. Maybe we should use a singleton here anyway...
 	 */
     static Uint32 timerCallbackBOINCUpdateEvent(Uint32 interval, void *param);
+    
+    /// The render event interval (in ms) for invoking the render event observer
+    float m_RenderEventInterval;
     
     /// The current width of the host's desktop
     int m_DesktopWidth;

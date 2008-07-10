@@ -28,7 +28,7 @@ WindowManager::~WindowManager()
 {
 }
 
-bool WindowManager::initialize(const int width, const int height)
+bool WindowManager::initialize(const int width, const int height, const int frameRate)
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
 		cerr << "Window system could not be initalized: " << SDL_GetError() << endl;
@@ -52,9 +52,10 @@ bool WindowManager::initialize(const int width, const int height)
 		m_DesktopBitsPerPixel = videoInfo->vfmt->BitsPerPixel;
 	}
 	
-	// set initial non-fullscreen resolution
+	// set initial non-fullscreen resolution as well as the render interval
 	m_WindowedWidth = width;
 	m_WindowedHeight = height;
+	m_RenderEventInterval = 1000.0f / frameRate;
 
 	/*
 	 * SDL_ASYNCBLIT - Surface benutzt asynchrone Blits, wenn möglich
@@ -146,9 +147,8 @@ void WindowManager::eventLoop()
 	// be sure there's at least one observer!
 	assert(eventObservers.size() > 0);
 	
-	// TODO: make interval setting available to the outside
 	// set two main timers (interval in ms)	
-	SDL_AddTimer(40, &timerCallbackRenderEvent, NULL);
+	SDL_AddTimer(m_RenderEventInterval, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
 	// events we don't ignore, hence use
