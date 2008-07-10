@@ -166,7 +166,25 @@ public:
 	 * \see refreshLocalBOINCInformation()
 	 */
 	virtual void refreshBOINCInformation() = 0;
-	
+
+    /**
+     * \brief Retrieves the initial window width (horizontal resolution) when running in windowed mode
+     * 
+     * \return The initial window width to be used
+     * 
+     * \see BOINCClientAdapter::graphicsWindowWidth()
+     */
+    int initialWindowWidth();
+
+    /**
+     * \brief Retrieves the initial window width (vertical resolution) when running in windowed mode
+     * 
+     * \return The initial window height to be used
+     * 
+     * \see BOINCClientAdapter::graphicsWindowHeight()
+     */
+    int initialWindowHeight();
+
     /**
      * \brief Retrieves the frame rate at which the graphics engine should be invoked for rendering
      * 
@@ -195,6 +213,10 @@ protected:
 	
 	/// BOINC client adapter instance for information retrieval
 	BOINCClientAdapter m_BoincAdapter;
+	
+private:
+	/// Indicator showing the initial BOINC adapter refresh status
+	bool m_InitialBOINCRefreshDone;
 };
 
 /**

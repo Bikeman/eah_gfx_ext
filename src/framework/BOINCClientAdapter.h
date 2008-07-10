@@ -184,7 +184,7 @@ public:
      *
      \verbatim
      <project_specific>
-     	<graphics fps="20" quality="low">
+     	<graphics fps="20" quality="low" width="800" height="600">
      		<starsphere>
      			<feature id="globe" enabled="true" />
      		</starsphere>
@@ -195,11 +195,13 @@ public:
      </project_specific> 
      \endverbatim
      * 
-     * The \c graphics tag and its two attributes \b must be provided as shown above where
+     * The \c graphics tag and its four attributes \b must be provided as shown above where
      * the \c fps attribute contains the frame rate as integer value and \c quality contains
      * a lowercase string value describing the quality setting to be used (supported values: \c low,
-     * \c medium, \c high). Please note that the children of the \c graphics tag are just examples
-     * of how graphics application specific settings (e.g. features) should be stored per implementation.
+     * \c medium, \c high). The two remaining attributes \c width and \c height determine the initial
+     * window size when starting in windowed mode. Please note that the children of the \c graphics
+     * tag are recommendations of how graphics application specific settings (e.g. features) should be
+     * stored per implementation.
 	 *
      * \return The project specific information string (i.e. XML) found in \c APP_INIT_DATA
      * 
@@ -236,6 +238,34 @@ public:
      * \see m_UserData
      */
     GraphicsQualitySetting graphicsQualitySetting() const;
+    
+    /**
+     * \brief Retrieves the initial window width when running in windowed mode
+     * 
+     * This setting is given by the \c width attribute of the \c graphics tag that's
+     * part of the \c project_specific XML tag. It's ignored when the application
+     * is started in fullscreen/screensaver mode.
+     * 
+     * \return The initial window width to be used
+     *
+     * \see projectInformation
+     * \see m_UserData
+     */
+    int graphicsWindowWidth() const;
+    
+    /**
+     * \brief Retrieves the initial window height when running in windowed mode
+     * 
+     * This setting is given by the \c height attribute of the \c graphics tag that's
+     * part of the \c project_specific XML tag. It's ignored when the application
+     * is started in fullscreen/screensaver mode.
+     * 
+     * \return The initial window height to be used
+     *
+     * \see projectInformation
+     * \see m_UserData
+     */
+    int graphicsWindowHeight() const;
 
 private:
     /**

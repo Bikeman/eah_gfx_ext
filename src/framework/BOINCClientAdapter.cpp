@@ -106,6 +106,18 @@ BOINCClientAdapter::GraphicsQualitySetting BOINCClientAdapter::graphicsQualitySe
 	return BOINCClientAdapter::LowGraphicsQualitySetting;
 }
 
+int BOINCClientAdapter::graphicsWindowWidth() const
+{
+	// TODO: parse projectInformation() when available
+	return 800;
+}
+
+int BOINCClientAdapter::graphicsWindowHeight() const
+{
+	// TODO: parse projectInformation() when available
+	return 600;
+}
+
 string BOINCClientAdapter::coreVersion() const
 {
 	stringstream buffer;
