@@ -140,6 +140,13 @@ public:
 	 * 
 	 */
 	void toggleFullscreen();
+	
+	/**
+	 * \brief Set the screensaver mode indicator
+	 * 
+	 * \param enabled The new value for the screensaver mode indicator
+	 */	
+	void setScreensaverMode(const bool enabled);
 
 private:
 	/**
@@ -225,6 +232,9 @@ private:
     
     /// The SDL display surface handle
     SDL_Surface *m_DisplaySurface;
+    
+    /// The screensaver mode indicator
+    bool m_ScreensaverMode;
     
     /**
      * \brief The known event codes handled by %eventLoop()

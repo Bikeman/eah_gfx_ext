@@ -22,6 +22,7 @@
 
 WindowManager::WindowManager()
 {
+	m_ScreensaverMode = false;
 }
 
 WindowManager::~WindowManager()
@@ -152,16 +153,16 @@ void WindowManager::eventLoop()
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
 	// events we don't ignore, hence use
-	//SDL_EventState( SDL_QUIT, SDL_IGNORE);
-	//SDL_EventState( SDL_KEYDOWN, SDL_IGNORE);
-	//SDL_EventState( SDL_MOUSEMOTION, SDL_IGNORE);
-	//SDL_EventState( SDL_VIDEORESIZE, SDL_IGNORE);
-	//SDL_EventState( SDL_USEREVENT, SDL_IGNORE);
+	//SDL_EventState(SDL_QUIT, SDL_IGNORE);
+	//SDL_EventState(SDL_KEYDOWN, SDL_IGNORE);
+	//SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+	//SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
+	//SDL_EventState(SDL_VIDEORESIZE, SDL_IGNORE);
+	//SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
 	
 	// events we ignore
 	SDL_EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
 	SDL_EventState(SDL_KEYUP, SDL_IGNORE);
-	SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
 	SDL_EventState(SDL_JOYAXISMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYBALLMOTION, SDL_IGNORE);
 	SDL_EventState(SDL_JOYHATMOTION, SDL_IGNORE);
@@ -197,6 +198,13 @@ void WindowManager::eventLoop()
 			
 			// notify observers (currently exactly one, hence front()) to fetch a BOINC update
 			eventObservers.front()->refreshBOINCInformation();
+		}
+		else if (m_ScreensaverMode &&
+				(event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN ||
+				 event.type == SDL_KEYDOWN)) {
+			
+			// we're in screensaver mode so exit on user input
+			SDL_Quit();
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
@@ -394,4 +402,9 @@ void WindowManager::toggleFullscreen()
 	// (windoze needs to be reinitialized instead of just resized, oh well)
 	/// \todo Can we determine the host OS? On X11 a resize() is sufficient!
 	eventObservers.front()->initialize(m_CurrentWidth, m_CurrentHeight, 0, true);
+}
+
+void WindowManager::setScreensaverMode(const bool enabled)
+{
+	m_ScreensaverMode = enabled;
 }

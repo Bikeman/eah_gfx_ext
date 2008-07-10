@@ -79,6 +79,7 @@ int main(int argc, char **argv)
 		if(param == "--fullscreen") {
 			// switch to fullscreen (on windoze: after init!)
 			window.toggleFullscreen();
+			window.setScreensaverMode(true);
 		}
 	}
 
