@@ -20,43 +20,12 @@
 
 #include "AbstractGraphicsEngine.h"
 
-AbstractGraphicsEngine::AbstractGraphicsEngine() : m_BoincAdapter() 
+AbstractGraphicsEngine::AbstractGraphicsEngine() : m_BoincAdapter()
 {
-	m_InitialBOINCRefreshDone = false;
 }
 
 AbstractGraphicsEngine::~AbstractGraphicsEngine()
 {
-}
-
-int AbstractGraphicsEngine::initialWindowWidth()
-{
-	if(!m_InitialBOINCRefreshDone) {
-		m_BoincAdapter.refresh();
-		m_InitialBOINCRefreshDone = true;
-	}
-	
-	return m_BoincAdapter.graphicsWindowWidth();
-}
-
-int AbstractGraphicsEngine::initialWindowHeight()
-{
-	if(!m_InitialBOINCRefreshDone) {
-		m_BoincAdapter.refresh();
-		m_InitialBOINCRefreshDone = true;
-	}
-	
-	return m_BoincAdapter.graphicsWindowHeight();
-}
-
-int AbstractGraphicsEngine::frameRate()
-{
-	if(!m_InitialBOINCRefreshDone) {
-		m_BoincAdapter.refresh();
-		m_InitialBOINCRefreshDone = true;
-	}
-	
-	return m_BoincAdapter.graphicsFrameRate();
 }
 
 void AbstractGraphicsEngine::refreshLocalBOINCInformation()

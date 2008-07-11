@@ -23,10 +23,12 @@
 WindowManager::WindowManager()
 {
 	m_ScreensaverMode = false;
+	m_BoincAdapter = new BOINCClientAdapter();
 }
 
 WindowManager::~WindowManager()
 {
+	delete m_BoincAdapter;
 }
 
 bool WindowManager::initialize(const int width, const int height, const int frameRate)
@@ -52,11 +54,17 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	if (videoInfo->vfmt->BitsPerPixel != 0) {
 		m_DesktopBitsPerPixel = videoInfo->vfmt->BitsPerPixel;
 	}
-	
-	// set initial non-fullscreen resolution as well as the render interval
-	m_WindowedWidth = width;
-	m_WindowedHeight = height;
-	m_RenderEventInterval = 1000.0f / frameRate;
+
+	// get initial non-fullscreen resolution and frame rate from project preferences
+	m_BoincAdapter->initialize("");
+	int preferredWidth = m_BoincAdapter->graphicsWindowWidth();
+	int preferredHeight = m_BoincAdapter->graphicsWindowHeight();
+	int preferredFrameRate = m_BoincAdapter->graphicsFrameRate();
+
+	// override optional default values if preferred values are set
+	m_WindowedWidth = preferredWidth != 0 ? preferredWidth : width;
+	m_WindowedHeight = preferredHeight != 0 ? preferredHeight : height;
+	m_RenderEventInterval = 1000.0f / (preferredFrameRate != 0 ? preferredFrameRate : frameRate);
 
 	/*
 	 * SDL_ASYNCBLIT - Surface benutzt asynchrone Blits, wenn möglich
@@ -74,7 +82,7 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	// set common video flags
 	// (for OpenGL nothing more than SDL_OPENGL and SDL_FULLSCREEN should be used)
 	m_VideoModeFlags = SDL_OPENGL;
-	
+
 	// check fullscreen video mode
 	m_FullscreenModeAvailable = true;
 	Uint32 bitPerPixel = SDL_VideoModeOK(
@@ -87,7 +95,7 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 		cerr << "Fullscreen video mode not supported: " << SDL_GetError() << endl;
 		m_FullscreenModeAvailable = false;
 	}
-	
+
 	// check initial windowed video mode
 	m_WindowedModeAvailable = true;
 	bitPerPixel = SDL_VideoModeOK(
@@ -100,7 +108,7 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 		cerr << "Windowed video mode not supported: " << SDL_GetError() << endl;
 		m_WindowedModeAvailable = false;
 	}
-	
+
 	// both checks failed
 	if(!(m_FullscreenModeAvailable || m_WindowedModeAvailable)) {
 		cerr << "No suitable video mode available!"<< endl;
@@ -113,7 +121,7 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	
+
 	// unused requirements
 	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
@@ -127,14 +135,14 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	m_CurrentWidth = m_WindowedWidth;
 	m_CurrentHeight = m_WindowedHeight;
 	m_VideoModeFlags |= SDL_RESIZABLE;
-	
+
 	// finally, get surface
 	m_DisplaySurface = SDL_SetVideoMode(
 							m_CurrentWidth,
 							m_CurrentHeight,
 							m_DesktopBitsPerPixel,
 							m_VideoModeFlags);
-	
+
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
 		return false;
@@ -147,8 +155,8 @@ void WindowManager::eventLoop()
 {
 	// be sure there's at least one observer!
 	assert(eventObservers.size() > 0);
-	
-	// set two main timers (interval in ms)	
+
+	// set two main timers (interval in ms)
 	SDL_AddTimer(m_RenderEventInterval, &timerCallbackRenderEvent, NULL);
 	SDL_AddTimer(1000, &timerCallbackBOINCUpdateEvent, NULL);
 
@@ -159,7 +167,7 @@ void WindowManager::eventLoop()
 	//SDL_EventState(SDL_MOUSEBUTTONDOWN, SDL_IGNORE);
 	//SDL_EventState(SDL_VIDEORESIZE, SDL_IGNORE);
 	//SDL_EventState(SDL_USEREVENT, SDL_IGNORE);
-	
+
 	// events we ignore
 	SDL_EventState(SDL_ACTIVEEVENT, SDL_IGNORE);
 	SDL_EventState(SDL_KEYUP, SDL_IGNORE);
@@ -176,7 +184,7 @@ void WindowManager::eventLoop()
 	while (SDL_WaitEvent(&event) ) {
 		if (event.type == SDL_USEREVENT &&
 			event.user.code == RenderEvent) {
-			
+
 #ifdef DEBUG_VALGRIND
 			// stop after i iterations when running valgrinded
 			static int i = 0;
@@ -191,35 +199,35 @@ void WindowManager::eventLoop()
 				if (m_DisplaySurface) SDL_FreeSurface(m_DisplaySurface);
 				break;
 			}
-#endif      
+#endif
 		}
 		else if (event.type == SDL_USEREVENT &&
 				 event.user.code == BOINCUpdateEvent) {
-			
+
 			// notify observers (currently exactly one, hence front()) to fetch a BOINC update
 			eventObservers.front()->refreshBOINCInformation();
 		}
 		else if (m_ScreensaverMode &&
 				(event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN ||
 				 event.type == SDL_KEYDOWN)) {
-			
+
 			// we're in screensaver mode so exit on user input
 			SDL_Quit();
 		}
 		else if (event.motion.state & (SDL_BUTTON(1) | SDL_BUTTON(3)) &&
 				 event.type == SDL_MOUSEMOTION) {
-			
+
 			if (event.motion.state & SDL_BUTTON(1)) {
 				// notify our observers (currently exactly one, hence front())
 				eventObservers.front()->mouseMoveEvent(
-										event.motion.xrel, 
+										event.motion.xrel,
 										event.motion.yrel,
 										AbstractGraphicsEngine::MouseButtonLeft);
 			}
 			else if (event.motion.state & SDL_BUTTON(3)) {
 				// notify our observers (currently exactly one, hence front())
 				eventObservers.front()->mouseMoveEvent(
-										event.motion.xrel, 
+										event.motion.xrel,
 										event.motion.yrel,
 										AbstractGraphicsEngine::MouseButtonRight);
 			}
@@ -227,14 +235,14 @@ void WindowManager::eventLoop()
 		else if (event.type == SDL_VIDEORESIZE) {
 			m_CurrentWidth = m_WindowedWidth = event.resize.w;
 			m_CurrentHeight = m_WindowedHeight = event.resize.h;
-			
+
 			// update video mode
 			m_DisplaySurface = SDL_SetVideoMode(
 									m_CurrentWidth,
 									m_CurrentHeight,
 									m_DesktopBitsPerPixel,
 									m_VideoModeFlags);
-			
+
 			// notify our observers (currently exactly one, hence front())
 			// (windoze needs to be reinitialized instead of just resized, oh well)
 			/// \todo Can we determine the host OS? On X11 a resize() is sufficient!
@@ -242,7 +250,7 @@ void WindowManager::eventLoop()
 		}
 		else if (event.type == SDL_QUIT ||
 				(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
-			
+
 			// just exit (SDL_FreeSurface is called automatically)
 			SDL_Quit();
 
@@ -370,11 +378,11 @@ void WindowManager::toggleFullscreen()
 		// set new dimensions
 		m_CurrentWidth = m_WindowedWidth;
 		m_CurrentHeight = m_WindowedHeight;
-		
+
 		// (un)set video mode flags
 		m_VideoModeFlags &= ~SDL_FULLSCREEN;
 		m_VideoModeFlags |= SDL_RESIZABLE;
-	
+
 		// show cursor in fullscreen mode
 		SDL_ShowCursor(SDL_ENABLE);
 	}
@@ -382,22 +390,22 @@ void WindowManager::toggleFullscreen()
 		// set new dimensions
 		m_CurrentWidth = m_DesktopWidth;
 		m_CurrentHeight = m_DesktopHeight;
-		
+
 		// (un)set video mode flags
 		m_VideoModeFlags |= SDL_FULLSCREEN;
 		m_VideoModeFlags &= ~SDL_RESIZABLE;
-		
+
 		// hide cursor
 		SDL_ShowCursor(SDL_DISABLE);
 	}
-	
+
 	// reset video mode
 	m_DisplaySurface = SDL_SetVideoMode(
 							m_CurrentWidth,
 							m_CurrentHeight,
 							m_DesktopBitsPerPixel,
 							m_VideoModeFlags);
-	
+
 	// notify our observers (currently exactly one, hence front())
 	// (windoze needs to be reinitialized instead of just resized, oh well)
 	/// \todo Can we determine the host OS? On X11 a resize() is sufficient!

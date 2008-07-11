@@ -35,31 +35,28 @@ int main(int argc, char **argv)
 	AbstractGraphicsEngine *graphics = GraphicsEngineFactory::createInstance(
 											GraphicsEngineFactory::Starsphere,
 											GraphicsEngineFactory::EinsteinS5R3);
-	
+
 	if(!graphics) {
 		cerr << "Requested graphics engine could not be found/instantiated!" << endl;
 		exit(1);
 	}
-    
-    // initialize window manager 
-    if(!window.initialize(graphics->initialWindowWidth(),
-    					  graphics->initialWindowHeight(),
-    					  graphics->frameRate())) {
-    	
+
+    // initialize window manager
+    if(!window.initialize()) {
     	cerr << "Window manager could not be initialized!" << endl;
     	delete graphics;
         exit(1);
     }
-    
+
 	// create font resource instance
 	const Resource *fontResource = factory.createInstance("FontSansSerif");
-	
+
 	if(fontResource == NULL) {
 		cerr << "Font resource could not be loaded!" << endl;
 		delete graphics;
 		exit(1);
 	}
-	
+
 	if(fontResource->data()->size() <= 0) {
 		cerr << "Font resource could not be loaded!" << endl;
 		delete graphics;
@@ -68,14 +65,14 @@ int main(int argc, char **argv)
 	}
 
     window.setWindowCaption("Einstein@Home");
-	
+
     // register starsphere as event observer
     window.registerEventObserver(graphics);
 
 	// pepare rendering
 	graphics->initialize(window.windowWidth(), window.windowHeight(), fontResource);
 	graphics->refreshBOINCInformation();
-	
+
 	// check optional command line parameter
 	if(argc == 2) {
 		string param(argv[1]);
@@ -88,11 +85,11 @@ int main(int argc, char **argv)
 
 	// enter main event loop
 	window.eventLoop();
-	
+
 	// clean up end exit
 	window.unregisterEventObserver(graphics);
 	delete graphics;
 	delete fontResource;
-	
+
 	exit(0);
 }
