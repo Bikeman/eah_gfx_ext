@@ -492,6 +492,7 @@ print_usage()
 	echo "  --linux"
 	echo "  --mac"
 	echo "  --win32"
+	echo "  --doc"
 	echo "*************************"
 
 	echo "Wrong usage. Stopping!" >> $LOGFILE
@@ -505,6 +506,7 @@ print_usage()
 TARGET_LINUX=1
 TARGET_MAC=2
 TARGET_WIN32=3
+TARGET_DOC=4
 
 echo "************************************" | tee -a $LOGFILE
 echo "Starting new build!" | tee -a $LOGFILE
@@ -534,6 +536,10 @@ case "$1" in
 		check_last_build "$1" || failure
 		echo "Building win32 version:" | tee -a $LOGFILE
 		;;
+	"--doc")
+		TARGET=$TARGET_DOC
+		echo "Building documentation..." | tee -a $LOGFILE
+		;;
 	"--distclean")
 		distclean || failure
 		exit 0
@@ -552,18 +558,26 @@ esac
 
 # here we go...
 
-check_prerequisites || failure
-prepare_generic || failure
-
 case $TARGET in
 	$TARGET_LINUX)
+		check_prerequisites || failure
+		prepare_generic || failure
 		build_linux || failure
 		;;
 	$TARGET_MAC)
+		check_prerequisites || failure
+		prepare_generic || failure
 		build_mac || failure
 		;;
 	$TARGET_WIN32)
+		check_prerequisites || failure
+		prepare_generic || failure
 		build_win32 || failure
+		;;
+	$TARGET_DOC)
+		doxygen Doxyfile >> $LOGFILE 2>&1 || failure
+		cp -f $ROOT/doc/default/*.png $ROOT/doc/html >> $LOGFILE 2>&1 || failure
+		cp -f $ROOT/doc/default/*.gif $ROOT/doc/html >> $LOGFILE 2>&1 || failure
 		;;
 	*)
 		# should be unreachable

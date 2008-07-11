@@ -192,6 +192,7 @@
  * - ar
  * - lex (i.e. flex)
  * - yacc (i.e. bison)
+ * - doxygen (optional)
  *
  * \subsubsection sec_build_usage Usage
  *
@@ -201,6 +202,10 @@
  * - Linux build: \code build.sh --linux \endcode
  * - Mac OS X build: \code build.sh --mac \endcode
  * - Windows build (uses MinGW cross-compile with Linux as build system!): \code build.sh --win32 \endcode
+ *
+ * Additional tools are provided as follows:
+ *
+ * - Build this documentation (requires doxygen): \code build.sh --doc \endcode
  * - Purge build tree: \code build.sh --distclean \endcode
  *
  * \section cha_license The License
