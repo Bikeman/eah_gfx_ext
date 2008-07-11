@@ -55,7 +55,7 @@
  *
  * \section sec_doc_user User Documentation
  *
- * \subsection cha_app The Starsphere Graphics Application
+ * \subsection cha_app Starsphere Graphics Application
  *
  * \subsubsection sec_app_overview Overview
  *
@@ -105,7 +105,7 @@
  *
  * \section sec_doc_dev Developer Documentation
  *
- * \subsection cha_frame The Framework
+ * \subsection cha_frame Graphics Application Framework
  * \subsubsection sec_frame_overview Overview
  *
  * The Framework takes care of the following things:
@@ -121,7 +121,7 @@
  * class list
  * \htmlonly</a>\endhtmlonly.
  *
- * \subsection cha_orc The Open Resource Compiler
+ * \subsection cha_orc Open Resource Compiler
  *
  * \subsubsection sec_orc_overview Overview
  *
@@ -151,7 +151,7 @@
  * - \c InputSpecFileName: The name of the resource specification file (input)
  * - \c OutputCodeFileName: The name of the resource code file (output)
  *
- * \subsection cha_source The Source Code
+ * \subsection cha_source Source Code Access
  *
  * Please use this \htmlonly<a href="http://einstein.phys.uwm.edu/graphics/src/graphics_framework_src_0.1.tar.gz">\endhtmlonly
  * link
@@ -164,7 +164,7 @@
  * cvs -z3 -d:pserver:anonymous@gravity.phys.uwm.edu:2402/usr/local/cvs/lscsoft co -P einsteinathome/graphics
  * \endcode
  *
- * \subsection cha_build The Build Script
+ * \subsection cha_build Build Script
  *
  * \subsubsection sec_build_overview Overview
  *
@@ -208,7 +208,7 @@
  * - Build this documentation (requires doxygen): \code build.sh --doc \endcode
  * - Purge build tree: \code build.sh --distclean \endcode
  *
- * \section cha_license The License
+ * \section cha_license License
  * \verbatim
    Copyright © 2004 Bruce Allen, David Hammer, Eric Myers
    Copyright © 2008 Oliver Bock, Bernd Machenschalk
