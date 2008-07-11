@@ -30,7 +30,7 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 	m_FontLogo2 = 0;
 	m_FontHeader = 0;
 	m_FontText = 0;
-	
+
 	Axes=0, Stars=0, Constellations=0, Pulsars=0;
 	LLOmarker=0, LHOmarker=0, GEOmarker=0, VIRGOmarker=0;
 	sphGrid=0, SNRs=0, SearchMarker=0;
@@ -55,7 +55,7 @@ Starsphere::Starsphere() : AbstractGraphicsEngine()
 
 	rotation_offset = 0.0;
 	rotation_speed = 180.0;
-	
+
 	m_CurrentRightAscension = -1.0;
 	m_CurrentDeclination = -1.0;
 	m_RefreshSearchMarker = true;
@@ -92,7 +92,7 @@ void Starsphere::sphVertex(GLfloat RAdeg, GLfloat DEdeg)
 
 /**
  * Star Marker:
- * Makes a marker for one star at a given position and angular size.  
+ * Makes a marker for one star at a given position and angular size.
  */
 void Starsphere::star_marker(float RAdeg, float DEdeg, float size)
 {
@@ -117,9 +117,9 @@ void Starsphere::make_stars()
 	if(Stars) glDeleteLists(Stars, 1);
 	Stars = glGenLists(1);
 	glNewList(Stars, GL_COMPILE);
-	
+
 		glColor3f(1.0, 1.0, 1.0);
-	
+
 		/**
 		 * At some point in the future star_info[][] will also contain
 		 * star magnitude and the marker size will vary with this.
@@ -141,7 +141,7 @@ void Starsphere::make_stars()
 				star_marker(star_info[i][0], star_info[i][1], mag_size);
 			}
 		}
-		
+
 	glEndList();
 }
 
@@ -157,13 +157,13 @@ void Starsphere::make_pulsars()
 	if(Pulsars) glDeleteLists(Pulsars, 1);
 	Pulsars = glGenLists(1);
 	glNewList(Pulsars, GL_COMPILE);
-	
+
 		glColor3f(0.80, 0.0, 0.85); // _P_ulsars are _P_urple
-	
+
 		for (i=0; i < Npulsars; i++) {
 			star_marker(pulsar_info[i][0], pulsar_info[i][1], mag_size);
 		}
-		
+
 	glEndList();
 }
 
@@ -179,13 +179,13 @@ void Starsphere::make_snrs()
 	if(SNRs) glDeleteLists(SNRs, 1);
 	SNRs = glGenLists(1);
 	glNewList(SNRs, GL_COMPILE);
-	
+
 		glColor3f(0.7, 0.176, 0.0); // _S_NRs are _S_ienna
-	
+
 		for (i=0; i < NSNRs; i++) {
 			star_marker(SNR_info[i][0], SNR_info[i][1], mag_size);
 		}
-		
+
 	glEndList();
 }
 
@@ -201,10 +201,10 @@ void Starsphere::make_constellations()
 	if(Constellations) glDeleteLists(Constellations, 1);
 	Constellations = glGenLists(1);
 	glNewList(Constellations, GL_COMPILE);
-	
+
 		glLineWidth(1.0);
 		glColor3f(0.7, 0.7, 0.0); // light yellow
-	
+
 		glBegin(GL_LINES); // draws lines between *pairs* of vertices
 			for (star_num=0; star_num < Nstars; ++star_num) {
 				sphVertex(star_info[star_num][0], star_info[star_num][1]);
@@ -212,7 +212,7 @@ void Starsphere::make_constellations()
 				sphVertex(star_info[star_num][0], star_info[star_num][1]);
 			}
 		glEnd();
-		
+
 	glEndList();
 }
 
@@ -270,7 +270,7 @@ void Starsphere::make_obs()
 	m_ObservatoryDrawTimeLocal = dtime();
 	time_t local = m_ObservatoryDrawTimeLocal;
 	tm *utc = gmtime(&local);
-	double utcOffset = difftime(local, mktime(utc));	
+	double utcOffset = difftime(local, mktime(utc));
 	double observatoryDrawTimeGMT = m_ObservatoryDrawTimeLocal - utcOffset;
 
 	radius = 1.0*sphRadius; // radius of sphere on which they are drawn
@@ -291,10 +291,10 @@ void Starsphere::make_obs()
 	if(LLOmarker) glDeleteLists(LLOmarker, 1);
 	LLOmarker = glGenLists(1);
 	glNewList(LLOmarker, GL_COMPILE);
-	
+
 		glColor3f(0.0, 1.0, 0.0);
 		glLineWidth(lineSize);
-		
+
 		glBegin(GL_LINE_STRIP);
 			//  North/South arm:
 			sphVertex3D(RAdeg, DEdeg-arm_len_deg, radius);
@@ -302,13 +302,13 @@ void Starsphere::make_obs()
 			// East/West arm:
 			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
 		glEnd();
-		
+
 		// arm joint H2
 		glPointSize((GLfloat) lineSize);
 		glBegin(GL_POINTS);
 			sphVertex3D(RAdeg, DEdeg, radius);
 		glEnd();
-		
+
 	glEndList();
 
 	/**
@@ -325,10 +325,10 @@ void Starsphere::make_obs()
 	if(LHOmarker) glDeleteLists(LHOmarker, 1);
 	LHOmarker = glGenLists(1);
 	glNewList(LHOmarker, GL_COMPILE);
-	
+
 		glColor3f(0.0, 0.0, 1.0);
 		glLineWidth(lineSize);
-		
+
 		glBegin(GL_LINE_STRIP);
 			// North/South arm:
 			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
@@ -336,7 +336,7 @@ void Starsphere::make_obs()
 			// East/West arm:
 			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
 		glEnd();
-		
+
 		glBegin(GL_LINE_STRIP);
 			// North/South arm, H2:
 			sphVertex3D(RAdeg-h2, DEdeg+arm_len_deg/2.0+h2/2.0, radius);
@@ -344,19 +344,19 @@ void Starsphere::make_obs()
 			// East/West arm, H2;
 			sphVertex3D(RAdeg-arm_len_deg/2.0-h2, DEdeg+h2/2.0, radius);
 		glEnd();
-		
+
 		// arm joint H1
 		glPointSize((GLfloat) lineSize);
 		glBegin(GL_POINTS);
 			sphVertex3D(RAdeg, DEdeg, radius);
 		glEnd();
-		
+
 		// arm joint H2
 		glPointSize((GLfloat) lineSize);
 		glBegin(GL_POINTS);
 			sphVertex3D(RAdeg-h2, DEdeg+h2/2.0, radius);
 		glEnd();
-		
+
 	glEndList();
 
 	/**
@@ -374,10 +374,10 @@ void Starsphere::make_obs()
 	if(GEOmarker) glDeleteLists(GEOmarker, 1);
 	GEOmarker = glGenLists(1);
 	glNewList(GEOmarker, GL_COMPILE);
-	
+
 		glColor3f(1.0, 0.0, 0.0);
 		glLineWidth(lineSize);
-		
+
 		glBegin(GL_LINE_STRIP);
 			// North/South arm:
 			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
@@ -385,15 +385,15 @@ void Starsphere::make_obs()
 			// West/East arm:
 			sphVertex3D(RAdeg+arm_len_deg, DEdeg, radius);
 		glEnd();
-		
+
 		// arm joint
 		glPointSize((GLfloat) lineSize);
 		glBegin(GL_POINTS);
 			sphVertex3D(RAdeg, DEdeg, radius);
 		glEnd();
-		
+
 	glEndList();
-	
+
 	/**
 	 *  VIRGO Interferometer:
 	 */
@@ -409,10 +409,10 @@ void Starsphere::make_obs()
 	if(VIRGOmarker) glDeleteLists(VIRGOmarker, 1);
 	VIRGOmarker = glGenLists(1);
 	glNewList(VIRGOmarker, GL_COMPILE);
-	
+
 		glColor3f(1.0, 1.0, 1.0);
 		glLineWidth(lineSize);
-		
+
 		glBegin(GL_LINE_STRIP);
 			// North/South arm:
 			sphVertex3D(RAdeg, DEdeg+arm_len_deg, radius);
@@ -420,13 +420,13 @@ void Starsphere::make_obs()
 			// West/East arm:
 			sphVertex3D(RAdeg-arm_len_deg, DEdeg, radius);
 		glEnd();
-		
+
 		// arm joint
 		glPointSize((GLfloat) lineSize);
 		glBegin(GL_POINTS);
 			sphVertex3D(RAdeg, DEdeg, radius);
 		glEnd();
-	
+
 	glEndList();
 
 	return;
@@ -441,7 +441,7 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 
 	// r1 is inner circle, r2 is outer circle, r3 is crosshairs
 	r1 = size, r2=3*size, r3=4*size;
-	
+
 	// delete existing, create new (required for windoze)
 	if(SearchMarker) glDeleteLists(SearchMarker, 1);
 	SearchMarker = glGenLists(1);
@@ -449,15 +449,15 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 
 		// start gunsight drawing
 		glPushMatrix();
-		
+
 		glLineWidth(3.0);
 		glColor3f(1.0, 0.5, 0.0); // Orange
-		
+
 		// First rotate east  to the RA position around y
 		glRotatef(RAdeg, 0.0, 1.0, 0.0);
 		// Then rotate up to DEC position around z (not x)
 		glRotatef(DEdeg, 0.0, 0.0, 1.0);
-	
+
 		// Inner circle
 		glBegin(GL_LINE_LOOP);
 			for (i=0; i<Nstep; i++) {
@@ -467,7 +467,7 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 				sphVertex(x, y);
 			}
 		glEnd();
-	
+
 		// Outer circle
 		glBegin(GL_LINE_LOOP);
 			for (i=0; i<Nstep; i++) {
@@ -477,7 +477,7 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 				sphVertex(x, y);
 			}
 		glEnd();
-	
+
 		// Arms that form the gunsight
 		glBegin(GL_LINES);
 			//  North arm:
@@ -493,9 +493,9 @@ void Starsphere::make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size)
 			sphVertex(+r1, 0.0);
 			sphVertex(+r3, 0.0);
 		glEnd();
-		
+
 		glPopMatrix();
-		
+
 		// searchlight line out to marker (OFF!)
 		if(false) {
 			glBegin(GL_LINES);
@@ -522,20 +522,20 @@ void Starsphere::make_axes()
 
 		glBegin(GL_LINES);
 			glLineWidth(2.0);
-			
+
 			glColor3f(1.0, 0.0, 0.0);
 			glVertex3f(-axl, 0.0, 0.0);
 			glVertex3f(axl, 0.0, 0.0);
-		
+
 			glColor3f(0.0, 1.0, 0.0);
 			glVertex3f(0.0, -axl, 0.0);
 			glVertex3f(0.0, axl, 0.0);
-		
+
 			glColor3f(0.0, 0.0, 1.0);
 			glVertex3f(0.0, 0.0, -axl);
 			glVertex3f(0.0, 0.0, axl);
 		glEnd();
-	
+
 	glEndList();
 }
 
@@ -553,15 +553,15 @@ void Starsphere::make_globe()
 	glNewList(sphGrid, GL_COMPILE);
 
 		glLineWidth(1.0);
-		
+
 		// Lines of constant Right Ascencion (East Longitude)
 		for (hr=0; hr<24; hr++) {
 			RAdeg=hr*15.0;
 			glColor3f(0.25, 0.25, 0.25);
-			
+
 			// mark median
 			if(hr==0) glColor3f(0.55, 0.55, 0.55);
-			
+
 			glBegin(GL_LINE_STRIP);
 				for (i=0; i<=iMax; i++) {
 					DEdeg = i*180.0/iMax - 90.0;
@@ -569,11 +569,11 @@ void Starsphere::make_globe()
 				}
 			glEnd();
 		}
-	
-		// Lines of constant Declination (Lattitude)	
+
+		// Lines of constant Declination (Lattitude)
 		for (j=1; j<=12; j++) {
 			DEdeg = 90.0 - j*15.0;
-			
+
 			glBegin(GL_LINE_STRIP);
 				for (i=0; i<=iMax; i++) {
 					RAdeg = i*360.0/iMax;
@@ -581,7 +581,7 @@ void Starsphere::make_globe()
 				}
 			glEnd();
 		}
-		
+
 	glEndList();
 }
 
@@ -594,13 +594,13 @@ void Starsphere::resize(const int width, const int height)
 	m_CurrentWidth = width;
 	m_CurrentHeight = height;
 	aspect = (float)width / (float)height;
-	
+
 	// adjust HUD config
 	m_YStartPosTop = height - 25;
 
 	// make sure the search marker is updated (conditional rendering!)
 	m_RefreshSearchMarker = true;
-	
+
 	// adjust aspect ratio and projection
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 	glMatrixMode(GL_PROJECTION);
@@ -616,17 +616,17 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 {
 	// check whether we initialize the first time or have to recycle (required for windoze)
 	if(!recycle) {
-		
+
 		// store the font resource
 		if(font) m_FontResource = font;
-		
+
 		// initialize the BOINC client adapter
-		m_BoincAdapter.initialize("EinsteinHS");
-		
+		m_BoincAdapter.initialize(EinsteinS5R3Adapter::SharedMemoryIdentifier);
+
 		// inital HUD offset setup
 		m_XStartPosLeft = 5;
 		m_YOffsetLarge = 18;
-		
+
 		setFeature(STARS, true);
 		setFeature(CONSTELLATIONS, true);
 		setFeature(PULSARS, true);
@@ -638,7 +638,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		setFeature(MARKER, true);
 	}
 	else {
-		
+
 		// seems that windoze also "resets" our OpenGL fonts
 		// let's clean up before reinitializing them
 		if(m_FontLogo1) delete m_FontLogo1;
@@ -649,65 +649,65 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 
 	// we might be called to recycle even before initialization
 	if(!m_FontResource) {
-		
+
 		// display a warning, this could be unintentionally
 		cerr << "Warning: font resource still unknown! You might want to recycle at a later stage..." << endl;
 	}
 	else {
-		
+
 		// create large font instances using font resource (base address + size)
 		m_FontLogo1 = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
 									24, 72 );
-		
+
 		if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
 		     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
 		     return;
 		}
-		
+
 		m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-		
+
 		// create medium font instances using font resource (base address + size)
 		m_FontLogo2 = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
 									13, 78 );
-		
+
 		if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
 		     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
 		     return;
 		}
-		
+
 		m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
-		
+
 		// create medium font instances using font resource (base address + size)
 		m_FontHeader = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
 									13, 78 );
-		
+
 		if ( m_FontHeader == 0 || !m_FontHeader->isValid() ) {
 		     cerr << "Could not construct header font face from in memory resource!" << endl;
 		     return;
 		}
-		
+
 		m_FontHeader->setForegroundColor(1.0, 1.0, 0.0, 1.0);
-			
+
 		// create small font instances using font resource (base address + size)
 		m_FontText = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
 									11, 72 );
-		
+
 		if ( m_FontText == 0 || !m_FontText->isValid() ) {
 		     cerr << "Could not construct text font face from in memory resource!" << endl;
 		     return;
 		}
-		
+
 		m_FontText->setForegroundColor(0.75, 0.75, 0.75, 1.0);
 	}
-	
+
 	// setup initial dimensions
 	resize(width, height);
 
@@ -716,13 +716,13 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 #if defined( GL_RASTER_POSITION_UNCLIPPED_IBM )
 	glEnable( GL_RASTER_POSITION_UNCLIPPED_IBM );
 #endif
-	
+
 	// drawing setup:
 	glClearColor(0.0, 0.0, 0.0, 0.0); // background is black
 	glEnable(GL_CULL_FACE);
 	glFrontFace(GL_CCW);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	
+
 	// enable opt-in quality feature
 	if(m_BoincAdapter.graphicsQualitySetting() == BOINCClientAdapter::HighGraphicsQualitySetting) {
 		// some polishing
@@ -732,7 +732,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	}
-	
+
 	// FSAA will be enabled explicitly when needed!
 	glDisable(GL_MULTISAMPLE_ARB);
 
@@ -771,7 +771,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 }
 
 /**
- * Rendering routine:  this is what does the drawing:   
+ * Rendering routine:  this is what does the drawing:
  */
 void Starsphere::render(const double timeOfDay)
 {
@@ -779,7 +779,7 @@ void Starsphere::render(const double timeOfDay)
 	GLfloat Zrot = 0.0, Zobs=0.0;
 	double revs, t, dt = 0;
 	static double start_time=-1.0, last_time=-1.0;
-	
+
 	// Calculate the real time t since we started (or reset) and the
 	// time dt since the last render() call.    Both may be useful
 	// for timing animations.  Note that time_of_day is dtime().
@@ -808,9 +808,9 @@ void Starsphere::render(const double timeOfDay)
 	// now draw the scene...
 	glLoadIdentity();
 
-	// Vary the viewpoint with both a long period wobble of the elevation 
+	// Vary the viewpoint with both a long period wobble of the elevation
 	// of the view and a longer period zoom in/out that might even penetrate
-	// The starsphere for a brief time.   Increase the power in pow(,) to 
+	// The starsphere for a brief time.   Increase the power in pow(,) to
 	// make the visit inside briefer.
 	vp_theta = 90.0 - viewpt_elev + wobble_amp*sin(PI2*t/(wobble_period*60.0));
 	vp_phi = viewpt_azimuth;
@@ -851,7 +851,7 @@ void Starsphere::render(const double timeOfDay)
 		glCallList(VIRGOmarker);
 		glPopMatrix();
 	}
-	
+
 	// draw the search marker (gunsight)
 	if (isFeature(MARKER)) {
 		if(m_RefreshSearchMarker) {
@@ -867,13 +867,13 @@ void Starsphere::render(const double timeOfDay)
 
 	// draw 2D vectorized HUD
 	if(isFeature(LOGO) || isFeature(SEARCHINFO)) {
-	
+
 		// disable depth testing since we're in 2D mode
 		glDisable(GL_DEPTH_TEST);
-		
+
 		// enable textured fonts
 		glEnable(GL_TEXTURE_2D);
-		
+
 		// save current state
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
@@ -882,23 +882,23 @@ void Starsphere::render(const double timeOfDay)
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
-	
+
 		if (isFeature(LOGO)) {
 			m_FontLogo1->draw(m_XStartPosLeft, m_YStartPosTop, "Einstein@Home");
 			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "World Year of Physics 2005");
 		}
-		
+
 		if (isFeature(SEARCHINFO)) renderSearchInformation();
-		
+
 		// restore original state
 		glMatrixMode(GL_PROJECTION);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();
-		
+
 		// disable font textures
 		glDisable(GL_TEXTURE_2D);
-		
+
 		// enable depth testing since we're leaving 2D mode
 		glEnable(GL_DEPTH_TEST);
 	}
@@ -910,7 +910,7 @@ void Starsphere::render(const double timeOfDay)
 void Starsphere::mouseButtonEvent(const int positionX, const int positionY,
 								  const AbstractGraphicsEngine::MouseButton buttonPressed)
 {
-	
+
 }
 
 void Starsphere::mouseMoveEvent(const int deltaX, const int deltaY,
@@ -966,7 +966,7 @@ void Starsphere::keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey ke
 			break;
 		default:
 			break;
-	}	
+	}
 }
 
 /**
@@ -1013,22 +1013,22 @@ void Starsphere::refreshLocalBOINCInformation()
 {
 	// call base class implementation
 	AbstractGraphicsEngine::refreshLocalBOINCInformation();
-	
+
 	// prepare conversion buffer
 	stringstream buffer;
 	buffer.precision(2);
 	buffer.setf(ios::fixed, ios::floatfield);
 	buffer.fill('0');
 	buffer.setf(ios::right, ios::adjustfield);
-	
+
 	// store content required for our HUD (user info)
 	m_UserName = "User: " + m_BoincAdapter.userName();
 	m_TeamName = "Team: " + m_BoincAdapter.teamName();
-	
+
 	buffer << "Project Credit: " << fixed << m_BoincAdapter.userCredit() << ends;
 	m_UserCredit = buffer.str();
 	buffer.str("");
-	
+
 	buffer << "Project RAC: " << fixed << m_BoincAdapter.userRACredit() << ends;
 	m_UserRACredit = buffer.str();
 	buffer.str("");

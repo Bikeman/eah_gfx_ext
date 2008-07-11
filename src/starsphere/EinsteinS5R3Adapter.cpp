@@ -20,10 +20,12 @@
 
 #include "EinsteinS5R3Adapter.h"
 
+const string EinsteinS5R3Adapter::SharedMemoryIdentifier = "EinsteinHS";
+
 EinsteinS5R3Adapter::EinsteinS5R3Adapter(BOINCClientAdapter *boincClient)
 {
 	this->boincClient = boincClient;
-	
+
 	m_WUSkyPosRightAscension = 0.0;
 	m_WUSkyPosDeclination = 0.0;
 	m_WUFractionDone = 0.0;
@@ -44,10 +46,10 @@ void EinsteinS5R3Adapter::parseApplicationInformation()
 {
 	// get updated application information
 	string info = boincClient->applicationInformation();
-	
+
 	// do we have any data?
 	if(info.length() > 0) {
-		
+
 		// parse data into members
 		if(4 != sscanf(info.c_str(),
 			  		"<graphics_info>\n"
@@ -59,7 +61,7 @@ void EinsteinS5R3Adapter::parseApplicationInformation()
 			  		&m_WUSkyPosDeclination,
 			  		&m_WUFractionDone,
 			  		&m_WUCPUTime))
-		{		 
+		{
 			cerr << "Incompatible shared memory data encountered!" << endl;
 		}
 		else {

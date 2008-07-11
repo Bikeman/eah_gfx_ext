@@ -40,6 +40,7 @@
 #include <util.h>
 
 #include "AbstractGraphicsEngine.h"
+#include "EinsteinS5R3Adapter.h"
 
 /* SIN and COS take arguments in DEGREES */
 #define PI 3.14159265
@@ -64,22 +65,22 @@ using namespace std;
 
 /**
  * \brief %Starsphere rendering engine for \b Einstein\@Home
- * 
+ *
  * This class comprises the generic parts of the %Starsphere rendering engine.
  * %Starsphere displays the celestial sphere indicating a fixed set of stars with
  * their constellations as well as known pulsars and supernova remnants. Apart from
  * that the four main gravitational wave observatory locations are shown at their actual
  * real-time position. Furthermore a head-up display (HUD) shows relevant BOINC
  * statistics as well as information on the current workunit (WU) being processed.
- * 
+ *
  * For more details please refer to http://einstein.phys.uwm.edu/starsphere.php
- * 
+ *
  * Note: all science run specific parts are implemented in specialized subclasses
  * of this engine.
- * 
+ *
  * \todo The code of this implementaion is based on the former version of %Starsphere
  * and there's still some refactoring, code cleanup and documenting left to be done.
- * 
+ *
  * \author Oliver Bock\n
  * Max-Planck-Institute for Gravitational Physics\n
  * Hannover, Germany
@@ -92,17 +93,17 @@ public:
 
 	/**
 	 * \brief This method is called to initialize the engine
-	 * 
+	 *
 	 * \param width The current width of the display surface
 	 * \param height The current height of the display surface
 	 * \param font A pointer to a Resource object containing TTF font faces for text rendering
 	 * \param recycle This flag indicates whether we initialize (FALSE) or reinitialize (TRUE) the context
 	 */
 	virtual void initialize(const int width, const int height, const Resource *font, const bool recycle = false);
-	
+
 	/**
 	 * \brief This method is called when the windowing system encounters a window resize event
-	 * 
+	 *
 	 * \param width The new width of the display surface
 	 * \param height The new height of the display surface
 	 */
@@ -115,65 +116,65 @@ public:
 	void mouseMoveEvent(const int deltaX, const int deltaY,
 						const AbstractGraphicsEngine::MouseButton buttonPressed);
 	void keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed);
-	
+
 protected:
 	/**
 	 * \brief Default contructor
-	 * 
+	 *
 	 * The constructor is protected since this an abstract class.
-	 */	
+	 */
 	Starsphere();
-	
+
 	/**
 	 * \brief Render science run specific search information
-	 * 
+	 *
 	 * This abtract method is to be defined by derived classes implementing
 	 * the science run specific search information handling and rendering.
-	 * 
+	 *
 	 * Note: for this engine this also includes the "BOINC Statistics"
 	 * as it is top-aligned to the "Search Information".
 	 */
 	virtual void renderSearchInformation() = 0;
-	
+
 	/**
 	 * \brief This method has to be called in order to update the BOINC client information
-	 * 
+	 *
 	 * This is the local/generic implementation which calls
 	 * AbstractGraphicsEngine::refreshLocalBOINCInformation() first and
 	 * refreshes the "BOINC Statistics" afterwards.
-	 * 
+	 *
 	 * \see AbstractGraphicsEngine::refreshLocalBOINCInformation()
 	 */
 	virtual void refreshLocalBOINCInformation();
-	
+
 	// resource handling
 	const Resource *m_FontResource;
 	OGLFT::TranslucentTexture *m_FontLogo1;
 	OGLFT::TranslucentTexture *m_FontLogo2;
 	OGLFT::TranslucentTexture *m_FontHeader;
 	OGLFT::TranslucentTexture *m_FontText;
-	
+
 	// Graphics state info:
 	int m_CurrentWidth;
 	int m_CurrentHeight;
 	float aspect;
-	
+
 	// HUD text rendering config (maybe overridden in subclasses)
 	GLfloat m_XStartPosLeft;
 	GLfloat m_YStartPosTop;
 	GLfloat m_YOffsetLarge;
-	
+
 	// local HUD contents
 	string m_UserName;
 	string m_TeamName;
 	string m_UserCredit;
 	string m_UserRACredit;
-	
+
 	// search marker info
 	double m_CurrentRightAscension;
 	double m_CurrentDeclination;
 	bool m_RefreshSearchMarker;
-	
+
 private:
 	void make_stars();
 	void make_pulsars();
@@ -219,11 +220,11 @@ private:
 	GLfloat rotation_speed; // degrees per minute
 
 	//------------ new clean members -----
-	
+
 	// view control
 	void rotateSphere(const int relativeRotation, const int relativeElevation);
 	void zoomSphere(const int relativeZoom);
-	
+
 	// feature control
 	enum Features {
 		STARS = 1,
@@ -237,8 +238,8 @@ private:
 		SEARCHINFO = 256,
 		LOGO = 512,
 		MARKER = 1024
-	};	
-	
+	};
+
 	void setFeature(const Features features, const bool enable);
 	bool isFeature(const Features features);
 
