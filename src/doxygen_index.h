@@ -51,6 +51,7 @@
  * - Community involvement: build and share \b your \b own graphics application!
  * - Provide different backgrounds and search visualizations
  * - Full Linux screensaver support (X11, KDE, Gnome)
+ * - True XML support (libxml2 integration)
  * - Help dialog (on screen display)
  *
  * \section sec_doc_user User Documentation
