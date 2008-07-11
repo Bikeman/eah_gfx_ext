@@ -95,7 +95,7 @@ public:
      */
     double wuCPUTime() const;
 
-    /// The identifier of the Einstein@Home science application's shared memory area
+    /// The identifier of the Einstein\@Home science application's shared memory area
     static const string SharedMemoryIdentifier;
 
 private:
