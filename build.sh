@@ -457,6 +457,8 @@ distclean()
 	rm -rf 3rdparty || failure
 	rm -rf build || failure
 	rm -rf install || failure
+	rm -rf doc/html || failure
+	rm -f doc/*.tag || failure
 
 	rm -f .lastbuild || failure
 }
