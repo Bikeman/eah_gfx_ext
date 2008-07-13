@@ -86,6 +86,7 @@ prepare_build_tree()
 	echo "Preparing build tree..." | tee -a $LOGFILE
 	mkdir -p build/sdl >> $LOGFILE || failure
 	mkdir -p build/freetype2 >> $LOGFILE || failure
+	mkdir -p build/libxml2 >> $LOGFILE || failure
 	mkdir -p build/oglft >> $LOGFILE || failure
 	mkdir -p build/boinc >> $LOGFILE || failure
 	mkdir -p build/framework >> $LOGFILE || failure
@@ -136,6 +137,15 @@ prepare_generic()
 	# substitute old source tree
 	rm -rf freetype2 >> $LOGFILE 2>&1 || failure
 	mv freetype-2.3.5 freetype2 >> $LOGFILE 2>&1 || failure
+
+	echo "Retrieving libxml2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty || failure
+	wget ftp://xmlsoft.org/libxml2/libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
+	tar -xzf libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
+	rm libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
+	# substitute old source tree
+	rm -rf libxml2 >> $LOGFILE 2>&1 || failure
+	mv libxml2-2.6.32 libxml2 >> $LOGFILE 2>&1 || failure
 	
 	cd $ROOT/3rdparty/oglft || failure
 	if [ -d .svn ]; then
@@ -194,7 +204,9 @@ build_generic()
 {
 	echo "Building SDL (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/sdl || failure
+	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/sdl || failure
 	if [ "$1" == "$TARGET_MAC" ]; then
 		$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --enable-video-x11=no >> $LOGFILE 2>&1 || failure
@@ -208,14 +220,23 @@ build_generic()
 	echo "Building Freetype2 (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/freetype2 || failure
 	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
-	chmod +x configure >> $LOGFILE 2>&1 || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/freetype2 || failure
 	# note: freetype (or sdl?) probably doesn't need *no* configure when static -> ansi build, see readme!
 	$ROOT/3rdparty/freetype2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Freetype2!" | tee -a $LOGFILE
+
+	echo "Building libxml2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/libxml2 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
+	cd $ROOT/build/libxml2 || failure
+	$ROOT/3rdparty/libxml2/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed libxml2!" | tee -a $LOGFILE
 
 	echo "Patching OGLFT..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/oglft || failure
@@ -239,7 +260,9 @@ build_generic()
 
 	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/boinc || failure
+	chmod +x _autosetup >> $LOGFILE 2>&1 || failure
 	./_autosetup >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc || failure
 	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
 	make >> $LOGFILE 2>&1 || failure
@@ -262,7 +285,9 @@ build_generic_win32()
 
 	echo "Building SDL (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/sdl || failure
+	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-sdl-config" ]; then
 		SDL_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-sdl-config"
 		export SDL_CONFIG
@@ -281,8 +306,8 @@ build_generic_win32()
 	echo "Building Freetype2 (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/freetype2 || failure
 	chmod +x autogen.sh >> $LOGFILE 2>&1 || failure
-	chmod +x configure >> $LOGFILE 2>&1 || failure
 	./autogen.sh >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-freetype-config" ]; then
 		FT_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-freetype-config"
 		export FT_CONFIG
@@ -294,6 +319,20 @@ build_generic_win32()
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Freetype2!" | tee -a $LOGFILE
+
+	echo "Building libxml2 (this may take a while)..." | tee -a $LOGFILE
+	cd $ROOT/3rdparty/libxml2 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
+	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-libxml-2.0-config" ]; then
+		LIBXML2_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-libxml-2.0-config"
+		export LIBXML2_CONFIG
+		echo "Cross-compile LIBXML2_CONFIG: $LIBXML2_CONFIG" >> $LOGFILE
+	fi
+	cd $ROOT/build/libxml2 || failure
+	$ROOT/3rdparty/libxml2/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$PREFIX --enable-shared=no --enable-static=yes >> $LOGFILE 2>&1 || failure
+	make >> $LOGFILE 2>&1 || failure
+	make install >> $LOGFILE 2>&1 || failure
+	echo "Successfully built and installed libxml2!" | tee -a $LOGFILE
 
 	echo "Patching OGLFT..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/oglft || failure
@@ -324,7 +363,9 @@ build_generic_win32()
 	# patch: add graphics2 and customize build path (see below)
 	echo "Building BOINC (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/boinc || failure
+	chmod +x _autosetup >> $LOGFILE 2>&1 || failure
 	./_autosetup >> $LOGFILE 2>&1 || failure
+	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc || failure
 	# note: configure is still required but we don't use the generated Makefile
 	$ROOT/3rdparty/boinc/configure --host=$TARGET_HOST --build=$BUILD_HOST --prefix=$ROOT/install --includedir=$ROOT/install/include --oldincludedir=$ROOT/install/include --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
