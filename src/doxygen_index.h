@@ -46,6 +46,13 @@
  * available. For example: on a recent Linux PC the %Starsphere application consumes less than 10% CPU power when
  * running at typical desktop resolutions (e.g. 1280x1024), 30 frames per second and high quality.
  *
+ * \subsection sec_platforms Supported Platforms
+ *
+ * The binary versions as well as the build script support the following platforms:
+ * - Linux (Intel, 32 Bit)
+ * - Windows (Intel, 32 Bit, cross compiled with MinGW)
+ * - Mac OS X (Tiger/Leopard, Intel/PowerPC, 32 Bit)
+ *
  * \subsection sec_future The Future
  *
  * - Community involvement: build and share \b your \b own graphics application!
@@ -170,35 +177,63 @@
  * \subsubsection sec_build_overview Overview
  *
  * The (very simple) build script tries to compile binaries for all supported platforms without depending
- * on any required library being installed on the build machine. The only requirement is a properly
- * installed and configured build system based on the GNU Compiler Collection Version 4 and a
- * working (direct) connection to the internet. Everything else is subsequently downloaded,
- * configured and compiled automatically by the script.
+ * on any additional library being installed on the build machine. The only requirements are a properly
+ * installed and configured build system based on the GNU Compiler Collection Version 4, a few common
+ * library development packages and a working (direct) connection to the internet.
+ * Everything else is subsequently downloaded, configured and compiled automatically by the script.
+ *
+ * \subsubsection sec_build_provided Libraries used (provided automatically)
+ *
+ * - SDL - Simple DirectMedia Layer
+ * - FreeType 2 - High-quality glyph images
+ * - OGLFT - OpenGL-FreeType Library
+ * - BOINC (Graphics/API)
  *
  * \subsubsection sec_build_requirements Requirements
  *
- * Please make sure the following tools are available to the build script:
+ * Please make sure the following development packages (headers/libs) and tools are available to the build script
+ * (note: the following package names refer to Debian only, your distribution's package names might vary):
  *
- * - bash
- * - gcc / g++
- * - automake
- * - autoconf
- * - m4
- * - cmake
- * - wget
- * - cvs
- * - svn
- * - ld
- * - libtool
- * - ar
- * - lex (i.e. flex)
- * - yacc (i.e. bison)
- * - doxygen (optional)
+ * - Common libraries (mostly required by SDL):
+ *   - libc6-dev
+ *   - zlib1g-dev
+ * - Libraries for Linux and Windows/MinGW (required by SDL):
+ *   - libgl1-mesa-dev | nvidia-glx-dev
+ *   - libglu1-mesa-dev
+ *   - libxt-dev
+ *   - libxext-dev
+ *   - libaudio-dev
+ * - Libraries for Mac OS X (required by SDL, provided by XCode):
+ *   - OpenGL Framework
+ *   - Cocoa Framework
+ *   - Carbon Framework
+ *   - QuickTime Framework
+ *   - ApplicationServices Framework
+ *   - AudioToolbox Framework
+ *   - AudioUnit Framework
+ *   - IOKit Framework
+ * - Tools:
+ *   - bash
+ *   - gcc / g++
+ *   - automake
+ *   - autoconf
+ *   - m4
+ *   - cmake
+ *   - wget
+ *   - cvs
+ *   - svn
+ *   - ld
+ *   - libtool
+ *   - ar
+ *   - lex (i.e. flex)
+ *   - yacc (i.e. bison)
+ *   - doxygen (optional)
  *
  * \subsubsection sec_build_usage Usage
  *
  * In order to use the script you just have to navigate to the \c graphics directory
- * in the Einstein\@Home source tree and run the script passing as an argument the desired target platform:
+ * in the Einstein\@Home source tree and run the script passing as an argument the desired target platform
+ * (you'll find the compiled executable \c starsphere in the \c install/bin directory):
  *
  * - Linux build: \code build.sh --linux \endcode
  * - Mac OS X build: \code build.sh --mac \endcode
