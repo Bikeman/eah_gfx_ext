@@ -25,7 +25,7 @@
 #include "Resource.h"
 
 /**
- * \addtogroup framwork Framework
+ * \addtogroup framework Framework
  * @{
  */
 

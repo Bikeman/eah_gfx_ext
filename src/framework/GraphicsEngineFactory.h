@@ -25,7 +25,7 @@
 #include "StarsphereS5R3.h"
 
 /**
- * \addtogroup framwork Framework
+ * \addtogroup framework Framework
  * @{
  */
 

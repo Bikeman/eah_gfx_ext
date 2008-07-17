@@ -27,8 +27,10 @@
 
 #include "Resource.h"
 
+using namespace std;
+
 /**
- * \addtogroup framwork Framework
+ * \addtogroup framework Framework
  * @{
  */
 

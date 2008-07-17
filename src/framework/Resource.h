@@ -27,7 +27,7 @@
 using namespace std;
 
 /**
- * \addtogroup framwork Framework
+ * \addtogroup framework Framework
  * @{
  */
 
