@@ -31,7 +31,7 @@ CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/freetype-config --cflags)
 CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile
-OBJS = AbstractGraphicsEngine.o GraphicsEngineFactory.o WindowManager.o Resource.o ResourceFactory.o BOINCClientAdapter.o
+OBJS = AbstractGraphicsEngine.o GraphicsEngineFactory.o WindowManager.o Resource.o ResourceFactory.o BOINCClientAdapter.o Libxml2Adapter.o
 DEBUGFLAGSCPP = -pg -ggdb -O0
 
 # TODO: GraphicsEngineFactory obviously depends on the actual implementations (here starsphere)! need to change the structure! what about plugins?
@@ -71,6 +71,8 @@ ResourceFactory.o: $(DEPS) $(FRAMEWORK_SRC)/ResourceFactory.cpp $(FRAMEWORK_SRC)
 Resource.o: $(DEPS) $(FRAMEWORK_SRC)/Resource.cpp $(FRAMEWORK_SRC)/Resource.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/Resource.cpp
 
+Libxml2Adapter.o: $(DEPS) $(FRAMEWORK_SRC)/Libxml2Adapter.cpp $(FRAMEWORK_SRC)/Libxml2Adapter.h $(FRAMEWORK_SRC)/XMLProcessorInterface.h
+	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/Libxml2Adapter.cpp
 # tools
 install:
 	cp libframework.a $(ORC_INSTALL)/lib
