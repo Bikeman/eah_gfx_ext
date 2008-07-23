@@ -29,12 +29,21 @@
 
 int main(int argc, char **argv)
 {
+
+	// choose application to be build/used
+	GraphicsEngineFactory::Applications scienceApplication;
+#ifdef SCIENCE_APP
+	scienceApplication = GraphicsEngineFactory::SCIENCE_APP;
+#else
+	scienceApplication = GraphicsEngineFactory::EinsteinS5R3;
+#endif
+
 	// prepare main objects
 	WindowManager window;
 	ResourceFactory factory;
 	AbstractGraphicsEngine *graphics = GraphicsEngineFactory::createInstance(
 											GraphicsEngineFactory::Starsphere,
-											GraphicsEngineFactory::EinsteinS5R3);
+											scienceApplication);
 
 	if(!graphics) {
 		cerr << "Requested graphics engine could not be found/instantiated!" << endl;
