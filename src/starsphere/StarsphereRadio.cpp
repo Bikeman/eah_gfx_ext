@@ -94,22 +94,25 @@ void StarsphereRadio::refreshBOINCInformation()
 	if(m_WUDispersionMeasureValue != m_EinsteinAdapter.wuDispersionMeasure()) {
 		// we've got a new dispersion measure, update HUD
 		m_WUDispersionMeasureValue = m_EinsteinAdapter.wuSkyPosDeclination();
-		buffer << "Dispersion: " << fixed << m_WUDispersionMeasureValue << ends;
+		buffer << "DM: " << fixed << m_WUDispersionMeasureValue << " pc/cm3" << ends;
 		m_WUDispersionMeasure = buffer.str();
 		buffer.str("");
 	}
 
 	// update the following information every time (no need to check first)
 
-	buffer << "Orb. Radius: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalRadius() << ends;
+	buffer.precision(3);
+	buffer << "Orb. Radius: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalRadius() << " ls" << ends;
 	m_WUTemplateOrbitalRadius = buffer.str();
 	buffer.str("");
 
-	buffer << "Orb. Period: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalPeriod() << ends;
+	buffer.precision(0);
+	buffer << "Orb. Period: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalPeriod() << " s" << ends;
 	m_WUTemplateOrbitalPeriod = buffer.str();
 	buffer.str("");
 
-	buffer << "Orb. Phase: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalPhase() << ends;
+	buffer.precision(2);
+	buffer << "Orb. Phase: " << fixed << m_EinsteinAdapter.wuTemplateOrbitalPhase() << " rad" << ends;
 	m_WUTemplateOrbitalPhase = buffer.str();
 	buffer.str("");
 
