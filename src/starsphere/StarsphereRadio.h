@@ -22,9 +22,14 @@
 #define STARSPHERERADIO_H_
 
 #include <sstream>
+#include <vector>
 
 #include "Starsphere.h"
 #include "EinsteinRadioAdapter.h"
+
+//FIXME: these can be removed after FFT testing!
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -100,6 +105,12 @@ private:
 	 * as it is top-aligned to the "Search Information".
 	 */
 	void renderSearchInformation();
+
+	void renderPowerSpectrum();
+	void generatePowerSpectrumCoordSystem(const int originX, const int originY);
+
+	GLuint m_PowerSpectrumCoordSystemList;
+	vector<char>* m_PowerSpectrumFreqBins;
 
 	/// Specialized BOINC client adapter instance for information retrieval
 	EinsteinRadioAdapter m_EinsteinAdapter;

@@ -23,10 +23,13 @@
 StarsphereRadio::StarsphereRadio() : Starsphere(), m_EinsteinAdapter(&m_BoincAdapter)
 {
 	m_WUDispersionMeasureValue = -1.0;
+	m_PowerSpectrumCoordSystemList = 0;
+	m_PowerSpectrumFreqBins = new vector<char>(40, 0);
 }
 
 StarsphereRadio::~StarsphereRadio()
 {
+	if(m_PowerSpectrumFreqBins) delete m_PowerSpectrumFreqBins;
 }
 
 void StarsphereRadio::initialize(const int width, const int height, const Resource *font, const bool recycle)
@@ -47,6 +50,10 @@ void StarsphereRadio::initialize(const int width, const int height, const Resour
 		m_Y5StartPosBottom = m_Y4StartPosBottom - m_YOffsetMedium;
 		m_Y6StartPosBottom = m_Y5StartPosBottom - m_YOffsetMedium;
 	}
+
+	// prepare power spectrum
+	// TODO: store fixed values as class consts
+	generatePowerSpectrumCoordSystem(width - 210, height - 60);
 }
 
 void StarsphereRadio::resize(const int width, const int height)
@@ -54,7 +61,12 @@ void StarsphereRadio::resize(const int width, const int height)
 	Starsphere::resize(width, height);
 
 	// adjust HUD config
+	// TODO: store fixed values as class consts
 	m_XStartPosRight = width - 125;
+
+	// update static power spectrum parts
+	// TODO: store fixed values as class consts
+	generatePowerSpectrumCoordSystem(width - 210, height - 60);
 }
 
 void StarsphereRadio::refreshBOINCInformation()
@@ -131,26 +143,98 @@ void StarsphereRadio::refreshBOINCInformation()
 							<< right << setw(2) << sec << ends;
 
 	m_WUCPUTime = buffer.str();
+
+	// update power spectrum bin data
+	// TODO: store fixed values as class consts
+	// TODO: this has to be a separate method!
+	generatePowerSpectrumCoordSystem(m_CurrentWidth - 210, m_CurrentHeight - 60);
 }
 
 void StarsphereRadio::renderSearchInformation()
 {
-		// left info block
-		m_FontHeader->draw(m_XStartPosLeft, m_YStartPosBottom, "BOINC Information");
-		m_FontText->draw(m_XStartPosLeft, m_Y1StartPosBottom, m_UserName.c_str());
-		m_FontText->draw(m_XStartPosLeft, m_Y2StartPosBottom, m_TeamName.c_str());
-		m_FontText->draw(m_XStartPosLeft, m_Y3StartPosBottom, m_UserCredit.c_str());
-		m_FontText->draw(m_XStartPosLeft, m_Y4StartPosBottom, m_UserRACredit.c_str());
-		m_FontText->draw(m_XStartPosLeft, m_Y5StartPosBottom, m_WUPercentDone.c_str());
-		m_FontText->draw(m_XStartPosLeft, m_Y6StartPosBottom, m_WUCPUTime.c_str());
+	// left info block
+	m_FontHeader->draw(m_XStartPosLeft, m_YStartPosBottom, "BOINC Information");
+	m_FontText->draw(m_XStartPosLeft, m_Y1StartPosBottom, m_UserName.c_str());
+	m_FontText->draw(m_XStartPosLeft, m_Y2StartPosBottom, m_TeamName.c_str());
+	m_FontText->draw(m_XStartPosLeft, m_Y3StartPosBottom, m_UserCredit.c_str());
+	m_FontText->draw(m_XStartPosLeft, m_Y4StartPosBottom, m_UserRACredit.c_str());
+	m_FontText->draw(m_XStartPosLeft, m_Y5StartPosBottom, m_WUPercentDone.c_str());
+	m_FontText->draw(m_XStartPosLeft, m_Y6StartPosBottom, m_WUCPUTime.c_str());
 
-		// right info block
-		m_FontHeader->draw(m_XStartPosRight, m_YStartPosBottom, "Search Information");
-		m_FontText->draw(m_XStartPosRight, m_Y1StartPosBottom, m_WUSkyPosRightAscension.c_str());
-		m_FontText->draw(m_XStartPosRight, m_Y2StartPosBottom, m_WUSkyPosDeclination.c_str());
-		m_FontText->draw(m_XStartPosRight, m_Y3StartPosBottom, m_WUDispersionMeasure.c_str());
-		m_FontText->draw(m_XStartPosRight, m_Y4StartPosBottom, m_WUTemplateOrbitalRadius.c_str());
-		m_FontText->draw(m_XStartPosRight, m_Y5StartPosBottom, m_WUTemplateOrbitalPeriod.c_str());
-		m_FontText->draw(m_XStartPosRight, m_Y6StartPosBottom, m_WUTemplateOrbitalPhase.c_str());
+	// right info block
+	m_FontHeader->draw(m_XStartPosRight, m_YStartPosBottom, "Search Information");
+	m_FontText->draw(m_XStartPosRight, m_Y1StartPosBottom, m_WUSkyPosRightAscension.c_str());
+	m_FontText->draw(m_XStartPosRight, m_Y2StartPosBottom, m_WUSkyPosDeclination.c_str());
+	m_FontText->draw(m_XStartPosRight, m_Y3StartPosBottom, m_WUDispersionMeasure.c_str());
+	m_FontText->draw(m_XStartPosRight, m_Y4StartPosBottom, m_WUTemplateOrbitalRadius.c_str());
+	m_FontText->draw(m_XStartPosRight, m_Y5StartPosBottom, m_WUTemplateOrbitalPeriod.c_str());
+	m_FontText->draw(m_XStartPosRight, m_Y6StartPosBottom, m_WUTemplateOrbitalPhase.c_str());
 
+	// power spectrum
+	renderPowerSpectrum();
+}
+
+void StarsphereRadio::renderPowerSpectrum()
+{
+	// TODO: store fixed values as class consts
+	m_FontText->draw(m_XStartPosRight - 20, m_CurrentHeight - 75, "Power Spectrum");
+
+	glPushMatrix();
+	glLoadIdentity();
+	glCallList(m_PowerSpectrumCoordSystemList);
+	//TODO: separate call list for bins!
+	glPopMatrix();
+}
+
+void StarsphereRadio::generatePowerSpectrumCoordSystem(const int originX, const int originY)
+{
+	GLfloat offsetX = (GLfloat)originX;
+	GLfloat offsetY = (GLfloat)originY;
+	GLfloat axesWidth = 2.0;
+	GLfloat binWidth = 5.0;
+
+	// delete existing, create new (required for windoze)
+	if(m_PowerSpectrumCoordSystemList) glDeleteLists(m_PowerSpectrumCoordSystemList, 1);
+	m_PowerSpectrumCoordSystemList = glGenLists(1);
+	glNewList(m_PowerSpectrumCoordSystemList, GL_COMPILE);
+
+		// draw coordinate system axes
+		glBegin(GL_LINE_STRIP);
+			glLineWidth(axesWidth);
+			glColor4f(0.7, 0.7, 0.0, 1.0);
+			glVertex2f(offsetX, offsetY + 50.0);
+			glVertex2f(offsetX, offsetY);
+			glVertex2f(offsetX + 200, offsetY);
+		glEnd();
+
+		// draw origin (axes joint)
+		glBegin(GL_POINTS);
+			glPointSize(axesWidth);
+			glColor4f(0.7, 0.7, 0.0, 1.0);
+			glVertex2f(offsetX, offsetY);
+		glEnd();
+
+		//TODO: for high quality mode: draw coord. system backdrop with alpha = ~0.3
+
+//		------test code
+		srand(time(NULL));
+		for(int i=0; i<40; ++i) {
+			m_PowerSpectrumFreqBins->at(i) = rand()%10;
+		}
+
+		// draw frequency bins
+		glBegin(GL_LINES);
+			glLineWidth(binWidth);
+			glColor4f(1.0, 1.0, 1.0, 1.0);
+
+			// iterate over all bins
+			for(int i=0; i<40; ++i) {
+				glVertex2f(offsetX+1+i*binWidth, offsetY+1);
+				glVertex2f(offsetX+1+i*binWidth, offsetY+1+m_PowerSpectrumFreqBins->at(i)*4.5);
+			}
+		glEnd();
+//		------test code
+
+
+	glEndList();
 }
