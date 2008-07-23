@@ -52,24 +52,24 @@ void EinsteinRadioAdapter::parseApplicationInformation()
 
 		// parse data into members
 		// TODO: this is soon going to be replaced by true XML parsing!
-		if(4 != sscanf(info.c_str(),
+		if(8 != sscanf(info.c_str(),
 				"<graphics_info>\n"
 				"  <fraction_done>%lf</fraction_done>\n"
 				"  <cpu_time>%lf</cpu_time>\n"
 				"  <skypos_rac>%lf</skypos_rac>\n"
 				"  <skypos_dec>%lf</skypos_dec>\n"
-				"  <dispersion>%lf</dispersion>\n",
-				"  <orb_radius>%lf</orb_radius>\n",
-				"  <orb_period>%lf</orb_period\n",
+				"  <dispersion>%lf</dispersion>\n"
+				"  <orb_radius>%lf</orb_radius>\n"
+				"  <orb_period>%lf</orb_period\n"
 				"  <orb_phase>%lf</orb_phase>\n",
-			  		&m_WUFractionDone,
-			  		&m_WUCPUTime,
-			  		&m_WUSkyPosRightAscension,
-			  		&m_WUSkyPosDeclination,
-			  		&m_WUDispersionMeasure,
-			  		&m_WUTemplateOrbitalRadius,
-			  		&m_WUTemplateOrbitalPeriod,
-			  		&m_WUTemplateOrbitalPhase))
+				&m_WUFractionDone,
+				&m_WUCPUTime,
+				&m_WUSkyPosRightAscension,
+				&m_WUSkyPosDeclination,
+				&m_WUDispersionMeasure,
+				&m_WUTemplateOrbitalRadius,
+				&m_WUTemplateOrbitalPeriod,
+				&m_WUTemplateOrbitalPhase))
 		{
 			cerr << "Incompatible shared memory data encountered!" << endl;
 		}
