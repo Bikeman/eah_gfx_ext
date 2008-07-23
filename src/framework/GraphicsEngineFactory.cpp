@@ -37,11 +37,14 @@ AbstractGraphicsEngine * GraphicsEngineFactory::createInstance(
 				case EinsteinS5R3:
 					return new StarsphereS5R3();
 					break;
+				case EinsteinRadio:
+					return new StarsphereRadio();
+					break;
 				default:
 					return NULL;
 			}
 			break;
 		default:
-			return NULL;	
+			return NULL;
 	}
 }
