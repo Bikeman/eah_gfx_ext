@@ -416,7 +416,7 @@ build_starsphere()
 	export ORC_INSTALL=$ROOT/install || failure
 	cd $ROOT/build/orc || failure
 	cp $ROOT/src/orc/Makefile . >> $LOGFILE 2>&1 || failure
-	make >> $LOGFILE 2>&1 || failure
+	make $1 >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [ORC]!" | tee -a $LOGFILE
 
@@ -436,7 +436,7 @@ build_starsphere()
 	else
 		cp -f $ROOT/src/framework/Makefile . >> $LOGFILE 2>&1 || failure
 	fi
-	make >> $LOGFILE 2>&1 || failure
+	make $1 >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Framework]!" | tee -a $LOGFILE
 
@@ -452,7 +452,7 @@ build_starsphere()
 	else
 		cp -f $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
 	fi
-	make >> $LOGFILE 2>&1 || failure
+	make $1 >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Application]!" | tee -a $LOGFILE
 
@@ -590,7 +590,7 @@ case "$1" in
 	"--starsphere")
 		# "hidden" bonus option :-)
 		TARGET=$TARGET_LINUX
-		build_starsphere || failure
+		build_starsphere "debug" || failure
 		exit 0
 		;;
 	*)
