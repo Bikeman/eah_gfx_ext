@@ -39,14 +39,16 @@ using namespace std;
  */
 
 /**
- * \brief Specialized rendering engine for the Pulsar Search science run
+ * \brief Specialized rendering engine for the "Arecibo Radio Pulsar Search" science run
  *
  * This class comprises the specialized parts of the Starsphere rendering engine.
  * The main differences stem from the fact that most science runs differ in their
  * search configuration and parameters. Thus the parameters exposed by the HUD
  * (head-up display) are positioned and rendered here. For the time being the
  * "BOINC Information" are top-aligned to the "Search Parameters", hence they're
- * also positioned and rendered here.
+ * also positioned and rendered here. This specific implementation also introduces a
+ * nice feature that visualizes the \a actual search data in guise of a \a real-time power
+ * spectrum.
  *
  * \author Oliver Bock\n
  * Max-Planck-Institute for Gravitational Physics\n
@@ -106,11 +108,72 @@ private:
 	 */
 	void renderSearchInformation();
 
-	void renderPowerSpectrum();
+	/**
+	 * \brief Creates an OpenGL call list which contains the static power spectrum coordinate system
+	 *
+	 * \param originX The x-screen coordinate of the power spectrum's origin
+	 * \param originY The y-screen coordinate of the power spectrum's origin
+	 */
 	void generatePowerSpectrumCoordSystem(const int originX, const int originY);
 
+	/**
+	 * \brief Creates an OpenGL call list which contains the dynamic power spectrum frequency bins
+	 *
+	 * \param originX The x-screen coordinate of the power spectrum's origin
+	 * \param originY The y-screen coordinate of the power spectrum's origin
+	 */
+	void generatePowerSpectrumBins(const int originX, const int originY);
+
+	/// ID of the OpenGL call list which contains the static power spectrum coordinate system
 	GLuint m_PowerSpectrumCoordSystemList;
+
+	/// ID of the OpenGL call list which contains the dynamic power spectrum frequency bins
+	GLuint m_PowerSpectrumBinList;
+
+	/// Byte vector to hold the current power spectrum bin values
 	vector<char>* m_PowerSpectrumFreqBins;
+
+	/// Power Spectrum configuration setting (width)
+	GLfloat m_PowerSpectrumWidth;
+
+	/// Power Spectrum configuration setting (height)
+	GLfloat m_PowerSpectrumHeight;
+
+	/// Power Spectrum configuration setting (horizontal position of the origin relative to the window width)
+	GLfloat m_PowerSpectrumOriginWidthOffset;
+
+	/// Power Spectrum configuration setting (vertical position of the origin relative to the window height)
+	GLfloat m_PowerSpectrumOriginHeightOffset;
+
+	/// Power Spectrum configuration setting (horizontal position)
+	GLfloat m_PowerSpectrumXPos;
+
+	/// Power Spectrum configuration setting (vertical position)
+	GLfloat m_PowerSpectrumYPos;
+
+	/// Power Spectrum configuration setting (axes width)
+	GLfloat m_PowerSpectrumAxesWidth;
+
+	/// Power Spectrum configuration setting (bin width)
+	GLfloat m_PowerSpectrumBinWidth;
+
+	/// Power Spectrum configuration setting (bin distance)
+	GLfloat m_PowerSpectrumBinDistance;
+
+	/// Power Spectrum label configuration setting (horizontal position)
+	GLfloat m_PowerSpectrumLabelXPos;
+
+	/// Power Spectrum label configuration setting (vertical position)
+	GLfloat m_PowerSpectrumLabelYPos;
+
+	/// Power Spectrum label configuration setting (horizontal position relative to the power spectrum origin)
+	GLfloat m_PowerSpectrumLabelXOffset;
+
+	/// Power Spectrum label configuration setting (vertical position relative to the power spectrum origin)
+	GLfloat m_PowerSpectrumLabelYOffset;
+
+	/// Active render quality setting
+	BOINCClientAdapter::GraphicsQualitySetting m_QualitySetting;
 
 	/// Specialized BOINC client adapter instance for information retrieval
 	EinsteinRadioAdapter m_EinsteinAdapter;
@@ -147,6 +210,9 @@ private:
 
 	/// HUD configuration setting (horizontal start position for the right part)
 	GLfloat m_XStartPosRight;
+
+	/// HUD configuration setting (horizontal start position for the right part relative to the window width)
+	GLfloat m_XStartPosRightWidthOffset;
 
 	/// HUD configuration setting (vertical start position for the bottom part, header)
 	GLfloat m_YStartPosBottom;

@@ -24,6 +24,7 @@ StarsphereRadio::StarsphereRadio() : Starsphere(), m_EinsteinAdapter(&m_BoincAda
 {
 	m_WUDispersionMeasureValue = -1.0;
 	m_PowerSpectrumCoordSystemList = 0;
+	m_PowerSpectrumBinList = 0;
 	m_PowerSpectrumFreqBins = new vector<char>(40, 0);
 }
 
@@ -36,37 +37,60 @@ void StarsphereRadio::initialize(const int width, const int height, const Resour
 {
 	Starsphere::initialize(width, height, font, recycle);
 
+	// store quality setting
+	m_QualitySetting = m_BoincAdapter.graphicsQualitySetting();
+
 	// check whether we initialize the first time or have to recycle (required for windoze)
 	if(!recycle) {
 
 		// adjust HUD config
-		m_YOffsetMedium = 15;
-		m_XStartPosRight = width - 125;
-		m_YStartPosBottom = 100;
+		m_YOffsetMedium = 15.0;
+		m_XStartPosRightWidthOffset = 125.0;
+		m_XStartPosRight = width - m_XStartPosRightWidthOffset;
+		m_YStartPosBottom = 100.0;
 		m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
 		m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
 		m_Y3StartPosBottom = m_Y2StartPosBottom - m_YOffsetMedium;
 		m_Y4StartPosBottom = m_Y3StartPosBottom - m_YOffsetMedium;
 		m_Y5StartPosBottom = m_Y4StartPosBottom - m_YOffsetMedium;
 		m_Y6StartPosBottom = m_Y5StartPosBottom - m_YOffsetMedium;
+
+		// adjust Power Spectrum config
+		m_PowerSpectrumWidth = 200.0;
+		m_PowerSpectrumHeight = 50.0;
+		m_PowerSpectrumOriginWidthOffset = 210.0;
+		m_PowerSpectrumOriginHeightOffset = 60.0;
+		m_PowerSpectrumXPos = width - m_PowerSpectrumOriginWidthOffset;
+		m_PowerSpectrumYPos = height - m_PowerSpectrumOriginHeightOffset;
+		m_PowerSpectrumAxesWidth = 2.0;
+		m_PowerSpectrumBinWidth = 3.0;
+		m_PowerSpectrumBinDistance = 2.0;
+		m_PowerSpectrumLabelXOffset = (m_PowerSpectrumWidth - 120.0) / 2;
+		m_PowerSpectrumLabelYOffset = 15.0;
+		m_PowerSpectrumLabelXPos = m_PowerSpectrumXPos + m_PowerSpectrumLabelXOffset;
+		m_PowerSpectrumLabelYPos = m_PowerSpectrumYPos - m_PowerSpectrumLabelYOffset;
 	}
 
 	// prepare power spectrum
-	// TODO: store fixed values as class consts
-	generatePowerSpectrumCoordSystem(width - 210, height - 60);
+	generatePowerSpectrumCoordSystem(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
 }
 
 void StarsphereRadio::resize(const int width, const int height)
 {
 	Starsphere::resize(width, height);
 
-	// adjust HUD config
-	// TODO: store fixed values as class consts
-	m_XStartPosRight = width - 125;
+	// update HUD config
+	m_XStartPosRight = width - m_XStartPosRightWidthOffset;
 
-	// update static power spectrum parts
-	// TODO: store fixed values as class consts
-	generatePowerSpectrumCoordSystem(width - 210, height - 60);
+
+	// update power spectrum
+	m_PowerSpectrumXPos = width - m_PowerSpectrumOriginWidthOffset;
+	m_PowerSpectrumYPos = height - m_PowerSpectrumOriginHeightOffset;
+	m_PowerSpectrumLabelXPos = m_PowerSpectrumXPos + m_PowerSpectrumLabelXOffset;
+	m_PowerSpectrumLabelYPos = m_PowerSpectrumYPos - m_PowerSpectrumLabelYOffset;
+
+	generatePowerSpectrumCoordSystem(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
+	generatePowerSpectrumBins(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
 }
 
 void StarsphereRadio::refreshBOINCInformation()
@@ -138,16 +162,14 @@ void StarsphereRadio::refreshBOINCInformation()
 	const int min = (cputime - hrs*3600) / 60;
 	const int sec =  cputime - (hrs*3600 + min*60);
 
-	buffer << "WU CPU Time: "  << right << setw(2) << hrs << ":"
-							<< right << setw(2) << min << ":"
-							<< right << setw(2) << sec << ends;
+	buffer << "WU CPU Time: " << right << setw(2) << hrs << ":"
+							  << right << setw(2) << min << ":"
+							  << right << setw(2) << sec << ends;
 
 	m_WUCPUTime = buffer.str();
 
 	// update power spectrum bin data
-	// TODO: store fixed values as class consts
-	// TODO: this has to be a separate method!
-	generatePowerSpectrumCoordSystem(m_CurrentWidth - 210, m_CurrentHeight - 60);
+	generatePowerSpectrumBins(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
 }
 
 void StarsphereRadio::renderSearchInformation()
@@ -170,71 +192,113 @@ void StarsphereRadio::renderSearchInformation()
 	m_FontText->draw(m_XStartPosRight, m_Y5StartPosBottom, m_WUTemplateOrbitalPeriod.c_str());
 	m_FontText->draw(m_XStartPosRight, m_Y6StartPosBottom, m_WUTemplateOrbitalPhase.c_str());
 
-	// power spectrum
-	renderPowerSpectrum();
-}
+	// power spectrum label
+	m_FontText->draw(m_PowerSpectrumLabelXPos, m_PowerSpectrumLabelYPos, "Arecibo Power Spectrum");
 
-void StarsphereRadio::renderPowerSpectrum()
-{
-	// TODO: store fixed values as class consts
-	m_FontText->draw(m_XStartPosRight - 20, m_CurrentHeight - 75, "Power Spectrum");
+	// disable opt-in quality feature for power spectrum
+	if(m_QualitySetting == BOINCClientAdapter::HighGraphicsQualitySetting) {
+		glDisable(GL_POINT_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+	}
 
+	// power spectrum (no alpha blending)
+	glDisable(GL_BLEND);
 	glPushMatrix();
 	glLoadIdentity();
 	glCallList(m_PowerSpectrumCoordSystemList);
-	//TODO: separate call list for bins!
+	glCallList(m_PowerSpectrumBinList);
 	glPopMatrix();
+	glEnable(GL_BLEND);
+
+	// enable opt-in quality feature for power spectrum
+	if(m_QualitySetting == BOINCClientAdapter::HighGraphicsQualitySetting) {
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+	}
 }
 
 void StarsphereRadio::generatePowerSpectrumCoordSystem(const int originX, const int originY)
 {
 	GLfloat offsetX = (GLfloat)originX;
 	GLfloat offsetY = (GLfloat)originY;
-	GLfloat axesWidth = 2.0;
-	GLfloat binWidth = 5.0;
 
 	// delete existing, create new (required for windoze)
 	if(m_PowerSpectrumCoordSystemList) glDeleteLists(m_PowerSpectrumCoordSystemList, 1);
 	m_PowerSpectrumCoordSystemList = glGenLists(1);
 	glNewList(m_PowerSpectrumCoordSystemList, GL_COMPILE);
 
+		glLineWidth(m_PowerSpectrumAxesWidth);
+
 		// draw coordinate system axes
 		glBegin(GL_LINE_STRIP);
-			glLineWidth(axesWidth);
-			glColor4f(0.7, 0.7, 0.0, 1.0);
-			glVertex2f(offsetX, offsetY + 50.0);
+			glColor4f(1.0, 1.0, 0.0, 1.0);
+			glVertex2f(offsetX, offsetY + m_PowerSpectrumHeight);
 			glVertex2f(offsetX, offsetY);
-			glVertex2f(offsetX + 200, offsetY);
+			glVertex2f(offsetX + m_PowerSpectrumWidth, offsetY);
 		glEnd();
+
+		glPointSize(m_PowerSpectrumAxesWidth);
 
 		// draw origin (axes joint)
 		glBegin(GL_POINTS);
-			glPointSize(axesWidth);
-			glColor4f(0.7, 0.7, 0.0, 1.0);
+			glColor4f(1.0, 1.0, 0.0, 1.0);
 			glVertex2f(offsetX, offsetY);
 		glEnd();
 
-		//TODO: for high quality mode: draw coord. system backdrop with alpha = ~0.3
+		//TODO: for high quality mode: draw coord. system backdrop with alpha = ~0.3 (attn: alpha blend. deactivated!)
 
-//		------test code
-		srand(time(NULL));
-		for(int i=0; i<40; ++i) {
-			m_PowerSpectrumFreqBins->at(i) = rand()%10;
-		}
+	glEndList();
+}
+
+void StarsphereRadio::generatePowerSpectrumBins(const int originX, const int originY)
+{
+	GLfloat offsetX = (GLfloat)originX;
+	GLfloat offsetY = (GLfloat)originY;
+	GLfloat axesXOffset = m_PowerSpectrumAxesWidth + 2;
+	GLfloat axesYOffset = m_PowerSpectrumAxesWidth / 2.0 + 1;
+	GLfloat binXOffset = m_PowerSpectrumBinWidth + m_PowerSpectrumBinDistance;
+
+	// set pixel normalization factor for maximum bin height
+	GLfloat normalizationFactor = 255.0 / (m_PowerSpectrumHeight - axesYOffset);
+
+	// TODO: use real FFT data
+//	------test code
+	srand(time(NULL));
+	for(int i=0; i<40; ++i) {
+		// set bin value to normalized pixel height
+		m_PowerSpectrumFreqBins->at(i) = (rand() % 10) * normalizationFactor;
+//		m_PowerSpectrumFreqBins->at(i) = 255 / normalizationFactor;
+	}
+//	------test code
+
+	// delete existing, create new (required for windoze)
+	if(m_PowerSpectrumBinList) glDeleteLists(m_PowerSpectrumBinList, 1);
+	m_PowerSpectrumBinList = glGenLists(1);
+	glNewList(m_PowerSpectrumBinList, GL_COMPILE);
+
+		glLineWidth(m_PowerSpectrumBinWidth);
 
 		// draw frequency bins
 		glBegin(GL_LINES);
-			glLineWidth(binWidth);
-			glColor4f(1.0, 1.0, 1.0, 1.0);
-
 			// iterate over all bins
-			for(int i=0; i<40; ++i) {
-				glVertex2f(offsetX+1+i*binWidth, offsetY+1);
-				glVertex2f(offsetX+1+i*binWidth, offsetY+1+m_PowerSpectrumFreqBins->at(i)*4.5);
+			for(int i = 0; i < 40; ++i) {
+				// show potential candidates (power >= 100)...
+				if(m_PowerSpectrumFreqBins->at(i) >= m_PowerSpectrumHeight / 2.55) {
+					 // ...in bright white
+					glColor4f(1.0, 1.0, 1.0, 1.0);
+				}
+				else {
+					// ...in light grey
+					glColor4f(0.66, 0.66, 0.66, 1.0);
+				}
+				// lower vertex
+				glVertex2f(offsetX + axesXOffset + i*binXOffset,
+						   offsetY + axesYOffset);
+				// upper vertex
+				glVertex2f(offsetX + axesXOffset + i*binXOffset,
+						   offsetY + axesYOffset + m_PowerSpectrumFreqBins->at(i));
 			}
 		glEnd();
-//		------test code
-
 
 	glEndList();
 }
