@@ -520,9 +520,9 @@ void Starsphere::make_axes()
 	Axes = glGenLists(1);
 	glNewList(Axes, GL_COMPILE);
 
-		glBegin(GL_LINES);
-			glLineWidth(2.0);
+		glLineWidth(2.0);
 
+		glBegin(GL_LINES);
 			glColor3f(1.0, 0.0, 0.0);
 			glVertex3f(-axl, 0.0, 0.0);
 			glVertex3f(axl, 0.0, 0.0);
@@ -834,11 +834,11 @@ void Starsphere::render(const double timeOfDay)
 	glRotatef(Zrot - rotation_offset, 0.0, 1.0, 0.0);
 
 	// stars, pulsars, supernovae, grid
-	if (isFeature(STARS))		glCallList(Stars);
-	if (isFeature(PULSARS))		glCallList(Pulsars);
-	if (isFeature(SNRS))		glCallList(SNRs);
+	if (isFeature(STARS))			glCallList(Stars);
+	if (isFeature(PULSARS))			glCallList(Pulsars);
+	if (isFeature(SNRS))			glCallList(SNRs);
 	if (isFeature(CONSTELLATIONS))	glCallList(Constellations);
-	if (isFeature(GLOBE))		glCallList(sphGrid);
+	if (isFeature(GLOBE))			glCallList(sphGrid);
 
 	// observatories move an extra 15 degrees/hr since they were drawn
 	if (isFeature(OBSERVATORIES)) {
