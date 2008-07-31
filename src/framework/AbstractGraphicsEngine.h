@@ -21,8 +21,12 @@
 #ifndef ABSTRACTGRAPHICSENGINE_H_
 #define ABSTRACTGRAPHICSENGINE_H_
 
+#include <string>
+
 #include "BOINCClientAdapter.h"
 #include "Resource.h"
+
+using namespace std;
 
 /**
  * \addtogroup framework Framework
@@ -169,11 +173,17 @@ public:
 
 protected:
 	/**
-	 * \brief Default constructor
+	 * \brief Constructor
 	 *
-	 * The constructor is protected since this is an abstract class.
+	 * The constructor is protected since this is an abstract class. It takes
+	 * as an argument the name of the shared memory area which is propagated
+	 * to the BOINC client adapter instance (during construction).
+	 *
+	 * \param sharedMemoryIdentifier The identifier of the shared memory area
+	 *
+	 * \see BOINCClientAdapter::BOINCClientAdapter()
 	 */
-	AbstractGraphicsEngine();
+	AbstractGraphicsEngine(string sharedMemoryIdentifier);
 
 	/**
 	 * \brief This method has to be called in order to update the BOINC client information

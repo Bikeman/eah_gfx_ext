@@ -119,11 +119,18 @@ public:
 
 protected:
 	/**
-	 * \brief Default contructor
+	 * \brief Constructor
 	 *
-	 * The constructor is protected since this an abstract class.
+	 * The constructor is protected since this is an abstract class. It takes
+	 * as an argument the name of the shared memory area which is propagated
+	 * to the BOINC client adapter instance (during construction).
+	 *
+	 * \param sharedMemoryIdentifier The identifier of the shared memory area
+	 *
+	 * \see AbstractGraphicsEngine::AbstractGraphicsEngine()
+	 * \see BOINCClientAdapter::BOINCClientAdapter()
 	 */
-	Starsphere();
+	Starsphere(string sharedMemoryIdentifier);
 
 	/**
 	 * \brief Render science run specific search information

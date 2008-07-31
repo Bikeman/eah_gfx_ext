@@ -20,9 +20,10 @@
 
 #include "BOINCClientAdapter.h"
 
-BOINCClientAdapter::BOINCClientAdapter()
+BOINCClientAdapter::BOINCClientAdapter(string sharedMemoryIdentifier)
 {
 	m_Initialized = false;
+	m_SharedMemoryAreaIdentifier = sharedMemoryIdentifier;
 	m_SharedMemoryAreaAvailable = false;
 }
 
@@ -30,13 +31,11 @@ BOINCClientAdapter::~BOINCClientAdapter()
 {
 }
 
-void BOINCClientAdapter::initialize(string sharedMemoryIdentifier)
+void BOINCClientAdapter::initialize()
 {
-	m_SharedMemoryAreaIdentifier = sharedMemoryIdentifier;
-	
 	readUserInfo();
 	readSharedMemoryArea();
-	
+
 	m_Initialized = true;
 }
 
@@ -45,8 +44,8 @@ void BOINCClientAdapter::refresh()
 	if(m_Initialized) {
 		readUserInfo();
 		readSharedMemoryArea();
-		
-		/// \todo Check that we're still watching our own WU (or science app)! 
+
+		/// \todo Check that we're still watching our own WU (or science app)!
 	}
 	else {
 		cerr << "The BOINC Client Adapter has not yet been initialized!";
@@ -69,11 +68,11 @@ void BOINCClientAdapter::readSharedMemoryArea()
 	// the shared memory area's not available, try to get a pointer to it
 	else {
 	   m_SharedMemoryArea = (char*) boinc_graphics_get_shmem((char*)m_SharedMemoryAreaIdentifier.c_str());
-	    
+
 	    if(m_SharedMemoryArea) {
 	    	// fine, get the contents recursively
 	        m_SharedMemoryAreaAvailable = true;
-	        readSharedMemoryArea();	        
+	        readSharedMemoryArea();
 	    }
 	    else {
 	    	// bad luck
@@ -121,12 +120,12 @@ int BOINCClientAdapter::graphicsWindowHeight() const
 string BOINCClientAdapter::coreVersion() const
 {
 	stringstream buffer;
-	
+
 	// build common version string
 	buffer	<< m_UserData.major_version << "."
 			<< m_UserData.minor_version << "."
 			<< m_UserData.release;
-	
+
 	return string(buffer.str());
 }
 
@@ -139,8 +138,8 @@ string BOINCClientAdapter::applicationVersion() const
 {
 	stringstream buffer;
 	buffer << m_UserData.app_version;
-	
-	return string(buffer.str());	
+
+	return string(buffer.str());
 }
 
 string BOINCClientAdapter::userName() const
@@ -170,17 +169,17 @@ double BOINCClientAdapter::hostCredit() const
 
 double BOINCClientAdapter::hostRACredit() const
 {
-	return m_UserData.host_expavg_credit;	
+	return m_UserData.host_expavg_credit;
 }
 
 string BOINCClientAdapter::wuName() const
 {
-	return string(m_UserData.wu_name);	
+	return string(m_UserData.wu_name);
 }
 
 double BOINCClientAdapter::wuFPOpsEstimated() const
 {
-	return m_UserData.rsc_fpops_est;	
+	return m_UserData.rsc_fpops_est;
 }
 
 

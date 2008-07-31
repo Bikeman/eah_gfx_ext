@@ -23,7 +23,7 @@
 WindowManager::WindowManager()
 {
 	m_ScreensaverMode = false;
-	m_BoincAdapter = new BOINCClientAdapter();
+	m_BoincAdapter = new BOINCClientAdapter("");
 }
 
 WindowManager::~WindowManager()
@@ -56,7 +56,7 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	}
 
 	// get initial non-fullscreen resolution and frame rate from project preferences
-	m_BoincAdapter->initialize("");
+	m_BoincAdapter->initialize();
 	int preferredWidth = m_BoincAdapter->graphicsWindowWidth();
 	int preferredHeight = m_BoincAdapter->graphicsWindowHeight();
 	int preferredFrameRate = m_BoincAdapter->graphicsFrameRate();

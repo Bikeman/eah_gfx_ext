@@ -23,7 +23,8 @@
 
 #include "Starsphere.h"
 
-Starsphere::Starsphere() : AbstractGraphicsEngine()
+Starsphere::Starsphere(string sharedMemoryAreaIdentifier) :
+	AbstractGraphicsEngine(sharedMemoryAreaIdentifier)
 {
 	m_FontResource = 0;
 	m_FontLogo1 = 0;
@@ -621,7 +622,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		if(font) m_FontResource = font;
 
 		// initialize the BOINC client adapter
-		m_BoincAdapter.initialize(EinsteinS5R3Adapter::SharedMemoryIdentifier);
+		m_BoincAdapter.initialize();
 
 		// inital HUD offset setup
 		m_XStartPosLeft = 5;

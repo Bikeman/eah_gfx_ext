@@ -20,7 +20,8 @@
 
 #include "AbstractGraphicsEngine.h"
 
-AbstractGraphicsEngine::AbstractGraphicsEngine() : m_BoincAdapter()
+AbstractGraphicsEngine::AbstractGraphicsEngine(string sharedMemoryIdentifier) :
+	m_BoincAdapter(sharedMemoryIdentifier)
 {
 }
 
