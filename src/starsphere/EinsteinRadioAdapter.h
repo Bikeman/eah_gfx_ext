@@ -22,12 +22,16 @@
 #define EINSTEINRADIOADAPTER_H_
 
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #include "BOINCClientAdapter.h"
 
 using namespace std;
 
 #define PI 3.14159265
+#define POWERSPECTRUM_BINS 40
+#define POWERSPECTRUM_BIN_BYTES 80
 
 /**
  * \addtogroup starsphere Starsphere
@@ -109,6 +113,13 @@ public:
 	double wuTemplateOrbitalPhase() const;
 
     /**
+	 * \brief Retrieves the power spectrum of the currently active template
+	 *
+	 * \return The power spectrum of the currently active template
+	 */
+	const vector<char>* wuTemplatePowerSpectrum() const;
+
+    /**
      * \brief Retrieves the completion fraction of the currently active work unit
      *
      * \return The completion fraction (range 0-1)
@@ -158,6 +169,9 @@ private:
 
 	/// Initial orbital phase of the currently active template
 	double m_WUTemplateOrbitalPhase;
+
+	/// Power spectrum of the currently active template
+	vector<char> m_WUTemplatePowerSpectrum;
 
 	/// The completion fraction of the active work unit
 	double m_WUFractionDone;

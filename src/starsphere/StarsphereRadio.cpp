@@ -20,17 +20,18 @@
 
 #include "StarsphereRadio.h"
 
-StarsphereRadio::StarsphereRadio() : Starsphere(), m_EinsteinAdapter(&m_BoincAdapter)
+StarsphereRadio::StarsphereRadio() :
+	Starsphere(EinsteinRadioAdapter::SharedMemoryIdentifier),
+	m_EinsteinAdapter(&m_BoincAdapter)
 {
 	m_WUDispersionMeasureValue = -1.0;
 	m_PowerSpectrumCoordSystemList = 0;
 	m_PowerSpectrumBinList = 0;
-	m_PowerSpectrumFreqBins = new vector<char>(40, 0);
+	m_PowerSpectrumFreqBins = 0;
 }
 
 StarsphereRadio::~StarsphereRadio()
 {
-	if(m_PowerSpectrumFreqBins) delete m_PowerSpectrumFreqBins;
 }
 
 void StarsphereRadio::initialize(const int width, const int height, const Resource *font, const bool recycle)
@@ -129,7 +130,7 @@ void StarsphereRadio::refreshBOINCInformation()
 
 	if(m_WUDispersionMeasureValue != m_EinsteinAdapter.wuDispersionMeasure()) {
 		// we've got a new dispersion measure, update HUD
-		m_WUDispersionMeasureValue = m_EinsteinAdapter.wuSkyPosDeclination();
+		m_WUDispersionMeasureValue = m_EinsteinAdapter.wuDispersionMeasure();
 		buffer << "DM: " << fixed << m_WUDispersionMeasureValue << " pc/cm3" << ends;
 		m_WUDispersionMeasure = buffer.str();
 		buffer.str("");
@@ -261,15 +262,12 @@ void StarsphereRadio::generatePowerSpectrumBins(const int originX, const int ori
 	// set pixel normalization factor for maximum bin height
 	GLfloat normalizationFactor = 255.0 / (m_PowerSpectrumHeight - axesYOffset);
 
-	// TODO: use real FFT data
-//	------test code
-	srand(time(NULL));
-	for(int i=0; i<40; ++i) {
-		// set bin value to normalized pixel height
-		m_PowerSpectrumFreqBins->at(i) = (rand() % 10) * normalizationFactor;
-//		m_PowerSpectrumFreqBins->at(i) = 255 / normalizationFactor;
+	// fetch pointer to power spectrum data
+	m_PowerSpectrumFreqBins = m_EinsteinAdapter.wuTemplatePowerSpectrum();
+	if(!m_PowerSpectrumFreqBins) {
+		cerr << "Power spectrum data currently unavailable!" << endl;
+		return;
 	}
-//	------test code
 
 	// delete existing, create new (required for windoze)
 	if(m_PowerSpectrumBinList) glDeleteLists(m_PowerSpectrumBinList, 1);
@@ -281,9 +279,9 @@ void StarsphereRadio::generatePowerSpectrumBins(const int originX, const int ori
 		// draw frequency bins
 		glBegin(GL_LINES);
 			// iterate over all bins
-			for(int i = 0; i < 40; ++i) {
+			for(int i = 0; i < POWERSPECTRUM_BINS; ++i) {
 				// show potential candidates (power >= 100)...
-				if(m_PowerSpectrumFreqBins->at(i) >= m_PowerSpectrumHeight / 2.55) {
+				if(m_PowerSpectrumFreqBins->at(i) >= 100) {
 					 // ...in bright white
 					glColor4f(1.0, 1.0, 1.0, 1.0);
 				}
@@ -296,7 +294,7 @@ void StarsphereRadio::generatePowerSpectrumBins(const int originX, const int ori
 						   offsetY + axesYOffset);
 				// upper vertex
 				glVertex2f(offsetX + axesXOffset + i*binXOffset,
-						   offsetY + axesYOffset + m_PowerSpectrumFreqBins->at(i));
+						   offsetY + axesYOffset + m_PowerSpectrumFreqBins->at(i) / normalizationFactor);
 			}
 		glEnd();
 

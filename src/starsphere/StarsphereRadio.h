@@ -131,7 +131,7 @@ private:
 	GLuint m_PowerSpectrumBinList;
 
 	/// Byte vector to hold the current power spectrum bin values
-	vector<char>* m_PowerSpectrumFreqBins;
+	const vector<char>* m_PowerSpectrumFreqBins;
 
 	/// Power Spectrum configuration setting (width)
 	GLfloat m_PowerSpectrumWidth;
