@@ -83,29 +83,31 @@ void EinsteinRadioAdapter::parseApplicationInformation()
 			m_WUSkyPosRightAscension *= 180/PI;
 			m_WUSkyPosDeclination *= 180/PI;
 
-			// prepare power spectrum data
+			// deserialize power spectrum data
 			string spectrumString(spectrumArray);
 			if(spectrumString.length() == POWERSPECTRUM_BIN_BYTES) {
 				int spectrumBinValue;
+				// prepare hex to int conversion stream
 				istringstream spectrumBinStream;
+				spectrumBinStream.exceptions(ios_base::badbit | ios_base::failbit);
 				// iterate over all bins
 				for(int i = 0, j = 0; i < POWERSPECTRUM_BIN_BYTES; i += 2, ++j) {
-					spectrumBinStream.str(spectrumString.substr(i, 2));
-					if(spectrumBinStream) {
+					try {
+						spectrumBinStream.str(spectrumString.substr(i, 2));
 						// convert hex bin value to integer
 						spectrumBinStream >> hex >> spectrumBinValue;
 						// store bin power value
 						m_WUTemplatePowerSpectrum.at(j) = (char) spectrumBinValue;
 						spectrumBinStream.clear();
 					}
-					else {
-						cerr << "Premature end of spectrum stream encountered!" << endl;
+					catch(ios_base::failure) {
+						cerr << "Error processing power spectrum shared memory data!" << endl;
 						break;
 					}
 				}
 			}
 			else {
-				cerr << "Invalid power spectrum data encountered!" << endl;
+				cerr << "Invalid power spectrum shared memory data encountered!" << endl;
 			}
 		}
 	}
