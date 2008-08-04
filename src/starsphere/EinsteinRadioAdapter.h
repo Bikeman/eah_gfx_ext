@@ -117,7 +117,7 @@ public:
 	 *
 	 * \return The power spectrum of the currently active template
 	 */
-	const vector<char>* wuTemplatePowerSpectrum() const;
+	const vector<unsigned char>* wuTemplatePowerSpectrum() const;
 
     /**
      * \brief Retrieves the completion fraction of the currently active work unit
@@ -171,7 +171,7 @@ private:
 	double m_WUTemplateOrbitalPhase;
 
 	/// Power spectrum of the currently active template
-	vector<char> m_WUTemplatePowerSpectrum;
+	vector<unsigned char> m_WUTemplatePowerSpectrum;
 
 	/// The completion fraction of the active work unit
 	double m_WUFractionDone;

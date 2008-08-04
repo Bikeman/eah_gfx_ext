@@ -97,7 +97,7 @@ void EinsteinRadioAdapter::parseApplicationInformation()
 						// convert hex bin value to integer
 						spectrumBinStream >> hex >> spectrumBinValue;
 						// store bin power value
-						m_WUTemplatePowerSpectrum.at(j) = (char) spectrumBinValue;
+						m_WUTemplatePowerSpectrum.at(j) = (unsigned char) spectrumBinValue;
 						spectrumBinStream.clear();
 					}
 					catch(ios_base::failure) {
@@ -143,7 +143,7 @@ double EinsteinRadioAdapter::wuTemplateOrbitalPhase() const
 	return m_WUTemplateOrbitalPhase;
 }
 
-const vector<char>* EinsteinRadioAdapter::wuTemplatePowerSpectrum() const
+const vector<unsigned char>* EinsteinRadioAdapter::wuTemplatePowerSpectrum() const
 {
 	return &m_WUTemplatePowerSpectrum;
 }
