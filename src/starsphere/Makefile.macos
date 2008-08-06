@@ -109,4 +109,4 @@ install:
 	cp starsphere_* $(STARSPHERE_INSTALL)/bin
 
 clean:
-	rm -f $(RESOURCESPEC).cpp $(OBJS) starsphere
+	rm -f $(RESOURCESPEC).cpp $(OBJS) starsphere_*

@@ -452,7 +452,7 @@ build_starsphere()
 	else
 		cp -f $ROOT/src/starsphere/Makefile . >> $LOGFILE 2>&1 || failure
 	fi
-	make $1 >> $LOGFILE 2>&1 || failure
+	make $2 >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed Starsphere [Application]!" | tee -a $LOGFILE
 
@@ -590,7 +590,7 @@ case "$1" in
 	"--starsphere")
 		# "hidden" bonus option :-)
 		TARGET=$TARGET_LINUX
-		build_starsphere "debug" || failure
+		build_starsphere "" "debug" || failure
 		exit 0
 		;;
 	*)
