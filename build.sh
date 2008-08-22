@@ -140,7 +140,7 @@ prepare_generic()
 
 	echo "Retrieving libxml2 (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty || failure
-	wget ftp://xmlsoft.org/libxml2/libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
+	wget --passive-ftp ftp://xmlsoft.org/libxml2/libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
 	tar -xzf libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
 	rm libxml2-sources-2.6.32.tar.gz >> $LOGFILE 2>&1 || failure
 	# substitute old source tree
