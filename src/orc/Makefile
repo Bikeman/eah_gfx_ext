@@ -30,7 +30,6 @@ CPPFLAGS += -I/usr/include
 LDFLAGS +=
 LIBS += -L/usr/lib
 
-DEBUGFLAGSCPP=-DDEBUG -pg -ggdb -O0
 OBJS=ResourceCompiler.o
 DEPS=Makefile
 
@@ -40,8 +39,8 @@ debug: orc
 release: clean orc
 
 # target specific options
-debug: CPPFLAGS += $(DEBUGFLAGSCPP)
-release: CPPFLAGS += -O3 -Wall -Wno-switch-enum
+debug: CPPFLAGS += -pg -ggdb3 -O0 -Wall -Wno-switch-enum
+release: CPPFLAGS += -DNDEBUG -ggdb3 -O3 -Wall -Wno-switch-enum
 release: LDFLAGS +=
 
 # file specific targets

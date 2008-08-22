@@ -32,7 +32,6 @@ CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile
 OBJS = AbstractGraphicsEngine.o GraphicsEngineFactory.o WindowManager.o Resource.o ResourceFactory.o BOINCClientAdapter.o Libxml2Adapter.o
-DEBUGFLAGSCPP = -pg -ggdb -O0
 
 # TODO: GraphicsEngineFactory obviously depends on the actual implementations (here starsphere)! need to change the structure! what about plugins?
 CPPFLAGS += -I$(FRAMEWORK_SRC) -I$(FRAMEWORK_SRC)/../starsphere
@@ -45,8 +44,8 @@ callgrind: clean debug
 release: clean libframework.a
 
 # target specific options
-debug: CPPFLAGS += $(DEBUGFLAGSCPP)
-release: CPPFLAGS += -DNDEBUG -O3 -Wall -Wno-switch-enum
+debug: CPPFLAGS += -pg -ggdb3 -O0 -Wall -Wno-switch-enum
+release: CPPFLAGS += -DNDEBUG -ggdb3 -O3 -Wall -Wno-switch-enum
 release: LDFLAGS +=
 
 # file based targets
