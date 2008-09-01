@@ -28,12 +28,14 @@ CXX ?= g++
 # variables
 LIBS = -Wl,-Bstatic -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --libs)
+LIBS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --libs)
 LIBS += -lboinc_api -lboinc -L/usr/lib
 LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lGL -lGLU
 
 CPPFLAGS = -I$(STARSPHERE_INSTALL)/include
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
+CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --cflags)
 CPPFLAGS += -I$(STARSPHERE_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile

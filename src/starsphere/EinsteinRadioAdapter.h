@@ -26,6 +26,7 @@
 #include <iomanip>
 
 #include "BOINCClientAdapter.h"
+#include "XMLProcessorInterface.h"
 
 using namespace std;
 
@@ -151,6 +152,9 @@ private:
 
 	/// Pointer to the (parent) BOINC client adapter
 	BOINCClientAdapter *boincClient;
+
+	/// Pointer to the XML processor
+	XMLProcessorInterface* m_xmlIFace;
 
 	/// Right ascension of the currently searched sky position (in degrees)
 	double m_WUSkyPosRightAscension;

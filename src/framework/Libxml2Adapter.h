@@ -25,6 +25,8 @@
 
 #include "XMLProcessorInterface.h"
 
+#include <libxml/parser.h>
+
 using namespace std;
 
 /**
@@ -33,14 +35,14 @@ using namespace std;
  */
 
 /**
- * \brief This class implements XMLProcessorInterface providing an adapter to libxml2 
- * 
+ * \brief This class implements XMLProcessorInterface providing an adapter to libxml2
+ *
  * For the time being libxml2 is considered to be the only interesting XML processing
  * library because of its rich feature set that comprises DOM, SAX, XPath, XSLT as well
  * as validation based on DTD and XML Schema.
- * 
+ *
  * \see XMLProcessorInterface
- * 
+ *
  * \author Oliver Bock\n
  * Max-Planck-Institute for Gravitational Physics\n
  * Hannover, Germany
@@ -53,21 +55,48 @@ public:
 
 	/// Destructor
 	virtual ~Libxml2Adapter();
-	
+
 	/**
-	 * \brief Retrieves a single element's attribute value
-	 * 
-	 * This method takes a XPath expression that properly defines how to search
-	 * for a specific attribute of a single element. If the XPath search results
-	 * in more than one element or if the attribute can't be found the return
-	 * value is NULL.
-	 * 
+	 * \brief Sets the XML document to be processed
+	 *
 	 * \param xml The XML document to be used for processing
-	 * \param xpath The XPath expression to be used for seaching
-	 * 
-	 * \return The attribute value or NULL in case of an error
+	 * \param url The base URL of the document
 	 */
-	string getAttributeBySingleElementXPath(const string xml, const string xpath);
+	void setXmlDocument(const string xml, const string url);
+
+	/**
+	 * \brief Retrieves a single node's (element or attribute) content
+	 *
+	 * This method takes a XPath expression that properly defines how to search
+	 * for a specific node (element or attribute). If the XPath search results
+	 * in more than one instance or if the node (or its content) can't be found
+	 * the return value is NULL.
+	 *
+	 * \param xpath The XPath expression to be used for seaching
+	 *
+	 * \return The node's content or NULL in case of an error
+	 */
+	string getSingleNodeContentByXPath(const string xpath);
+
+	/**
+	 * \brief Retrieves a single node's (element or attribute) content
+	 *
+	 * This method takes a XPath expression that properly defines how to search
+	 * for a specific node (element or attribute). If the XPath search results
+	 * in more than one instance or if the node (or its content) can't be found
+	 * the return value is NULL.
+	 *
+	 * \param xml The XML document to be used for processing
+	 * \param url The base URL of the document
+	 * \param xpath The XPath expression to be used for seaching
+	 *
+	 * \return The node's content or NULL in case of an error
+	 */
+	string getSingleNodeContentByXPath(const string xml, const string url, const string xpath);
+
+private:
+	/// The current XML document instance
+	xmlDocPtr m_xmlDocument;
 };
 
 /**

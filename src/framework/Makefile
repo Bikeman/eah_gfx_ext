@@ -28,6 +28,7 @@ CXX?=g++
 # variables
 CPPFLAGS = $(shell $(FRAMEWORK_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/freetype-config --cflags)
+CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/xml2-config --cflags)
 CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile
