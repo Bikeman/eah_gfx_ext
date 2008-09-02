@@ -32,6 +32,8 @@ LIBS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --libs)
 LIBS += -lboinc_api -lboinc -L/usr/lib
 LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lGL -lGLU
 
+LDFLAGS = -static-libgcc
+
 CPPFLAGS = -I$(STARSPHERE_INSTALL)/include
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
