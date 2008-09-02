@@ -48,7 +48,7 @@ void Libxml2Adapter::setXmlDocument(const string xml, const string url)
 string Libxml2Adapter::getSingleNodeContentByXPath(const string xpath)
 {
 	// no document available!
-	if(!m_xmlDocument) return("");
+	if(!m_xmlDocument) return(NULL);
 
 	// prepare xpath search
 	stringstream buffer;
@@ -64,11 +64,11 @@ string Libxml2Adapter::getSingleNodeContentByXPath(const string xpath)
 
     if(size == 0) {
     	cerr << "No node found using XPath expression: " << xpath << endl;
-    	return("");
+    	return(NULL);
     }
     else if(size < 1) {
     	cerr << "More than node found using XPath expression: " << xpath << endl;
-    	return("");
+    	return(NULL);
     }
 
     // convert xml contents
