@@ -323,8 +323,8 @@ build_generic_win32()
 	echo "Building libxml2 (this may take a while)..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/libxml2 || failure
 	chmod +x configure >> $LOGFILE 2>&1 || failure
-	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-libxml-2.0-config" ]; then
-		LIBXML2_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-libxml-2.0-config"
+	if [ -f "$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-xml2-config" ]; then
+		LIBXML2_CONFIG="$PREFIX/$TARGET_HOST/bin/$TARGET_HOST-xml2-config"
 		export LIBXML2_CONFIG
 		echo "Cross-compile LIBXML2_CONFIG: $LIBXML2_CONFIG" >> $LOGFILE
 	fi
