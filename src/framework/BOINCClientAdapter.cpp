@@ -19,12 +19,17 @@
  ***************************************************************************/
 
 #include "BOINCClientAdapter.h"
+#include "Libxml2Adapter.h"
+
+#include <sstream>
 
 BOINCClientAdapter::BOINCClientAdapter(string sharedMemoryIdentifier)
 {
 	m_Initialized = false;
 	m_SharedMemoryAreaIdentifier = sharedMemoryIdentifier;
 	m_SharedMemoryAreaAvailable = false;
+
+	m_xmlIFace = new Libxml2Adapter();
 
 	m_GraphicsFrameRate = 20;
 	m_GraphicsQualitySetting = BOINCClientAdapter::LowGraphicsQualitySetting;
@@ -34,15 +39,18 @@ BOINCClientAdapter::BOINCClientAdapter(string sharedMemoryIdentifier)
 
 BOINCClientAdapter::~BOINCClientAdapter()
 {
+	if(m_xmlIFace) delete m_xmlIFace;
 }
 
 void BOINCClientAdapter::initialize()
 {
-	readUserInfo();
-	readSharedMemoryArea();
-	readProjectPreferences();
+	if(!m_Initialized) {
+		readUserInfo();
+		readSharedMemoryArea();
+		readProjectPreferences();
 
-	m_Initialized = true;
+		m_Initialized = true;
+	}
 }
 
 void BOINCClientAdapter::refresh()
@@ -54,7 +62,7 @@ void BOINCClientAdapter::refresh()
 		/// \todo Check that we're still watching our own WU (or science app)!
 	}
 	else {
-		cerr << "The BOINC Client Adapter has not yet been initialized! Doing so now...";
+		cerr << "The BOINC Client Adapter has not yet been initialized! Doing so now..." << endl;
 		initialize();
 	}
 }
@@ -91,7 +99,52 @@ void BOINCClientAdapter::readSharedMemoryArea()
 
 void BOINCClientAdapter::readProjectPreferences()
 {
+	string temp;
+	istringstream convertor;
+	convertor.exceptions(ios_base::badbit | ios_base::failbit);
 
+	// prepare xml document
+	m_xmlIFace->setXmlDocument(projectInformation(), "http://einstein.phys.uwm.edu");
+
+	// use XPath queries to get attributes
+	try {
+		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@fps");
+		if(temp.length() > 0) {
+			convertor.str(temp);
+			convertor >> dec >> m_GraphicsFrameRate;
+			convertor.clear();
+		}
+
+		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@quality");
+		if(temp.length() > 0) {
+			if(temp == "high") {
+				m_GraphicsQualitySetting = BOINCClientAdapter::HighGraphicsQualitySetting;
+			}
+			else if(temp == "medium") {
+				m_GraphicsQualitySetting = BOINCClientAdapter::MediumGraphicsQualitySetting;
+			}
+			else {
+				m_GraphicsQualitySetting = BOINCClientAdapter::LowGraphicsQualitySetting;
+			}
+		}
+
+		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@width");
+		if(temp.length() > 0) {
+			convertor.str(temp);
+			convertor >> dec >> m_GraphicsWindowWidth;
+			convertor.clear();
+		}
+
+		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@height");
+		if(temp.length() > 0) {
+			convertor.str(temp);
+			convertor >> dec >> m_GraphicsWindowHeight;
+			convertor.clear();
+		}
+	}
+	catch(ios_base::failure) {
+		cerr << "Error parsing project preferences! Using defaults..." << endl;
+	}
 }
 
 string BOINCClientAdapter::applicationInformation() const
@@ -101,8 +154,12 @@ string BOINCClientAdapter::applicationInformation() const
 
 string BOINCClientAdapter::projectInformation() const
 {
-	// TODO: check if we have to add the <project_specific> tag!
-	return m_UserData.project_preferences;
+	// ugly workaround for incomplete XML fragment returned by BOINC!
+	string temp = "<project_preferences>\n";
+	temp += m_UserData.project_preferences;
+	temp += "</project_preferences>\n";
+
+	return temp;
 }
 
 int BOINCClientAdapter::graphicsFrameRate() const

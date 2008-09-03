@@ -84,13 +84,13 @@ public:
 	 * This method takes a XPath expression that properly defines how to search
 	 * for a specific node (element or attribute). If the XPath search results
 	 * in more than one instance or if the node (or its content) can't be found
-	 * the return value is NULL.
+	 * the return value is an empty string.
 	 *
 	 * \param xml The XML document to be used for processing
 	 * \param url The base URL of the document
 	 * \param xpath The XPath expression to be used for seaching
 	 *
-	 * \return The node's content or NULL in case of an error
+	 * \return The node's content or an empty string in case of an error
 	 */
 	string getSingleNodeContentByXPath(const string xml, const string url, const string xpath);
 

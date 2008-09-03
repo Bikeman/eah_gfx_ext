@@ -28,6 +28,8 @@
 #include "boinc_api.h"
 #include "graphics2.h"
 
+#include "XMLProcessorInterface.h"
+
 using namespace std;
 
 /**
@@ -226,7 +228,7 @@ public:
 	 * (not yet literally a XML schema, will be provided later) with respect to graphics settings:
      *
      \verbatim
-     <project_specific>
+     <project_preferences>
      	<graphics fps="20" quality="low" width="800" height="600">
      		<starsphere>
      			<feature id="globe" enabled="true" />
@@ -235,7 +237,7 @@ public:
      			<feature id="sound" enabled="false" />
      		</waverider>
      	</graphics>
-     </project_specific>
+     </project_preferences>
      \endverbatim
      *
      * The \c graphics tag and its four attributes \b must be provided as shown above where
@@ -380,6 +382,9 @@ private:
 	 * user account, work unit and computation session.
 	 */
 	APP_INIT_DATA m_UserData;
+
+	/// Pointer to the XML processor
+	XMLProcessorInterface* m_xmlIFace;
 };
 
 /**
