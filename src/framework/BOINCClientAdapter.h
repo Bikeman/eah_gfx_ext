@@ -162,9 +162,45 @@ public:
 	 */
 	string wuName() const;
 
+	/**
+	 * \brief Retrieves the estimated number of floating-point operations to complete the currently active work unit.
+	 *
+	 * An estimate of the average number of floating-point operations (FPOPS) required to complete the computation.
+	 * This is used to estimate how long the computation will take on a given host.
+	 *
+	 * \return The estimated number of FPOPS to complete the currently active work unit
+	 */
     double wuFPOpsEstimated() const;
+
+	/**
+	 * \brief Retrieves the maximum number of floating-point operations allowed for the currently active work unit.
+	 *
+	 * A bound on the number of floating-point operations (FPOPS) required to complete the computation.
+	 * If this bound is exceeded, the application will be aborted.
+	 *
+	 * \return The maximum number of FPOPS allowed for the currently active work unit
+	 */
     double wuFPOpsBound() const;
+
+	/**
+	 * \brief Retrieves an estimate of application's largest working set size.
+	 *
+	 * An estimate of application's largest working set size.
+	 * The workunit will only be sent to hosts with at least this much available RAM.
+	 *
+	 * \return The estimate of application's largest working set size
+	 */
     double wuMemoryBound() const;
+
+	/**
+	 * \brief Retrieves the maximum disk space allowed to be used by the application.
+	 *
+	 * A bound on the maximum disk space used by the application, including all input, temporary, and output files.
+	 * The workunit will only be sent to hosts with at least this much available disk space.
+	 * If this bound is exceeded, the application will be aborted.
+	 *
+	 * \return The maximum disk space allowed to be used by the application
+	 */
     double wuDiskBound() const;
 
 	/**
@@ -296,6 +332,20 @@ private:
 	 */
 	void readSharedMemoryArea();
 
+	/**
+	 * \brief Parse the project-specific preferences (XML)
+	 *
+	 * The project-specific preferences are retrieved by projectInformation().
+	 * This method parses the XML string returned and populates the respective data members.
+	 *
+	 * \see projectInformation()
+	 * \see m_GraphicsFrameRate
+	 * \see m_GraphicsQualitySetting
+	 * \see m_GraphicsWindowWidth
+	 * \see m_GraphicsWindowHeight
+	 */
+	void readProjectPreferences();
+
 	/// State flag which indicates whether the adapter instance is ready to be used
 	bool m_Initialized;
 
@@ -310,6 +360,18 @@ private:
 
 	/// Flag to indicate whether the shared memory area is available or not
 	bool m_SharedMemoryAreaAvailable;
+
+	/// Frame rate at which the project's graphics application should be rendered
+	int m_GraphicsFrameRate;
+
+	/// Quality setting at which the project's graphics application should be rendered
+	GraphicsQualitySetting m_GraphicsQualitySetting;
+
+	/// Initial window width when running in windowed mode
+	int m_GraphicsWindowWidth;
+
+	/// Initial window height when running in windowed mode
+	int m_GraphicsWindowHeight;
 
 	/**
 	 * \brief Information structure returned by the BOINC client API.

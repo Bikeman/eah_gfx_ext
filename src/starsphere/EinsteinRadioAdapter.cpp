@@ -59,6 +59,8 @@ void EinsteinRadioAdapter::parseApplicationInformation()
 	if(info.length() > 0) {
 		string temp;
 
+		// TODO: SAX-style xmlReader could be an alternative to this (wrt performance)!
+
 		// parse data into members
 		m_xmlIFace->setXmlDocument(info, "http://einstein.phys.uwm.edu");
 		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/skypos_rac");

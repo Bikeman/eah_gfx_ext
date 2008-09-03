@@ -25,6 +25,11 @@ BOINCClientAdapter::BOINCClientAdapter(string sharedMemoryIdentifier)
 	m_Initialized = false;
 	m_SharedMemoryAreaIdentifier = sharedMemoryIdentifier;
 	m_SharedMemoryAreaAvailable = false;
+
+	m_GraphicsFrameRate = 20;
+	m_GraphicsQualitySetting = BOINCClientAdapter::LowGraphicsQualitySetting;
+	m_GraphicsWindowWidth = 800;
+	m_GraphicsWindowHeight = 600;
 }
 
 BOINCClientAdapter::~BOINCClientAdapter()
@@ -35,6 +40,7 @@ void BOINCClientAdapter::initialize()
 {
 	readUserInfo();
 	readSharedMemoryArea();
+	readProjectPreferences();
 
 	m_Initialized = true;
 }
@@ -48,7 +54,8 @@ void BOINCClientAdapter::refresh()
 		/// \todo Check that we're still watching our own WU (or science app)!
 	}
 	else {
-		cerr << "The BOINC Client Adapter has not yet been initialized!";
+		cerr << "The BOINC Client Adapter has not yet been initialized! Doing so now...";
+		initialize();
 	}
 }
 
@@ -82,6 +89,11 @@ void BOINCClientAdapter::readSharedMemoryArea()
 	}
 }
 
+void BOINCClientAdapter::readProjectPreferences()
+{
+
+}
+
 string BOINCClientAdapter::applicationInformation() const
 {
 	return m_SharedMemoryAreaContents;
@@ -95,26 +107,22 @@ string BOINCClientAdapter::projectInformation() const
 
 int BOINCClientAdapter::graphicsFrameRate() const
 {
-	// TODO: parse projectInformation() when available
-	return 20;
+	return m_GraphicsFrameRate;
 }
 
 BOINCClientAdapter::GraphicsQualitySetting BOINCClientAdapter::graphicsQualitySetting() const
 {
-	// TODO: parse projectInformation() when available
-	return BOINCClientAdapter::LowGraphicsQualitySetting;
+	return m_GraphicsQualitySetting;
 }
 
 int BOINCClientAdapter::graphicsWindowWidth() const
 {
-	// TODO: parse projectInformation() when available
-	return 800;
+	return m_GraphicsWindowWidth;
 }
 
 int BOINCClientAdapter::graphicsWindowHeight() const
 {
-	// TODO: parse projectInformation() when available
-	return 600;
+	return m_GraphicsWindowHeight;
 }
 
 string BOINCClientAdapter::coreVersion() const
