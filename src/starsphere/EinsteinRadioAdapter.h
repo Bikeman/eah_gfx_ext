@@ -25,8 +25,9 @@
 #include <sstream>
 #include <iomanip>
 
+#include <libxml/xmlreader.h>
+
 #include "BOINCClientAdapter.h"
-#include "XMLProcessorInterface.h"
 
 using namespace std;
 
@@ -150,11 +151,25 @@ private:
 	 */
 	void parseApplicationInformation();
 
+	/**
+	 * \brief Processes single element nodes found by the XML parser
+	 *
+	 * This method can sort of resembles the callback method used in conjunction with SAX parsers.
+	 * It's called to process single XML nodes (in our case element nodes only) encountered
+	 * during XML document (tree) traversal.
+	 *
+	 * \param xmlReader The pointer to the current xmlReader instance
+	 * \param converter Reference to an existing string stream for value/type conversion
+	 *
+	 * \see parseApplicationInformation()
+	 */
+	void processXmlNode(const xmlTextReaderPtr xmlReader, stringstream& converter);
+
 	/// Pointer to the (parent) BOINC client adapter
 	BOINCClientAdapter *boincClient;
 
-	/// Pointer to the XML processor
-	XMLProcessorInterface* m_xmlIFace;
+	/// Pointer to the XML reader (SAX style)
+	xmlTextReaderPtr m_xmlReader;
 
 	/// Right ascension of the currently searched sky position (in degrees)
 	double m_WUSkyPosRightAscension;
@@ -174,7 +189,10 @@ private:
 	/// Initial orbital phase of the currently active template
 	double m_WUTemplateOrbitalPhase;
 
-	/// Power spectrum of the currently active template
+	/// Power spectrum of the currently active template (string)
+	string m_WUTemplatePowerSpectrumString;
+
+	/// Power spectrum of the currently active template (values)
 	vector<unsigned char> m_WUTemplatePowerSpectrum;
 
 	/// The completion fraction of the active work unit

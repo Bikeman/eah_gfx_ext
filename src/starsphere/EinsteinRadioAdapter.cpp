@@ -19,9 +19,8 @@
  ***************************************************************************/
 
 #include "EinsteinRadioAdapter.h"
-#include "Libxml2Adapter.h"
 
-#include <cstdlib>
+#include <sstream>
 
 const string EinsteinRadioAdapter::SharedMemoryIdentifier = "EinsteinRadio";
 
@@ -29,7 +28,7 @@ EinsteinRadioAdapter::EinsteinRadioAdapter(BOINCClientAdapter *boincClient) :
 	m_WUTemplatePowerSpectrum(POWERSPECTRUM_BINS, 0)
 {
 	this->boincClient = boincClient;
-	m_xmlIFace = new Libxml2Adapter();
+	m_xmlReader = NULL;
 
 	m_WUSkyPosRightAscension = 0.0;
 	m_WUSkyPosDeclination = 0.0;
@@ -39,7 +38,8 @@ EinsteinRadioAdapter::EinsteinRadioAdapter(BOINCClientAdapter *boincClient) :
 
 EinsteinRadioAdapter::~EinsteinRadioAdapter()
 {
-	if(m_xmlIFace) delete m_xmlIFace;
+	if(m_xmlReader) xmlFreeTextReader(m_xmlReader);
+    xmlCleanupParser();
 }
 
 void EinsteinRadioAdapter::refresh()
@@ -50,58 +50,68 @@ void EinsteinRadioAdapter::refresh()
 
 void EinsteinRadioAdapter::parseApplicationInformation()
 {
-	string spectrumString;
-
 	// get updated application information
 	string info = boincClient->applicationInformation();
 
 	// do we have any data?
 	if(info.length() > 0) {
-		string temp;
+		int result = 0;
 
-		// TODO: SAX-style xmlReader could be an alternative to this (wrt performance)!
+		// prepare conversion stream
+		stringstream converter;
+		converter.precision(3);
+		converter.exceptions(ios_base::badbit | ios_base::failbit);
 
-		// parse data into members
-		m_xmlIFace->setXmlDocument(info, "http://einstein.phys.uwm.edu");
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/skypos_rac");
-		m_WUSkyPosRightAscension = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/skypos_dec");
-		m_WUSkyPosDeclination = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/dispersion");
-		m_WUDispersionMeasure = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/orb_radius");
-		m_WUTemplateOrbitalRadius = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/orb_period");
-		m_WUTemplateOrbitalPeriod = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/orb_phase");
-		m_WUTemplateOrbitalPhase = strtod(temp.c_str(), NULL);
-		spectrumString = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/power_spectrum");
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/fraction_done");
-		m_WUFractionDone = strtod(temp.c_str(), NULL);
-		temp = m_xmlIFace->getSingleNodeContentByXPath("/graphics_info/cpu_time");
-		m_WUCPUTime = strtod(temp.c_str(), NULL);
+		if(!m_xmlReader) {
+			// set up SAX style XML reader (create instance)
+			m_xmlReader = xmlReaderForMemory(info.c_str(),
+											 info.length(),
+											 "http://einstein.phys.uwm.edu",
+											 "UTF-8",
+											 0);
+			if(!m_xmlReader) {
+				cerr << "Error creating XML reader for shared memory data!" << endl;
+				return;
+			}
+		}
+		else {
+			// set up SAX style XML reader (reusing existing instance)
+			if(xmlReaderNewMemory(m_xmlReader,
+								  info.c_str(),
+								  info.length(),
+								  "http://einstein.phys.uwm.edu",
+								  "UTF-8",
+								  0))
+			{
+				cerr << "Error updating XML reader for shared memory data!" << endl;
+				return;
+			}
+		}
 
-		// TODO: make sure parsing worked flawlessly (only spectrum is checked below!)
+		// parse XML fragment and process nodes
+        result = xmlTextReaderRead(m_xmlReader);
+        while (result == 1) {
+        	processXmlNode(m_xmlReader, converter);
+            result = xmlTextReaderRead(m_xmlReader);
+        }
 
 		// convert radians to degrees
 		m_WUSkyPosRightAscension *= 180/PI;
 		m_WUSkyPosDeclination *= 180/PI;
 
 		// deserialize power spectrum data
-		if(spectrumString.length() == POWERSPECTRUM_BIN_BYTES) {
+		if(m_WUTemplatePowerSpectrumString.length() == POWERSPECTRUM_BIN_BYTES) {
 			int spectrumBinValue;
-			// prepare hex to int conversion stream
-			istringstream spectrumBinStream;
-			spectrumBinStream.exceptions(ios_base::badbit | ios_base::failbit);
+;
 			// iterate over all bins
 			for(int i = 0, j = 0; i < POWERSPECTRUM_BIN_BYTES; i += 2, ++j) {
 				try {
-					spectrumBinStream.str(spectrumString.substr(i, 2));
+					converter.clear();
+					converter.str(m_WUTemplatePowerSpectrumString.substr(i, 2));
 					// convert hex bin value to integer
-					spectrumBinStream >> hex >> spectrumBinValue;
+					converter >> hex >> spectrumBinValue;
 					// store bin power value
 					m_WUTemplatePowerSpectrum.at(j) = (unsigned char) spectrumBinValue;
-					spectrumBinStream.clear();
 				}
 				catch(ios_base::failure) {
 					cerr << "Error processing power spectrum shared memory data!" << endl;
@@ -114,6 +124,75 @@ void EinsteinRadioAdapter::parseApplicationInformation()
 		}
 
 	}
+}
+
+void EinsteinRadioAdapter::processXmlNode(const xmlTextReaderPtr xmlReader, stringstream& converter)
+{
+	// we only parse element nodes
+    if(xmlTextReaderNodeType(xmlReader) != XML_READER_TYPE_ELEMENT) return;
+
+    // buffers (will be deallocated automatically)
+    const xmlChar *nodeName = NULL, *nodeValue = NULL;
+
+    // get element node's name
+    nodeName = xmlTextReaderConstLocalName(xmlReader);
+
+    if (nodeName == NULL) {
+		cerr << "Error parsing XML node (invalid name)" << endl;
+		return;
+    }
+
+	// move to node's text content (child node) or return if unavailable
+	if(! (xmlTextReaderRead(m_xmlReader) && xmlTextReaderHasValue(xmlReader))) {
+		return;
+	}
+
+	// get text node's value
+	nodeValue = xmlTextReaderConstValue(xmlReader);
+
+	if (nodeValue == NULL) {
+		cerr << "Error parsing XML node (invalid value)" << endl;
+		return;
+	}
+
+    try {
+        // prepare converter stream
+        converter.clear();
+        converter.str("");
+        converter << nodeValue;
+
+		// assign node value to respective data member
+		if(xmlStrEqual(nodeName, BAD_CAST("skypos_rac"))) {
+			converter >> fixed >> m_WUSkyPosRightAscension;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("skypos_dec"))) {
+			converter >> fixed >> m_WUSkyPosDeclination;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("dispersion"))) {
+			converter >> fixed >> m_WUDispersionMeasure;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("orb_radius"))) {
+			converter >> fixed >> m_WUTemplateOrbitalRadius;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("orb_period"))) {
+			converter >> fixed >> m_WUTemplateOrbitalPeriod;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("orb_phase"))) {
+			converter >> fixed >> m_WUTemplateOrbitalPhase;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("power_spectrum"))) {
+			converter >> m_WUTemplatePowerSpectrumString;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("fraction_done"))) {
+			converter >> fixed >> m_WUFractionDone;
+		}
+		else if(xmlStrEqual(nodeName, BAD_CAST("cpu_time"))) {
+			converter >> fixed >> m_WUCPUTime;
+		}
+    }
+    catch(ios_base::failure) {
+    	cerr << "Error converting XML reader node content!" << endl;
+    }
 }
 
 double EinsteinRadioAdapter::wuSkyPosRightAscension() const
