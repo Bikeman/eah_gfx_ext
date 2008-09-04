@@ -52,35 +52,74 @@ string Libxml2Adapter::getSingleNodeContentByXPath(const string xpath)
 	// no document available!
 	if(!m_xmlDocument) return("");
 
-	// prepare xpath search
-	stringstream buffer;
+	string result = "";
+
+	// prepare xpath context
     xmlXPathContextPtr xpathCtx = xmlXPathNewContext(m_xmlDocument);
+    if(xpathCtx == NULL) {
+    	cerr << "Error getting XPath context!" << endl;
+    	return("");
+    }
+
+    // prepare xpath expression
     xmlChar* xpathExpr = xmlCharStrdup(xpath.c_str());
+    if(xpathExpr == NULL) {
+    	cerr << "Error preparing XPath expression: " << xpath << endl;
+    	xmlXPathFreeContext(xpathCtx);
+    	return("");
+    }
 
     // run xpath query
     xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx);
+    if(xpathObj == NULL) {
+    	cerr << "Error evaluating XPath expression: " << xpath << endl;
+    	xmlFree(xpathExpr);
+    	xmlXPathFreeContext(xpathCtx);
+    	return("");
+    }
+
+    // retrieve node set returned by xpath query
     xmlNodeSetPtr nodes = xpathObj->nodesetval;
 
     // how many nodes did we find?
     int size = (nodes) ? nodes->nodeNr : 0;
 
-    if(size == 0) {
+    if(size <= 0) {
     	cerr << "No node found using XPath expression: " << xpath << endl;
-    	return("");
+    	result = "";
     }
-    else if(size < 1) {
+    else if(size > 1) {
     	cerr << "More than node found using XPath expression: " << xpath << endl;
-    	return("");
+    	result = "";
     }
+    else {
+		// prepare conversion stream
+		ostringstream converter;
+		converter.exceptions(ios_base::badbit | ios_base::failbit);
 
-    // convert xml contents
-    buffer << xmlNodeListGetString(m_xmlDocument, nodes->nodeTab[0]->xmlChildrenNode, 1);
+		// get xml content
+		xmlChar* nodeContent = xmlNodeListGetString(m_xmlDocument, nodes->nodeTab[0]->xmlChildrenNode, 1);
+
+		try {
+			// convert xml contents
+			converter << nodeContent;
+			result = converter.str();
+		}
+		catch(ios_base::failure) {
+			cerr << "Error converting XPath node content!" << endl;
+			result = "";
+		}
+
+		// clean up
+		xmlFree(nodeContent);
+    }
 
     // clean up
+    xmlFree(xpathExpr);
     xmlXPathFreeObject(xpathObj);
     xmlXPathFreeContext(xpathCtx);
 
-    return(buffer.str());
+    return(result);
 }
 
 string Libxml2Adapter::getSingleNodeContentByXPath(const string xml, const string url, const string xpath)
