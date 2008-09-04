@@ -100,8 +100,8 @@ void BOINCClientAdapter::readSharedMemoryArea()
 void BOINCClientAdapter::readProjectPreferences()
 {
 	string temp;
-	istringstream convertor;
-	convertor.exceptions(ios_base::badbit | ios_base::failbit);
+	istringstream converter;
+	converter.exceptions(ios_base::badbit | ios_base::failbit);
 
 	// prepare xml document
 	m_xmlIFace->setXmlDocument(projectInformation(), "http://einstein.phys.uwm.edu");
@@ -110,9 +110,9 @@ void BOINCClientAdapter::readProjectPreferences()
 	try {
 		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@fps");
 		if(temp.length() > 0) {
-			convertor.str(temp);
-			convertor >> dec >> m_GraphicsFrameRate;
-			convertor.clear();
+			converter.clear();
+			converter.str(temp);
+			converter >> dec >> m_GraphicsFrameRate;
 		}
 
 		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@quality");
@@ -130,16 +130,16 @@ void BOINCClientAdapter::readProjectPreferences()
 
 		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@width");
 		if(temp.length() > 0) {
-			convertor.str(temp);
-			convertor >> dec >> m_GraphicsWindowWidth;
-			convertor.clear();
+			converter.clear();
+			converter.str(temp);
+			converter >> dec >> m_GraphicsWindowWidth;
 		}
 
 		temp = m_xmlIFace->getSingleNodeContentByXPath("/project_preferences/graphics/@height");
 		if(temp.length() > 0) {
-			convertor.str(temp);
-			convertor >> dec >> m_GraphicsWindowHeight;
-			convertor.clear();
+			converter.clear();
+			converter.str(temp);
+			converter >> dec >> m_GraphicsWindowHeight;
 		}
 	}
 	catch(ios_base::failure) {
