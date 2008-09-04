@@ -37,6 +37,7 @@ LDFLAGS = -static-libgcc
 CPPFLAGS = -I$(STARSPHERE_INSTALL)/include
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
+CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --cflags)
 CPPFLAGS += -I$(STARSPHERE_INSTALL)/include/BOINC -I/usr/include
 
 DEPS = Makefile
