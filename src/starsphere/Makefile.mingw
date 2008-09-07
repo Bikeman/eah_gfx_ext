@@ -26,11 +26,15 @@ STARSPHERE_INSTALL?=$(PWD)
 CXX ?= g++
 
 # variables
-LIBS = -Wl,-Bstatic -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
+LIBS = -Wl,-Bstatic
+LIBS += -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --libs)
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --libs)
-LIBS += -lboinc -L/usr/lib
-LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lopengl32 -lglu32
+LIBS += -lws2_32 # required by libxml2
+LIBS += -lboinc
+LIBS += -Wl,-Bdynamic
+LIBS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs)
+LIBS += -lopengl32 -lglu32
 
 LDFLAGS = -static-libgcc
 
