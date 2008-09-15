@@ -21,7 +21,6 @@
 #include "BOINCClientAdapter.h"
 #include "Libxml2Adapter.h"
 
-#include <cstring>
 #include <sstream>
 
 BOINCClientAdapter::BOINCClientAdapter(string sharedMemoryIdentifier)
@@ -157,10 +156,11 @@ string BOINCClientAdapter::projectInformation() const
 {
 	string temp("<project_preferences />\n");
 	
-	if(strlen(m_UserData.project_preferences) > 0) {
+	// preferences available? (BOINC initializes them with 0)
+	if(m_UserData.project_preferences != 0) {
 		// ugly workaround for incomplete XML fragment returned by BOINC!
 		temp = "<project_preferences>\n";
-		temp += m_UserData.project_preferences;
+		temp += string(m_UserData.project_preferences);
 		temp += "</project_preferences>\n";
 	}
 
