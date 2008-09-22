@@ -21,6 +21,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <diagnostics.h>
+
 #include "WindowManager.h"
 #include "ResourceFactory.h"
 #include "AbstractGraphicsEngine.h"
@@ -29,6 +31,9 @@
 
 int main(int argc, char **argv)
 {
+	// enable BOINC diagnostics
+	// TODO: we might want to optimize this for glibc- and mingw-based stacktraces!
+	boinc_init_graphics_diagnostics(BOINC_DIAG_DEFAULTS);
 
 	// choose application to be build/used
 	GraphicsEngineFactory::Applications scienceApplication;
