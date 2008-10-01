@@ -392,7 +392,16 @@ void WindowManager::toggleFullscreen()
 		m_CurrentHeight = m_DesktopHeight;
 
 		// (un)set video mode flags
-		m_VideoModeFlags |= SDL_FULLSCREEN;
+#ifdef __APPLE__
+        if (m_ScreensaverMode) {
+            m_CurrentWidth = m_DesktopWidth;
+            m_CurrentHeight = m_DesktopHeight;
+            m_VideoModeFlags |= SDL_NOFRAME;
+        } else
+#endif
+        {
+            m_VideoModeFlags |= SDL_FULLSCREEN;
+        }
 		m_VideoModeFlags &= ~SDL_RESIZABLE;
 
 		// hide cursor

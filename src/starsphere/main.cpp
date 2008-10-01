@@ -28,6 +28,16 @@
 #include "AbstractGraphicsEngine.h"
 #include "GraphicsEngineFactory.h"
 
+#ifdef __APPLE__
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void SetMacSSLevel();
+#ifdef __cplusplus
+}    // extern "C"
+#endif
+#endif
+
 
 int main(int argc, char **argv)
 {
@@ -92,8 +102,11 @@ int main(int argc, char **argv)
 		string param(argv[1]);
 		if(param == "--fullscreen") {
 			// switch to fullscreen (on windoze: after init!)
+			window.setScreensaverMode(true);    // Must do this first on Apple
 			window.toggleFullscreen();
-			window.setScreensaverMode(true);
+#ifdef __APPLE__
+            SetMacSSLevel();
+#endif    
 		}
 	}
 
