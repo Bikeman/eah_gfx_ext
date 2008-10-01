@@ -56,7 +56,7 @@ public:
 	 * It takes as an argument the name of the shared memory area to be used
 	 * for inter-process communication.
 	 *
-	 * \param sharedMemoryIdentifier The identifier of the shared memory area
+	 * \param sharedMemoryAreaIdentifier The identifier of the shared memory area
 	 */
 	BOINCClientAdapter(string sharedMemoryAreaIdentifier);
 
