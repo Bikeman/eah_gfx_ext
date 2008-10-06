@@ -208,7 +208,7 @@ build_generic()
 	./autogen.sh >> $LOGFILE 2>&1 || failure
 	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/sdl || failure
-	if [ "$1" == "$TARGET_MAC" ]; then
+	if [ "$1" == "$TARGET_MAC_INTEL" -o "$1" == "$TARGET_MAC_PPC" ]; then
 		$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --enable-screensaver=yes --enable-video-x11=no >> $LOGFILE 2>&1 || failure
 	else
 		$ROOT/3rdparty/sdl/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --enable-screensaver=yes >> $LOGFILE 2>&1 || failure	
@@ -443,7 +443,7 @@ build_starsphere()
 	export STARSPHERE_INSTALL=$ROOT/install || failure
 	cd $ROOT/build/starsphere || failure
 	cp $ROOT/src/starsphere/*.res . >> $LOGFILE 2>&1 || failure
-	if [ "$1" == "$TARGET_MAC" ]; then
+	if [ "$1" == "$TARGET_MAC_INTEL" ] || [ "$1" == "$TARGET_MAC_PPC" ]; then
 		cp -f $ROOT/src/starsphere/Makefile.macos Makefile >> $LOGFILE 2>&1 || failure
 	elif [ "$1" == "$TARGET_WIN32" ]; then
 		cp -f $ROOT/src/starsphere/Makefile.mingw Makefile >> $LOGFILE 2>&1 || failure
@@ -469,8 +469,8 @@ build_linux()
 
 build_mac()
 {
-	build_generic $TARGET_MAC || failure
-	build_starsphere $TARGET_MAC || failure
+	build_generic $1 || failure
+	build_starsphere $1 || failure
 
 	return 0
 }
@@ -531,7 +531,8 @@ print_usage()
 	echo
 	echo "Available targets:"
 	echo "  --linux"
-	echo "  --mac"
+	echo "  --mac-intel"
+	echo "  --mac-ppc"
 	echo "  --win32"
 	echo "  --doc"
 	echo "*************************"
@@ -545,9 +546,10 @@ print_usage()
 ### main control ##########################################################
 
 TARGET_LINUX=1
-TARGET_MAC=2
-TARGET_WIN32=3
-TARGET_DOC=4
+TARGET_MAC_INTEL=2
+TARGET_MAC_PPC=4
+TARGET_WIN32=8
+TARGET_DOC=16
 
 echo "************************************" | tee -a $LOGFILE
 echo "Starting new build!" | tee -a $LOGFILE
@@ -567,10 +569,15 @@ case "$1" in
 		check_last_build "$1" || failure
 		echo "Building linux version:" | tee -a $LOGFILE
 		;;
-	"--mac")
-		TARGET=$TARGET_MAC
+	"--mac-intel")
+		TARGET=$TARGET_MAC_INTEL
 		check_last_build "$1" || failure
-		echo "Building mac version:" | tee -a $LOGFILE
+		echo "Building mac (Intel) version:" | tee -a $LOGFILE
+		;;
+	"--mac-ppc")
+		TARGET=$TARGET_MAC_PPC
+		check_last_build "$1" || failure
+		echo "Building mac (PPC) version:" | tee -a $LOGFILE
 		;;
 	"--win32")
 		TARGET=$TARGET_WIN32
@@ -605,10 +612,17 @@ case $TARGET in
 		prepare_generic || failure
 		build_linux || failure
 		;;
-	$TARGET_MAC)
+	$TARGET_MAC_INTEL)
 		check_prerequisites || failure
 		prepare_generic || failure
-		build_mac || failure
+		build_mac $TARGET_MAC_INTEL || failure
+		;;
+	$TARGET_MAC_PPC)
+		export CFLAGS=-mcpu=G3 || failure
+		export CXXFLAGS=-mcpu=G3 || failure
+		check_prerequisites || failure
+		prepare_generic || failure
+		build_mac $TARGET_MAC_PPC || failure
 		;;
 	$TARGET_WIN32)
 		check_prerequisites || failure
