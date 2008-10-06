@@ -245,9 +245,6 @@ build_generic()
 	FREETYPE2_INCLUDE_DIR="$ROOT/install/include"
 	FREETYPE2_LIBRARIES="$ROOT/install/lib/libfreetype.a"
 	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.oglft.patch >> $LOGFILE 2>&1 || failure
-	# patch: build static lib instead of shared
-	cd $ROOT/3rdparty/oglft/liboglft || failure
-	patch CMakeLists.txt < $ROOT/patches/CMakeLists.txt.liboglft.patch >> $LOGFILE 2>&1 || failure
 	echo "Building OGLFT..." | tee -a $LOGFILE
 	cd $ROOT/build/oglft || failure
 	# TODO: do we wanna create universal binaries on mac? If so, add -DCMAKE_OSX_ARCHITECTURES=ppc;i386
