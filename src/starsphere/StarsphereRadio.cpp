@@ -235,7 +235,7 @@ void StarsphereRadio::generatePowerSpectrumCoordSystem(const int originX, const 
 			glColor4f(1.0, 1.0, 0.0, 1.0);
 			glVertex2f(offsetX, offsetY + m_PowerSpectrumHeight);
 			glVertex2f(offsetX, offsetY);
-			glVertex2f(offsetX + m_PowerSpectrumWidth, offsetY);
+			glVertex2f(offsetX + m_PowerSpectrumWidth + 1, offsetY);
 		glEnd();
 
 		glPointSize(m_PowerSpectrumAxesWidth);
