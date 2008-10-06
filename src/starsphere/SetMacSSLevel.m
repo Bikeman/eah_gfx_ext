@@ -27,8 +27,6 @@ void SetMacSSLevel();
 // level to 2002, not the 1000 defined by NSScreenSaverWindowLevel 
 // and kCGScreenSaverWindowLevel
 #define RealSaverLevel 2002
-// Glut sets the window level to 100 when it sets full screen mode
-#define GlutFullScreenWindowLevel 100
 
 void SetMacSSLevel() {
     static NSMenu * emptyMenu;
@@ -50,4 +48,5 @@ void SetMacSSLevel() {
         return;
         
     [ myWindow setLevel:RealSaverLevel+20 ];
+    [ myWindow setFrameOrigin:NSMakePoint(0.0, 0.0) ];
 }
