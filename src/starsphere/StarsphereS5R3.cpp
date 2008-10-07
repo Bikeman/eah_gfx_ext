@@ -24,6 +24,7 @@ StarsphereS5R3::StarsphereS5R3() :
 	Starsphere(EinsteinS5R3Adapter::SharedMemoryIdentifier),
 	m_EinsteinAdapter(&m_BoincAdapter)
 {
+	m_CurrentTime = "";
 }
 
 StarsphereS5R3::~StarsphereS5R3()
@@ -40,6 +41,7 @@ void StarsphereS5R3::initialize(const int width, const int height, const Resourc
 		// adjust HUD config
 		m_YOffsetMedium = 15;
 		m_XStartPosRight = width - 125;
+		m_XStartPosClock = width - 115;
 		m_YStartPosBottom = 70;
 		m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
 		m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
@@ -54,6 +56,7 @@ void StarsphereS5R3::resize(const int width, const int height)
 
 	// adjust HUD config
 	m_XStartPosRight = width - 125;
+	m_XStartPosClock = width - 115;
 }
 
 void StarsphereS5R3::refreshBOINCInformation()
@@ -76,39 +79,56 @@ void StarsphereS5R3::refreshBOINCInformation()
 		// we've got a new position, update search marker and HUD
 		m_CurrentRightAscension = m_EinsteinAdapter.wuSkyPosRightAscension();
 		m_RefreshSearchMarker = true;
+		buffer.str("");
 		buffer << "Ascension: " << fixed << m_CurrentRightAscension << " deg" << ends;
 		m_WUSkyPosRightAscension = buffer.str();
-		buffer.str("");
 	}
 
 	if(m_CurrentDeclination != m_EinsteinAdapter.wuSkyPosDeclination()) {
 		// we've got a new position, update search marker and HUD
 		m_CurrentDeclination = m_EinsteinAdapter.wuSkyPosDeclination();
 		m_RefreshSearchMarker = true;
+		buffer.str("");
 		buffer << "Declination: " << fixed << m_CurrentDeclination << " deg" << ends;
 		m_WUSkyPosDeclination = buffer.str();
-		buffer.str("");
 	}
 
+	buffer.str("");
 	buffer << "Completed: " << fixed << m_EinsteinAdapter.wuFractionDone() * 100 << " %" << ends;
 	m_WUPercentDone = buffer.str();
-	buffer.str("");
 
 	// show WU's total CPU time (previously accumulated + current session)
-	const double cputime = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
-	const int hrs =  cputime / 3600;
-	const int min = (cputime - hrs*3600) / 60;
-	const int sec =  cputime - (hrs*3600 + min*60);
+	double time = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
+	int hrs = time / 3600;
+	int min = fmod(time, 3600) / 60;
+	int sec = fmod(time, 60);
 
+	buffer.str("");
 	buffer << "CPU Time: "  << right << setw(2) << hrs << ":"
 							<< right << setw(2) << min << ":"
 							<< right << setw(2) << sec << ends;
 
 	m_WUCPUTime = buffer.str();
+
+	// update current time string (clock)
+	time = dtime() - dday();
+	hrs = time / 3600;
+	min = fmod(time, 3600) / 60;
+	sec = fmod(time, 60);
+
+	buffer.str("");
+	buffer << right << setw(2) << hrs << ":"
+		   << right << setw(2) << min << ":"
+		   << right << setw(2) << sec << ends;
+
+	m_CurrentTime = buffer.str();
 }
 
 void StarsphereS5R3::renderSearchInformation()
 {
+		// clock
+		m_FontLogo1->draw(m_XStartPosClock, m_YStartPosTop, m_CurrentTime.c_str());
+
 		// left info block
 		m_FontHeader->draw(m_XStartPosLeft, m_YStartPosBottom, "BOINC Statistics");
 		m_FontText->draw(m_XStartPosLeft, m_Y1StartPosBottom, m_UserName.c_str());
