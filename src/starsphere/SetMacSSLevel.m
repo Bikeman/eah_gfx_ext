@@ -29,7 +29,6 @@ void SetMacSSLevel();
 #define RealSaverLevel 2002
 
 void SetMacSSLevel() {
-    static NSMenu * emptyMenu;
     NSOpenGLContext * myContext = nil;
     NSView *myView = nil;
     NSWindow* myWindow = nil;
