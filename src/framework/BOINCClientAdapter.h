@@ -230,12 +230,12 @@ public:
      \verbatim
      <project_preferences>
      	<graphics fps="20" quality="low" width="800" height="600">
-     		<starsphere>
+     		<engine name="starsphere">
      			<feature id="globe" enabled="true" />
-     		</starsphere>
-     		<waverider>
+     		</engine>
+     		<engine name="waverider">
      			<feature id="sound" enabled="false" />
-     		</waverider>
+     		</engine>
      	</graphics>
      </project_preferences>
      \endverbatim
