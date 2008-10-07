@@ -660,7 +660,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		m_FontLogo1 = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
-									24, 72 );
+									26, 78 );
 
 		if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
 		     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
@@ -673,7 +673,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		m_FontLogo2 = new OGLFT::TranslucentTexture(
 									&m_FontResource->data()->at(0),
 									m_FontResource->data()->size(),
-									13, 78 );
+									12, 72 );
 
 		if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
 		     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
@@ -886,7 +886,7 @@ void Starsphere::render(const double timeOfDay)
 
 		if (isFeature(LOGO)) {
 			m_FontLogo1->draw(m_XStartPosLeft, m_YStartPosTop, "Einstein@Home");
-			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "World Year of Physics 2005");
+			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "International Year of Astronomy 2009");
 		}
 
 		if (isFeature(SEARCHINFO)) renderSearchInformation();
