@@ -158,10 +158,10 @@ void StarsphereRadio::refreshBOINCInformation()
 	buffer.str("");
 
 	// show WU's total CPU time (previously accumulated + current session)
-	const double time = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
-	const int hrs = time / 3600;
-	const int min = fmod(time, 3600) / 60;
-	const int sec = fmod(time, 60);
+	const double timeCPU = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
+	const int hrs = timeCPU / 3600;
+	const int min = fmod(timeCPU, 3600) / 60;
+	const int sec = fmod(timeCPU, 60);
 
 	buffer << "WU CPU Time: " << right << setw(2) << hrs << ":"
 							  << right << setw(2) << min << ":"

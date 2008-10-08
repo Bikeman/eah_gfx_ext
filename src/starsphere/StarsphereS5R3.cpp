@@ -20,6 +20,8 @@
 
 #include "StarsphereS5R3.h"
 
+#include <time.h>
+
 StarsphereS5R3::StarsphereS5R3() :
 	Starsphere(EinsteinS5R3Adapter::SharedMemoryIdentifier),
 	m_EinsteinAdapter(&m_BoincAdapter)
@@ -98,10 +100,10 @@ void StarsphereS5R3::refreshBOINCInformation()
 	m_WUPercentDone = buffer.str();
 
 	// show WU's total CPU time (previously accumulated + current session)
-	double time = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
-	int hrs = time / 3600;
-	int min = fmod(time, 3600) / 60;
-	int sec = fmod(time, 60);
+	double timeCPU = m_BoincAdapter.wuCPUTimeSpent() + m_EinsteinAdapter.wuCPUTime();
+	int hrs = timeCPU / 3600;
+	int min = fmod(timeCPU, 3600) / 60;
+	int sec = fmod(timeCPU, 60);
 
 	buffer.str("");
 	buffer << "CPU Time: "  << right << setw(2) << hrs << ":"
@@ -111,17 +113,12 @@ void StarsphereS5R3::refreshBOINCInformation()
 	m_WUCPUTime = buffer.str();
 
 	// update current time string (clock)
-	time = dtime() - dday();
-	hrs = time / 3600;
-	min = fmod(time, 3600) / 60;
-	sec = fmod(time, 60);
+	char cBuffer[10] = {0};
+    time_t timeNow = time(0);
+    struct tm* timeLocal = localtime(&timeNow);
+    strftime(cBuffer, sizeof(cBuffer) - 1, "%H:%M:%S", timeLocal);
 
-	buffer.str("");
-	buffer << right << setw(2) << hrs << ":"
-		   << right << setw(2) << min << ":"
-		   << right << setw(2) << sec << ends;
-
-	m_CurrentTime = buffer.str();
+	m_CurrentTime = string(cBuffer);
 }
 
 void StarsphereS5R3::renderSearchInformation()
