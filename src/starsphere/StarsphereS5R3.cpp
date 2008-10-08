@@ -114,9 +114,9 @@ void StarsphereS5R3::refreshBOINCInformation()
 
 	// update current time string (clock)
 	char cBuffer[10] = {0};
-    time_t timeNow = time(0);
-    struct tm* timeLocal = localtime(&timeNow);
-    strftime(cBuffer, sizeof(cBuffer) - 1, "%H:%M:%S", timeLocal);
+	time_t timeNow = time(0);
+	struct tm* timeLocal = localtime(&timeNow);
+	strftime(cBuffer, sizeof(cBuffer) - 1, "%H:%M:%S", timeLocal);
 
 	m_CurrentTime = string(cBuffer);
 }
