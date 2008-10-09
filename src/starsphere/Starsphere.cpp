@@ -886,7 +886,8 @@ void Starsphere::render(const double timeOfDay)
 
 		if (isFeature(LOGO)) {
 			m_FontLogo1->draw(m_XStartPosLeft, m_YStartPosTop, "Einstein@Home");
-			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "International Year of Astronomy 2009");
+			m_FontLogo2->draw(m_XStartPosLeft + 25, m_YStartPosTop - m_YOffsetLarge, "World Year of Physics 2005");
+			m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge - 14, "International Year of Astronomy 2009");
 		}
 
 		if (isFeature(SEARCHINFO)) renderSearchInformation();
