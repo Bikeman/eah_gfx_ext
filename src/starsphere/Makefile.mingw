@@ -45,7 +45,7 @@ CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --cflags)
 CPPFLAGS += -I$(STARSPHERE_INSTALL)/include/BOINC
 
 DEPS = Makefile
-OBJS = Starsphere.o StarsphereS5R3.o StarsphereRadio.o EinsteinS5R3Adapter.o EinsteinRadioAdapter.o starlist.o snr_list.o pulsar_list.o $(RESOURCESPEC).o
+OBJS = Starsphere.o StarsphereS5R3.o StarsphereRadio.o EinsteinS5R3Adapter.o EinsteinRadioAdapter.o starlist.o snr_list.o pulsar_list.o $(RESOURCESPEC).o $(RESOURCESPEC)_mingw.o
 RESOURCESPEC = resources
 
 # TODO: GraphicsEngineFactory obviously depends on the actual implementations (here starsphere)! need to change the structure! what about plugins?
@@ -70,10 +70,10 @@ callgrind: CPPFLAGS += $(DEBUGFLAGSCPP) -D DEBUG_VALGRIND
 
 # file based targets
 starsphere_EinsteinS5R3: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
-	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinS5R3 $(OBJS) $(LIBS)
+	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinS5R3.exe $(OBJS) $(LIBS)
 
 starsphere_EinsteinRadio: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
-	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinRadio $(OBJS) $(LIBS)
+	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinRadio.exe $(OBJS) $(LIBS)
 
 Starsphere.o: $(DEPS) $(STARSPHERE_SRC)/Starsphere.cpp $(STARSPHERE_SRC)/Starsphere.h
 	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/Starsphere.cpp
@@ -104,6 +104,9 @@ $(RESOURCESPEC).o: $(STARSPHERE_SRC)/$(RESOURCESPEC).orc
 	$(STARSPHERE_INSTALL)/bin/orc $(STARSPHERE_SRC)/$(RESOURCESPEC).orc $(RESOURCESPEC).cpp
 	$(CXX) -g $(CPPFLAGS) -c $(RESOURCESPEC).cpp -o $(RESOURCESPEC).o
 
+$(RESOURCESPEC)_mingw.o: $(STARSPHERE_SRC)/$(RESOURCESPEC).rc
+	cp $(STARSPHERE_SRC)/*.ico .
+	$(STARSPHERE_INSTALL)/bin/i586-pc-mingw32-windres -O coff -o $(RESOURCESPEC)_mingw.o $(STARSPHERE_SRC)/$(RESOURCESPEC).rc
 
 # tools
 memcheck:
