@@ -66,10 +66,10 @@ memcheck: CPPFLAGS += $(DEBUGFLAGSCPP) -D DEBUG_VALGRIND
 callgrind: CPPFLAGS += $(DEBUGFLAGSCPP) -D DEBUG_VALGRIND
 
 # file based targets
-starsphere_EinsteinS5R3: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
+starsphere_EinsteinS5R3: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(STARSPHERE_SRC)/EaHMacIcon.h $(OBJS)
 	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinS5R3 $(OBJS) $(LIBS)
 
-starsphere_EinsteinRadio: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
+starsphere_EinsteinRadio: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(STARSPHERE_SRC)/EaHMacIcon.h $(OBJS)
 	$(CXX) -g $(CPPFLAGS) $(LDFLAGS) $(STARSPHERE_SRC)/main.cpp -o starsphere_EinsteinRadio $(OBJS) $(LIBS)
 
 Starsphere.o: $(DEPS) $(STARSPHERE_SRC)/Starsphere.cpp $(STARSPHERE_SRC)/Starsphere.h

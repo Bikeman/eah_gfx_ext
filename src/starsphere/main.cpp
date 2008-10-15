@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include <diagnostics.h>
+#include <boinc_api.h>
 
 #include "WindowManager.h"
 #include "ResourceFactory.h"
@@ -29,12 +30,13 @@
 #include "GraphicsEngineFactory.h"
 
 #ifdef __APPLE__
+#include "EaHMacIcon.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
     void SetMacSSLevel();
 #ifdef __cplusplus
-}    // extern "C"
+}
 #endif
 #endif
 
@@ -44,6 +46,10 @@ int main(int argc, char **argv)
 	// enable BOINC diagnostics
 	// TODO: we might want to optimize this for glibc- and mingw-based stacktraces!
 	boinc_init_graphics_diagnostics(BOINC_DIAG_DEFAULTS);
+
+#ifdef __APPLE__
+  setMacIcon(argv[0], MacAppIconData, sizeof(MacAppIconData));
+#endif
 
 	// choose application to be build/used
 	GraphicsEngineFactory::Applications scienceApplication;
