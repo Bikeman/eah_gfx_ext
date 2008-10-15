@@ -371,6 +371,29 @@ void WindowManager::setWindowIcon(const string filename) const
 	}
 }
 
+void WindowManager::setWindowIcon(const unsigned char *data, const int size) const
+{
+	// prepare data buffer structure
+	SDL_RWops *buffer = SDL_RWFromMem((void*) data, size);
+
+	if(buffer != NULL) {
+		// load BMP from prepared data buffer
+		SDL_Surface *surface = SDL_LoadBMP_RW(buffer, 1);
+
+		if(surface != NULL) {
+			// set window icon
+			SDL_WM_SetIcon(surface, NULL);
+			SDL_FreeSurface(surface);
+		}
+		else {
+			cerr << "Could not create window icon surface: " << SDL_GetError() << endl;
+		}
+	}
+	else {
+		cerr << "Could not prepare window icon data: " << SDL_GetError() << endl;
+	}
+}
+
 void WindowManager::toggleFullscreen()
 {
 	// toggle fullscreen bit and reset video mode

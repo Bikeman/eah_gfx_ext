@@ -133,9 +133,27 @@ public:
 	/**
 	 * \brief Set the main window's icon
 	 *
+	 * This method uses the provided filename to load a bitmap (BMP) image
+	 * from disk which in turn is displayed as the main window's icon.
+	 *
+	 * Note: The icon should have a size of 32x32 pixels!
+	 *
 	 * \param filename The new icon's filename
 	 */
 	void setWindowIcon(const string filename) const;
+
+	/**
+	 * \brief Set the main window's icon
+	 *
+	 * This method uses the provided raw data pointer to load a bitmap (BMP) image
+	 * from memory which in turn is displayed as the main window's icon.
+	 *
+	 * Note: The icon should have a size of 32x32 pixels!
+	 *
+	 * \param data Pointer to the bitmap data buffer
+	 * \param size Size of the bitmap data buffer
+	 */
+	void setWindowIcon(const unsigned char *data, const int size) const;
 
 	/**
 	 * \brief Toggles the fullscreen state of the main window

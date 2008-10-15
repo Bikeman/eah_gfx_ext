@@ -72,8 +72,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-	// create font resource instance
+	// create font and icon resource instances
 	const Resource *fontResource = factory.createInstance("FontSansSerif");
+	const Resource *iconResource = factory.createInstance("AppIconBMP");
 
 	if(fontResource == NULL) {
 		cerr << "Font resource could not be loaded!" << endl;
@@ -86,6 +87,14 @@ int main(int argc, char **argv)
 		delete graphics;
 		delete fontResource;
 		exit(1);
+	}
+
+	if(iconResource != NULL && iconResource->data()->size() > 0) {
+		window.setWindowIcon(&iconResource->data()->at(0), iconResource->data()->size());
+		delete iconResource;
+	}
+	else {
+		cerr << "Icon resource could not be loaded! Continuing anyway..." << endl;
 	}
 
     window.setWindowCaption("Einstein@Home");
@@ -106,7 +115,7 @@ int main(int argc, char **argv)
 			window.toggleFullscreen();
 #ifdef __APPLE__
             SetMacSSLevel();
-#endif    
+#endif
 		}
 	}
 
