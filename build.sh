@@ -261,7 +261,12 @@ build_generic()
 	./_autosetup >> $LOGFILE 2>&1 || failure
 	chmod +x configure >> $LOGFILE 2>&1 || failure
 	cd $ROOT/build/boinc || failure
-	$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
+	if [ "$1" == "$TARGET_MAC_INTEL" -o "$1" == "$TARGET_MAC_PPC" ]; then
+		export CPPFLAGS=-I/sw/include
+		$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client --with-apple-opengl-framework >> $LOGFILE 2>&1 || failure
+	else
+		$ROOT/3rdparty/boinc/configure --prefix=$ROOT/install --enable-shared=no --enable-static=yes --disable-server --disable-client >> $LOGFILE 2>&1 || failure
+	fi
 	make >> $LOGFILE 2>&1 || failure
 	make install >> $LOGFILE 2>&1 || failure
 	echo "Successfully built and installed BOINC!" | tee -a $LOGFILE
