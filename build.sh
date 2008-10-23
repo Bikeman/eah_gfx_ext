@@ -58,7 +58,7 @@ check_prerequisites()
 	echo "Checking prerequisites..." | tee -a $LOGFILE
 	
 	# required toolchain
-	TOOLS="automake autoconf m4 cmake wget svn cvs tar gcc g++ ld libtool ar lex yacc"
+	TOOLS="automake autoconf m4 cmake wget svn cvs tar patch gcc g++ ld libtool ar lex yacc"
 
 	for tool in $TOOLS; do
 		if ! ( type $tool >/dev/null 2>&1 ); then
@@ -462,6 +462,8 @@ build_starsphere()
 
 build_linux()
 {
+	export CC=/usr/local/gcc-4.0.3/bin/gcc-4.0.3
+	export CXX=/usr/local/gcc-4.0.3/bin/g++-4.0.3
 	build_generic || failure
 	build_starsphere || failure
 
