@@ -26,7 +26,7 @@ FRAMEWORK_INSTALL?=$(PWD)
 CXX?=g++
 
 # variables
-CPPFLAGS = $(shell $(FRAMEWORK_INSTALL)/bin/sdl-config --cflags)
+CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/freetype-config --cflags)
 CPPFLAGS += $(shell $(FRAMEWORK_INSTALL)/bin/xml2-config --cflags)
 CPPFLAGS += -I$(FRAMEWORK_INSTALL)/include/BOINC -I/usr/include
@@ -47,7 +47,6 @@ release: clean libframework.a
 # target specific options
 debug: CPPFLAGS += -pg -ggdb3 -O0 -Wall -Wno-switch-enum
 release: CPPFLAGS += -DNDEBUG -ggdb3 -O3 -Wall -Wno-switch-enum
-release: LDFLAGS +=
 
 # file based targets
 libframework.a: $(OBJS)
@@ -55,19 +54,19 @@ libframework.a: $(OBJS)
 
 AbstractGraphicsEngine.o: $(DEPS) $(FRAMEWORK_SRC)/AbstractGraphicsEngine.cpp $(FRAMEWORK_SRC)/AbstractGraphicsEngine.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/AbstractGraphicsEngine.cpp
-	
+
 GraphicsEngineFactory.o: $(DEPS) $(FRAMEWORK_SRC)/GraphicsEngineFactory.cpp $(FRAMEWORK_SRC)/GraphicsEngineFactory.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/GraphicsEngineFactory.cpp
-	
+
 WindowManager.o: $(DEPS) $(FRAMEWORK_SRC)/WindowManager.cpp $(FRAMEWORK_SRC)/WindowManager.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/WindowManager.cpp
-	
+
 BOINCClientAdapter.o: $(DEPS) $(FRAMEWORK_SRC)/BOINCClientAdapter.cpp $(FRAMEWORK_SRC)/BOINCClientAdapter.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/BOINCClientAdapter.cpp
-	
+
 ResourceFactory.o: $(DEPS) $(FRAMEWORK_SRC)/ResourceFactory.cpp $(FRAMEWORK_SRC)/ResourceFactory.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/ResourceFactory.cpp
-	
+
 Resource.o: $(DEPS) $(FRAMEWORK_SRC)/Resource.cpp $(FRAMEWORK_SRC)/Resource.h
 	$(CXX) -g ${CPPFLAGS} -c $(FRAMEWORK_SRC)/Resource.cpp
 

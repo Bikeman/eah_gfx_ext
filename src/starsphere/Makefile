@@ -26,15 +26,19 @@ STARSPHERE_INSTALL?=$(PWD)
 CXX ?= g++
 
 # variables
-LIBS = -Wl,-Bstatic -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
+LIBS += -Wl,-Bstatic -lframework -loglft -L$(STARSPHERE_INSTALL)/lib
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --libs)
 LIBS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --libs)
-LIBS += -lboinc_api -lboinc -L/usr/lib
-LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs) -lGL -lGLU
+LIBS += -lboinc_api -lboinc
+LIBS += -lstdc++
+LIBS += -L/usr/lib
+LIBS += -Wl,-Bdynamic $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --static-libs)
+LIBS += -lGL -lGLU
+LIBS += -lpthread -lm -lc
 
-LDFLAGS = -static-libgcc
+LDFLAGS += -static-libgcc
 
-CPPFLAGS = -I$(STARSPHERE_INSTALL)/include
+CPPFLAGS += -I$(STARSPHERE_INSTALL)/include
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/sdl-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/freetype-config --cflags)
 CPPFLAGS += $(shell $(STARSPHERE_INSTALL)/bin/xml2-config --cflags)
@@ -58,7 +62,6 @@ callgrind: clean debug starsphere
 # target specific options
 debug: CPPFLAGS += -pg -ggdb3 -O0 -Wall -Wno-switch-enum
 release: CPPFLAGS += -DNDEBUG -ggdb3 -O3 -Wall -Wno-switch-enum
-release: LDFLAGS +=
 starsphere_EinsteinS5R3: CPPFLAGS += -D SCIENCE_APP=EinsteinS5R3
 starsphere_EinsteinRadio: CPPFLAGS += -D SCIENCE_APP=EinsteinRadio
 memcheck: CPPFLAGS += $(DEBUGFLAGSCPP) -D DEBUG_VALGRIND
@@ -73,7 +76,7 @@ starsphere_EinsteinRadio: $(DEPS) $(STARSPHERE_SRC)/main.cpp $(OBJS)
 
 Starsphere.o: $(DEPS) $(STARSPHERE_SRC)/Starsphere.cpp $(STARSPHERE_SRC)/Starsphere.h
 	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/Starsphere.cpp
-	
+
 StarsphereS5R3.o: $(DEPS) $(STARSPHERE_SRC)/StarsphereS5R3.cpp $(STARSPHERE_SRC)/StarsphereS5R3.h
 	$(CXX) -g $(CPPFLAGS) -c $(STARSPHERE_SRC)/StarsphereS5R3.cpp
 
