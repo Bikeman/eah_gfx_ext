@@ -74,6 +74,9 @@ void StarsphereRadio::initialize(const int width, const int height, const Resour
 
 	// prepare power spectrum
 	generatePowerSpectrumCoordSystem(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
+
+	// prepare base class observatories (dimmed to 33%)
+	generateObservatories(0.33);
 }
 
 void StarsphereRadio::resize(const int width, const int height)
@@ -92,6 +95,10 @@ void StarsphereRadio::resize(const int width, const int height)
 
 	generatePowerSpectrumCoordSystem(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
 	generatePowerSpectrumBins(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
+}
+
+void StarsphereRadio::renderAdditionalObservatories() {
+	glCallList(m_areciboObservatory);
 }
 
 void StarsphereRadio::refreshBOINCInformation()
@@ -296,6 +303,109 @@ void StarsphereRadio::generatePowerSpectrumBins(const int originX, const int ori
 				glVertex2f(offsetX + axesXOffset + i*binXOffset,
 						   offsetY + axesYOffset + m_PowerSpectrumFreqBins->at(i) / normalizationFactor);
 			}
+		glEnd();
+
+	glEndList();
+}
+
+void StarsphereRadio::generateObservatories(float dimFactor)
+{
+	// call base class implementation first
+	Starsphere::generateObservatories(dimFactor);
+
+	GLfloat Lat, Lon; // Latitute/Longitude of IFO is
+	GLfloat RAdeg, DEdeg; // converted to RA/DEC of sky sphere position
+	GLfloat radius; // radius of sphere for obs
+
+	double factorRadDeg = 1.0 / 57.29577957795135; // RAD/DEG conversion factor
+	GLfloat dishRadius = 1; // radius of the Arecibo telescope antenna
+	GLfloat domeRadius = 0.2; // radius of the Arecibo telescope receiver dome
+
+	// get current time and UTC offset (for zenith position)
+	m_ObservatoryDrawTimeLocal = dtime();
+	time_t local = m_ObservatoryDrawTimeLocal;
+	tm *utc = gmtime(&local);
+	double utcOffset = difftime(local, mktime(utc));
+	double observatoryDrawTimeGMT = m_ObservatoryDrawTimeLocal - utcOffset;
+
+	radius = 1.0*sphRadius; // radius of sphere on which they are drawn
+
+	/**
+	 * Arecibo Observatory:
+	 */
+
+	Lat = 18.344167;
+	Lon = 66.752778;
+
+	RAdeg= RAofZenith(observatoryDrawTimeGMT, Lon);
+	DEdeg= Lat;
+
+	// delete existing, create new (required for windoze)
+	if(m_areciboObservatory) glDeleteLists(m_areciboObservatory, 1);
+	m_areciboObservatory = glGenLists(1);
+	glNewList(m_areciboObservatory, GL_COMPILE);
+
+		// we don't dim Arecibo, just IFOs
+		glColor3f(0.75, 0.75, 0.75);
+
+		// lines used to draw triangles
+		glLineWidth(1.0);
+
+		// draw antenna dish
+		float originX = RAdeg;
+		float originY = DEdeg;
+		float vectorY1 = originY;
+		float vectorX1 = originX;
+		float vectorX;
+		float vectorY;
+		float angle;
+
+		// make sure both side are visible
+		glDisable(GL_CULL_FACE);
+
+		glBegin(GL_TRIANGLES);
+			for(int i=0; i <= 360; i++) {
+				angle = ((double)i) * factorRadDeg;
+				vectorX = originX + dishRadius * (float)sin(angle);
+				vectorY = originY + dishRadius * (float)cos(angle);
+				sphVertex(originX, originY);
+				sphVertex(vectorX1, vectorY1);
+				sphVertex(vectorX, vectorY);
+				vectorY1 = vectorY;
+				vectorX1 = vectorX;
+			}
+		glEnd();
+
+		// draw receiver dome
+		glColor3f(0.5, 0.5, 0.5);
+		glBegin(GL_TRIANGLES);
+			for(int i=0; i <= 360; i++) {
+				angle = ((double)i) * factorRadDeg;
+				vectorX = originX + domeRadius * (float)sin(angle);
+				vectorY = originY + domeRadius * (float)cos(angle);
+				sphVertex(originX, originY);
+				sphVertex(vectorX1, vectorY1);
+				sphVertex(vectorX, vectorY);
+				vectorY1 = vectorY;
+				vectorX1 = vectorX;
+			}
+		glEnd();
+
+		// enable culling again
+		glEnable(GL_CULL_FACE);
+
+        // draw receiver struts
+		glColor3f(0.0, 0.0, 0.0);
+		glBegin(GL_LINES);
+			// north guide
+			sphVertex3D(RAdeg, DEdeg, radius);
+			sphVertex3D(RAdeg, DEdeg+1.0, radius);
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+			// south-west & south-east guides:
+			sphVertex3D(RAdeg-0.7, DEdeg-0.7, radius);
+			sphVertex3D(RAdeg, DEdeg, radius);
+			sphVertex3D(RAdeg+0.7, DEdeg-0.7, radius);
 		glEnd();
 
 	glEndList();

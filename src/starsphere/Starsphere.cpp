@@ -258,8 +258,12 @@ GLfloat Starsphere::RAofZenith(double T, GLfloat LONdeg)
 /**
  * Draw the observatories at their zenith positions
  */
-void Starsphere::make_obs()
+void Starsphere::generateObservatories(float dimFactor)
 {
+	// sanity check
+	if(dimFactor < 0.0) dimFactor = 0.0;
+	if(dimFactor > 1.0) dimFactor = 1.0;
+
 	GLfloat Lat, Lon; // Latitute/Longitude of IFO is
 	GLfloat RAdeg, DEdeg; // converted to RA/DEC of sky sphere position
 	GLfloat radius; // radius of sphere for obs
@@ -293,7 +297,7 @@ void Starsphere::make_obs()
 	LLOmarker = glGenLists(1);
 	glNewList(LLOmarker, GL_COMPILE);
 
-		glColor3f(0.0, 1.0, 0.0);
+		glColor3f(dimFactor * 0.0, dimFactor * 1.0, dimFactor * 0.0);
 		glLineWidth(lineSize);
 
 		glBegin(GL_LINE_STRIP);
@@ -327,7 +331,7 @@ void Starsphere::make_obs()
 	LHOmarker = glGenLists(1);
 	glNewList(LHOmarker, GL_COMPILE);
 
-		glColor3f(0.0, 0.0, 1.0);
+		glColor3f(dimFactor * 0.0, dimFactor * 0.0, dimFactor * 1.0);
 		glLineWidth(lineSize);
 
 		glBegin(GL_LINE_STRIP);
@@ -376,7 +380,7 @@ void Starsphere::make_obs()
 	GEOmarker = glGenLists(1);
 	glNewList(GEOmarker, GL_COMPILE);
 
-		glColor3f(1.0, 0.0, 0.0);
+		glColor3f(dimFactor * 1.0, dimFactor * 0.0, dimFactor * 0.0);
 		glLineWidth(lineSize);
 
 		glBegin(GL_LINE_STRIP);
@@ -411,7 +415,7 @@ void Starsphere::make_obs()
 	VIRGOmarker = glGenLists(1);
 	glNewList(VIRGOmarker, GL_COMPILE);
 
-		glColor3f(1.0, 1.0, 1.0);
+		glColor3f(dimFactor * 1.0, dimFactor * 1.0, dimFactor * 1.0);
 		glLineWidth(lineSize);
 
 		glBegin(GL_LINE_STRIP);
@@ -764,7 +768,6 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	make_snrs();
 	make_axes();
 	make_globe();
-	make_obs();
 
 	glDisable(GL_CLIP_PLANE0);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -850,6 +853,7 @@ void Starsphere::render(const double timeOfDay)
 		glCallList(LHOmarker);
 		glCallList(GEOmarker);
 		glCallList(VIRGOmarker);
+		renderAdditionalObservatories();
 		glPopMatrix();
 	}
 
@@ -907,6 +911,10 @@ void Starsphere::render(const double timeOfDay)
 
 	glFlush();
 	SDL_GL_SwapBuffers();
+}
+
+void Starsphere::renderAdditionalObservatories() {
+	// default implementation doesn't do anything
 }
 
 void Starsphere::mouseButtonEvent(const int positionX, const int positionY,

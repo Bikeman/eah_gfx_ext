@@ -108,6 +108,12 @@ public:
 	 * \param height The new height of the display surface
 	 */
 	virtual void resize(const int width, const int height);
+
+	/**
+	 * \brief This method renders one frame of the animation
+	 *
+	 * \param timeOfDay The current time (e.g. BOINC's dtime(), used for time-based rendering evolution)
+	 */
 	void render(const double timeOfDay);
 
 	// event handling
@@ -144,6 +150,20 @@ protected:
 	virtual void renderSearchInformation() = 0;
 
 	/**
+	 * \brief Render additional observatories
+	 *
+	 * This method doesn't do anything in its local implementation. It's provided
+	 * for potential specializing classes to add additional observatories by
+	 * overriding the empty default implementation.
+	 *
+	 * Important: overriding classes should just provide additional display lists
+	 * by via calls to glCallList().
+	 *
+	 * \see StarsphereRadio::renderAdditionalObservatories()
+	 */
+	virtual void renderAdditionalObservatories();
+
+	/**
 	 * \brief This method has to be called in order to update the BOINC client information
 	 *
 	 * This is the local/generic implementation which calls
@@ -153,6 +173,42 @@ protected:
 	 * \see AbstractGraphicsEngine::refreshLocalBOINCInformation()
 	 */
 	virtual void refreshLocalBOINCInformation();
+
+	/**
+	 * \brief Generates the OpenGL call lists for the displayed observatories
+	 *
+	 * \param dimFactor A dim factor (range: 0 <= x <= 1) that will, well, dim the color
+	 * of the observatories.
+	 */
+	virtual void generateObservatories(const float dimFactor);
+
+	// feature control
+	enum Features {
+		STARS = 1,
+		CONSTELLATIONS = 2,
+		OBSERVATORIES = 4,
+		XRAYS = 8,
+		PULSARS = 16,
+		SNRS = 32,
+		GLOBE = 64,
+		AXES = 128,
+		SEARCHINFO = 256,
+		LOGO = 512,
+		MARKER = 1024
+	};
+
+	void setFeature(const Features features, const bool enable);
+	bool isFeature(const Features features);
+
+	GLfloat RAofZenith(double T, GLfloat LONdeg);
+	void sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius);
+	void sphVertex(GLfloat RAdeg, GLfloat DEdeg);
+
+	GLfloat sphRadius;
+
+	// observatory movement
+	// (in seconds since 1970 with usec precision)
+	double m_ObservatoryDrawTimeLocal;
 
 	// resource handling
 	const Resource *m_FontResource;
@@ -187,14 +243,10 @@ private:
 	void make_pulsars();
 	void make_snrs();
 	void make_constellations();
-	void make_obs();
 	void make_axes();
 	void make_globe();
 	void make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size);
 
-	GLfloat RAofZenith(double T, GLfloat LONdeg);
-	void sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius);
-	void sphVertex(GLfloat RAdeg, GLfloat DEdeg);
 	void star_marker(float RAdeg, float DEdeg, float size);
 
 	/**
@@ -206,9 +258,8 @@ private:
 	GLuint sphGrid, SNRs, SearchMarker;
 
 	/**
-	 * Parameters and State info:
+	 * State info:
 	 */
-	GLfloat sphRadius;
 	int featureFlags;
 
 	/**
@@ -231,28 +282,6 @@ private:
 	// view control
 	void rotateSphere(const int relativeRotation, const int relativeElevation);
 	void zoomSphere(const int relativeZoom);
-
-	// feature control
-	enum Features {
-		STARS = 1,
-		CONSTELLATIONS = 2,
-		OBSERVATORIES = 4,
-		XRAYS = 8,
-		PULSARS = 16,
-		SNRS = 32,
-		GLOBE = 64,
-		AXES = 128,
-		SEARCHINFO = 256,
-		LOGO = 512,
-		MARKER = 1024
-	};
-
-	void setFeature(const Features features, const bool enable);
-	bool isFeature(const Features features);
-
-	// observatory movement
-	// (in seconds since 1970 with usec precision)
-	double m_ObservatoryDrawTimeLocal;
 };
 
 /* Constellation & star coordinates are in starlist.C */

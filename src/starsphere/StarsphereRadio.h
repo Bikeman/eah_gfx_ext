@@ -109,6 +109,14 @@ private:
 	void renderSearchInformation();
 
 	/**
+	 * \brief Renders the Arecibo observatory
+	 *
+	 * This specific implementation invokes a single display list rendering the
+	 * Arecibo observatory. It overrides the (empty) base class implementation.
+	 */
+	void renderAdditionalObservatories();
+
+	/**
 	 * \brief Creates an OpenGL call list which contains the static power spectrum coordinate system
 	 *
 	 * \param originX The x-screen coordinate of the power spectrum's origin
@@ -123,6 +131,16 @@ private:
 	 * \param originY The y-screen coordinate of the power spectrum's origin
 	 */
 	void generatePowerSpectrumBins(const int originX, const int originY);
+
+	/**
+	 * \brief Generates the OpenGL call lists for the displayed observatories
+	 *
+	 * \param dimFactor A dim factor (range: 0 <= x <= 1) that will, well, dim the color
+	 * of the observatories. Right now the factor is propagated to the base class
+	 * implementation, hence dims the IFOs. The local Arecibo observatory is currently
+	 * unaffected.
+	 */
+	void generateObservatories(const float dimFactor);
 
 	/// ID of the OpenGL call list which contains the static power spectrum coordinate system
 	GLuint m_PowerSpectrumCoordSystemList;
@@ -234,6 +252,9 @@ private:
 
 	/// HUD configuration setting (vertical start position for the bottom part, line 6)
 	GLfloat m_Y6StartPosBottom;
+
+	/// Arecibo Observatory display list
+	GLuint m_areciboObservatory;
 };
 
 /**

@@ -101,6 +101,15 @@ private:
 	 */
 	void renderSearchInformation();
 
+	/**
+	 * \brief Generates the OpenGL call lists for the displayed observatories
+	 *
+	 * \param dimFactor A dim factor (range: 0 <= x <= 1) that will, well, dim the color
+	 * of the observatories. Right now the factor is propagated to the base class
+	 * implementation, hence dims the IFOs.
+	 */
+	void generateObservatories(const float dimFactor);
+
 	/// Specialized BOINC client adapter instance for information retrieval
 	EinsteinS5R3Adapter m_EinsteinAdapter;
 

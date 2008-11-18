@@ -50,6 +50,9 @@ void StarsphereS5R3::initialize(const int width, const int height, const Resourc
 		m_Y3StartPosBottom = m_Y2StartPosBottom - m_YOffsetMedium;
 		m_Y4StartPosBottom = m_Y3StartPosBottom - m_YOffsetMedium;
 	}
+
+	// prepare base class observatories (not dimmed)
+	generateObservatories(1.0);
 }
 
 void StarsphereS5R3::resize(const int width, const int height)
@@ -139,4 +142,10 @@ void StarsphereS5R3::renderSearchInformation()
 		m_FontText->draw(m_XStartPosRight, m_Y2StartPosBottom, m_WUSkyPosDeclination.c_str());
 		m_FontText->draw(m_XStartPosRight, m_Y3StartPosBottom, m_WUPercentDone.c_str());
 		m_FontText->draw(m_XStartPosRight, m_Y4StartPosBottom, m_WUCPUTime.c_str());
+}
+
+void StarsphereS5R3::generateObservatories(float dimFactor)
+{
+	// we don't do anything special here, just call base class
+	Starsphere::generateObservatories(dimFactor);
 }
