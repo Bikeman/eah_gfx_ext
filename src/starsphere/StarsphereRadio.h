@@ -106,7 +106,7 @@ private:
 	 * For this specific implementation this also includes the "BOINC Statistics"
 	 * as it is top-aligned to the "Search Information".
 	 */
-	void renderSearchInformation();
+	inline void renderSearchInformation();
 
 	/**
 	 * \brief Renders the Arecibo observatory
@@ -114,7 +114,7 @@ private:
 	 * This specific implementation invokes a single display list rendering the
 	 * Arecibo observatory. It overrides the (empty) base class implementation.
 	 */
-	void renderAdditionalObservatories();
+	inline void renderAdditionalObservatories();
 
 	/**
 	 * \brief Creates an OpenGL call list which contains the static power spectrum coordinate system

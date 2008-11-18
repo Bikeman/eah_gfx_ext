@@ -147,7 +147,7 @@ protected:
 	 * Note: for this engine this also includes the "BOINC Statistics"
 	 * as it is top-aligned to the "Search Information".
 	 */
-	virtual void renderSearchInformation() = 0;
+	inline virtual void renderSearchInformation() = 0;
 
 	/**
 	 * \brief Render additional observatories
@@ -161,7 +161,7 @@ protected:
 	 *
 	 * \see StarsphereRadio::renderAdditionalObservatories()
 	 */
-	virtual void renderAdditionalObservatories();
+	inline virtual void renderAdditionalObservatories();
 
 	/**
 	 * \brief This method has to be called in order to update the BOINC client information
@@ -198,7 +198,7 @@ protected:
 	};
 
 	void setFeature(const Features features, const bool enable);
-	bool isFeature(const Features features);
+	inline bool isFeature(const Features features);
 
 	GLfloat RAofZenith(double T, GLfloat LONdeg);
 	void sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius);

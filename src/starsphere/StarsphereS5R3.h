@@ -99,7 +99,7 @@ private:
 	 * For this specific implementation this also includes the "BOINC Statistics"
 	 * as it is top-aligned to the "Search Information".
 	 */
-	void renderSearchInformation();
+	inline void renderSearchInformation();
 
 	/**
 	 * \brief Generates the OpenGL call lists for the displayed observatories
