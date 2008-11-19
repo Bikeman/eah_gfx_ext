@@ -635,9 +635,8 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		setFeature(STARS, true);
 		setFeature(CONSTELLATIONS, true);
 		setFeature(PULSARS, true);
-		setFeature(OBSERVATORIES, true);
 		setFeature(SNRS, true);
-		setFeature(GLOBE, true);
+		setFeature(OBSERVATORIES, true);
 		setFeature(SEARCHINFO, true);
 		setFeature(LOGO, true);
 		setFeature(MARKER, true);
