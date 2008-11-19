@@ -72,6 +72,32 @@ void StarsphereRadio::initialize(const int width, const int height, const Resour
 		m_PowerSpectrumLabelYPos = m_PowerSpectrumYPos - m_PowerSpectrumLabelYOffset;
 	}
 
+	// create large font instances using font resource (base address + size)
+	m_FontLogo1 = new OGLFT::TranslucentTexture(
+								&m_FontResource->data()->at(0),
+								m_FontResource->data()->size(),
+								26, 78 );
+
+	if ( m_FontLogo1 == 0 || !m_FontLogo1->isValid() ) {
+	     cerr << "Could not construct logo1 font face from in memory resource!" << endl;
+	     return;
+	}
+
+	m_FontLogo1->setForegroundColor(1.0, 1.0, 0.0, 1.0);
+
+	// create medium font instances using font resource (base address + size)
+	m_FontLogo2 = new OGLFT::TranslucentTexture(
+								&m_FontResource->data()->at(0),
+								m_FontResource->data()->size(),
+								12, 72 );
+
+	if ( m_FontLogo2 == 0 || !m_FontLogo2->isValid() ) {
+	     cerr << "Could not construct logo2 font face from in memory resource!" << endl;
+	     return;
+	}
+
+	m_FontLogo2->setForegroundColor(0.75, 0.75, 0.75, 1.0);
+
 	// prepare power spectrum
 	generatePowerSpectrumCoordSystem(m_PowerSpectrumXPos, m_PowerSpectrumYPos);
 
@@ -409,4 +435,10 @@ void StarsphereRadio::generateObservatories(float dimFactor)
 		glEnd();
 
 	glEndList();
+}
+
+void StarsphereRadio::renderLogo()
+{
+	m_FontLogo1->draw(m_XStartPosLeft, m_YStartPosTop, "Einstein@Home");
+	m_FontLogo2->draw(m_XStartPosLeft, m_YStartPosTop - m_YOffsetLarge, "International Year of Astronomy 2009");
 }

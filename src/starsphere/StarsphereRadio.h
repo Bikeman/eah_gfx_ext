@@ -101,6 +101,14 @@ public:
 
 private:
 	/**
+	 * \brief Render science run specific logo
+	 *
+	 * This specific implementation shows the usual "Einstein@Home" logo combined
+	 * with "International Year of Astronomy 2009" as subtitle
+	 */
+	inline void renderLogo();
+
+	/**
 	 * \brief Render science run specific search information
 	 *
 	 * For this specific implementation this also includes the "BOINC Statistics"

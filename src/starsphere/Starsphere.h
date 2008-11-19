@@ -139,6 +139,14 @@ protected:
 	Starsphere(string sharedMemoryIdentifier);
 
 	/**
+	 * \brief Render science run specific logo
+	 *
+	 * This abtract method is to be defined by derived classes implementing
+	 * the science run specific logo rendering.
+	 */
+	inline virtual void renderLogo() = 0;
+
+	/**
 	 * \brief Render science run specific search information
 	 *
 	 * This abtract method is to be defined by derived classes implementing

@@ -94,6 +94,14 @@ public:
 
 private:
 	/**
+	 * \brief Render science run specific logo
+	 *
+	 * This specific implementation shows the usual "Einstein@Home" logo combined
+	 * with "World Year of Physics 2005" as subtitle
+	 */
+	inline void renderLogo();
+
+	/**
 	 * \brief Render science run specific search information
 	 *
 	 * For this specific implementation this also includes the "BOINC Statistics"
