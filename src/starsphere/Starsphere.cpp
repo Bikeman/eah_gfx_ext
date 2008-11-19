@@ -863,11 +863,7 @@ void Starsphere::render(const double timeOfDay)
 		glPushMatrix();
 		glLoadIdentity();
 
-		if (isFeature(LOGO)) {
-			// call subclass implementation
-			renderLogo();
-		}
-
+		if (isFeature(LOGO)) renderLogo();
 		if (isFeature(SEARCHINFO)) renderSearchInformation();
 
 		// restore original state

@@ -371,6 +371,11 @@ void StarsphereRadio::generateObservatories(float dimFactor)
 	m_areciboObservatory = glGenLists(1);
 	glNewList(m_areciboObservatory, GL_COMPILE);
 
+		// enable opt-in quality feature FSAA (GL_POLYGON_SMOOTH is discouraged)
+		if(m_QualitySetting == BOINCClientAdapter::HighGraphicsQualitySetting) {
+			glEnable(GL_MULTISAMPLE_ARB);
+		}
+
 		// we don't dim Arecibo, just IFOs
 		glColor3f(0.75, 0.75, 0.75);
 
@@ -433,6 +438,11 @@ void StarsphereRadio::generateObservatories(float dimFactor)
 			sphVertex3D(RAdeg, DEdeg, radius);
 			sphVertex3D(RAdeg+0.7, DEdeg-0.7, radius);
 		glEnd();
+
+		// disable opt-in quality feature FSAA again
+		if(m_QualitySetting == BOINCClientAdapter::HighGraphicsQualitySetting) {
+			glDisable(GL_MULTISAMPLE_ARB);
+		}
 
 	glEndList();
 }
