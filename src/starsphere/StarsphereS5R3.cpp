@@ -43,7 +43,7 @@ void StarsphereS5R3::initialize(const int width, const int height, const Resourc
 		// adjust HUD config
 		m_YOffsetMedium = 15;
 		m_XStartPosRight = width - 125;
-		m_XStartPosClock = width - 115;
+		m_XStartPosClock = width - 98;
 		m_YStartPosBottom = 70;
 		m_Y1StartPosBottom = m_YStartPosBottom  - m_YOffsetMedium;
 		m_Y2StartPosBottom = m_Y1StartPosBottom - m_YOffsetMedium;
@@ -87,7 +87,7 @@ void StarsphereS5R3::resize(const int width, const int height)
 
 	// adjust HUD config
 	m_XStartPosRight = width - 125;
-	m_XStartPosClock = width - 115;
+	m_XStartPosClock = width - 98;
 }
 
 void StarsphereS5R3::refreshBOINCInformation()
