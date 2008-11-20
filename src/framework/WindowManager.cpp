@@ -122,8 +122,12 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 
-	// enable opt-in quality feature FSAA (4x)
+	// desired requirement for high quality mode
+	//FIXME: commented out right now as it interferes with the FSAA attributes below!)
+//	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+
 	if(m_BoincAdapter->graphicsQualitySetting() == BOINCClientAdapter::HighGraphicsQualitySetting) {
+		// enable opt-in quality feature FSAA (4x)
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	}
@@ -132,10 +136,8 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	//SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 	//SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	//SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
-	// we always start in windowed mode
-	// (starting in fullscreen fails with high CPU load!)
+	// we always start in windowed mode (starting in fullscreen fails with high CPU load!)
 	m_CurrentWidth = m_WindowedWidth;
 	m_CurrentHeight = m_WindowedHeight;
 	m_VideoModeFlags |= SDL_RESIZABLE;
@@ -150,6 +152,36 @@ bool WindowManager::initialize(const int width, const int height, const int fram
 	if (m_DisplaySurface == NULL) {
 		cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
 		return false;
+	}
+
+	// check if we got acceleration
+	int accelerated = 0;
+	if(SDL_GL_GetAttribute(SDL_GL_ACCELERATED_VISUAL, &accelerated) == -1) {
+		cerr << "Could not ensure accelerated rendering surface. Assuming no acceleration..." << endl;
+	}
+
+	if (!accelerated) {
+		cerr << "Hardware acceleration isn't available! Disabling high quality features..." << endl;
+
+		// disable features that demand acceleration
+//		SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+
+		// TODO: we should override m_BoincAdapter->graphicsQualitySetting() to medium or low!
+		// note, requires to extend starsphere's constructor (uses its own BOINCClientAdapter!)
+
+		// reset display surface
+		m_DisplaySurface = SDL_SetVideoMode(
+								m_CurrentWidth,
+								m_CurrentHeight,
+								m_DesktopBitsPerPixel,
+								m_VideoModeFlags);
+
+		if (m_DisplaySurface == NULL) {
+			cerr << "Could not acquire rendering surface: " << SDL_GetError() << endl;
+			return false;
+		}
 	}
 
 	return true;
