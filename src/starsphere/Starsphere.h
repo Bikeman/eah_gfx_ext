@@ -42,13 +42,13 @@
 #include "AbstractGraphicsEngine.h"
 #include "EinsteinS5R3Adapter.h"
 
-/* SIN and COS take arguments in DEGREES */
+// SIN and COS take arguments in DEGREES
 #define PI 3.14159265
 #define PI2 (2*PI)
 #define COS(X)   cos( (X) * PI2/360.0 )
 #define SIN(X)   sin( (X) * PI2/360.0 )
 
-/* search marker status */
+// search marker status
 #define MARKER_NONE 0
 #define MARKER_SHOW 1
 #define MARKER_NEW  2
@@ -116,11 +116,31 @@ public:
 	 */
 	void render(const double timeOfDay);
 
-	// event handling
+	/**
+	 * \brief Event handler for mouse button events
+	 *
+	 * \param positionX The mouse position's x-coordinate
+	 * \param positionY The mouse position's y-coordinate
+	 * \param buttonPressed The mouse button pressed
+	 */
 	void mouseButtonEvent(const int positionX, const int positionY,
 						  const AbstractGraphicsEngine::MouseButton buttonPressed);
+
+	/**
+	 * \brief Event handler for mouse move events
+	 *
+	 * \param deltaX The relative mouse movement in the x-direction
+	 * \param deltaY The relative mouse movement in the y-direction
+	 * \param buttonPressed The mouse button pressed
+	 */
 	void mouseMoveEvent(const int deltaX, const int deltaY,
 						const AbstractGraphicsEngine::MouseButton buttonPressed);
+
+	/**
+	 * \brief Event handler for key press events
+	 *
+	 * \param keyPressed The key pressed
+	 */
 	void keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey keyPressed);
 
 protected:
@@ -190,7 +210,12 @@ protected:
 	 */
 	virtual void generateObservatories(const float dimFactor);
 
-	// feature control
+	/**
+	 * \brief Available feature IDs
+	 *
+	 * \see Starsphere::setFeature()
+	 * \see Starsphere::isFeature()
+	 */
 	enum Features {
 		STARS = 1,
 		CONSTELLATIONS = 2,
@@ -205,103 +230,257 @@ protected:
 		MARKER = 1024
 	};
 
-	void setFeature(const Features features, const bool enable);
-	inline bool isFeature(const Features features);
+	/**
+	 * \brief Set the display state of a certain feature
+	 *
+	 * \param feature The feature to enable/disable
+	 * \param enable The state to set for the feature
+	 *
+	 * \see Starsphere::Features
+	 * \see Starsphere::isFeature()
+	 */
+	void setFeature(const Features feature, const bool enable);
 
+	/**
+	 * \brief Query the display state of a certain feature
+	 *
+	 * \param feature The feature to query
+	 *
+	 * \return The current state of the feature
+	 *
+	 * \see Starsphere::Features
+	 * \see Starsphere::setFeature()
+	 */
+	inline bool isFeature(const Features feature);
+
+	/**
+	 * \brief Computes the Right Ascension of the zenith at a given time (from
+	 * the Unix epoch, in seconds) at a given Longitude (in degrees)
+	 *
+	 * From 'The Cambridge Handbook of Physics Formulas', Graham Woan, 2003
+	 * edition, CUP. (NOT the first edition), p177.
+	 *
+	 * \param T Current time in seconds since the epoch
+	 * \param LONdeg Longitude in degrees
+	 *
+	 * \return The right ascension of the zenith
+	 */
 	GLfloat RAofZenith(double T, GLfloat LONdeg);
+
+	/**
+	 * \brief Creates a GL vertex in 3D sky sphere coordinates
+	 *
+	 * Use like glVertex()
+	 *
+	 * \param RAdeg The right ascension of the new vertex
+	 * \param DEdeg The declination of the new vertex
+	 * \param radius The radius of the sky sphere
+	 */
 	void sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius);
+
+	/**
+	 * \brief Creates a GL vertex on the surface of the sky sphere.
+	 *
+	 * Use like glVertex()
+	 *
+	 * \param RAdeg The right ascension of the new vertex
+	 * \param DEdeg The declination of the new vertex
+	 */
 	void sphVertex(GLfloat RAdeg, GLfloat DEdeg);
 
+	/// Radius of the celestial sphere
 	GLfloat sphRadius;
 
-	// observatory movement
-	// (in seconds since 1970 with usec precision)
+	/// Observatory movement (in seconds since 1970 with usec precision)
 	double m_ObservatoryDrawTimeLocal;
 
 	// resource handling
+
+	/// Font resource instance
 	const Resource *m_FontResource;
+
+	/// Font texture instance for logo title rendering
 	OGLFT::TranslucentTexture *m_FontLogo1;
+
+	/// Font texture instance for logo subtitle rendering
 	OGLFT::TranslucentTexture *m_FontLogo2;
+
+	/// Font texture instance for info box header rendering
 	OGLFT::TranslucentTexture *m_FontHeader;
+
+	/// Font texture instance for info box content rendering
 	OGLFT::TranslucentTexture *m_FontText;
 
 	// Graphics state info:
+
+	/// Current window width (x-resolution)
 	int m_CurrentWidth;
+
+	/// Current window height (y-resolution)
 	int m_CurrentHeight;
+
+	/// Current window aspect ration
 	float aspect;
 
+
 	// HUD text rendering config (maybe overridden in subclasses)
+
+	/// X-coordinate position for head up display (HUD) positioning
 	GLfloat m_XStartPosLeft;
+
+	/// Y-coordinate position for head up display (HUD) positioning
 	GLfloat m_YStartPosTop;
+
+	/// Y-coordinate line offset for head up display (HUD) positioning
 	GLfloat m_YOffsetLarge;
 
 	// local HUD contents
+
+	/// User name to be displayed in "BOINC Information" panel
 	string m_UserName;
+
+	/// Team name to be displayed in "BOINC Information" panel
 	string m_TeamName;
+
+	/// User total credit to be displayed in "BOINC Information" panel
 	string m_UserCredit;
+
+	/// User recent average credit to be displayed in "BOINC Information" panel
 	string m_UserRACredit;
 
 	// search marker info
+
+	/// Current right ascension of the search marker (gunsight)
 	double m_CurrentRightAscension;
+
+	/// Current declination of the search marker (gunsight)
 	double m_CurrentDeclination;
+
+	/// Refresh indicator when the search marker (gunsight) coordinates changed
 	bool m_RefreshSearchMarker;
 
 private:
+	/// Generate OpenGL display list for stars
 	void make_stars();
+
+	/// Generate OpenGL display list for pulsars
 	void make_pulsars();
+
+	/// Generate OpenGL display list for SNRs
 	void make_snrs();
+
+	/// Generate OpenGL display list for constellations
 	void make_constellations();
+
+	/// Generate OpenGL display list for the axes (debug)
 	void make_axes();
+
+	/// Generate OpenGL display list for the globe
 	void make_globe();
+
+	/**
+	 * \brief Generate OpenGL display list for search marker (gunsight)
+	 *
+	 * \param RAdeg Right ascension in degrees
+	 * \param DEdeg Declination in degrees
+	 * \param size Base size (radius/length) of the marker
+	 */
 	void make_search_marker(GLfloat RAdeg, GLfloat DEdeg, GLfloat size);
 
+	/**
+	 * \brief Generate a single star vertex
+	 *
+	 * \param RAdeg Right ascension in degrees
+	 * \param DEdeg Declination in degrees
+	 * \param size Point size of the star
+	 */
 	void star_marker(float RAdeg, float DEdeg, float size);
 
-	/**
-	 * Object ID's  and on/off switches.
-	 * (someday the keyboard can be used to turn display of items on/off)
-	 */
-	GLuint Axes, Stars, Constellations, Pulsars;
+
+	/// Feature display list ID's
+	GLuint Axes, Stars, Constellations, Pulsars, SNRs;
+
+	/// Feature display list ID's
 	GLuint LLOmarker, LHOmarker, GEOmarker, VIRGOmarker;
-	GLuint sphGrid, SNRs, SearchMarker;
+
+	/// Feature display list ID's
+	GLuint sphGrid, SearchMarker;
 
 	/**
-	 * State info:
+	 * \brief Current state of all features (bitmask)
+	 * \see Starsphere::Features()
+	 * \see Starsphere::setFeature()
+	 * \see Starsphere::isFeature()
 	 */
 	int featureFlags;
 
-	/**
-	 * Viewpoint (can be changed with mouse)
-	 */
-	GLfloat viewpt_azimuth; // azimuth, in degrees
-	GLfloat viewpt_elev; // elevation angle, in degrees
-	GLfloat viewpt_radius; // distance out
+	// Viewpoint (can be changed with mouse)
 
-	GLfloat wobble_amp; // wobble amplitude, in degrees
-	GLfloat wobble_period; // wobble up/down period, in minutes
-	GLfloat zoom_amp; // radial zoom amplitude
-	GLfloat zoom_period; // zoom in/out period, in minutes
+	/// Viewpoint azimuth in degrees
+	GLfloat viewpt_azimuth;
 
-	GLfloat rotation_offset; // so that we can rotate sphere
-	GLfloat rotation_speed; // degrees per minute
+	/// Viewpoint elevation angle in degrees
+	GLfloat viewpt_elev;
 
-	//------------ new clean members -----
+	/// Viewpoint distance out
+	GLfloat viewpt_radius;
+
+	/// Viewpoint wobble amplitude in degrees
+	GLfloat wobble_amp;
+
+	/// Viewpoint wobble up/down period in minutes
+	GLfloat wobble_period;
+
+	/// Viewpoint radial zoom amplitude
+	GLfloat zoom_amp;
+
+	/// Viewpoint zoom in/out period in minutes
+	GLfloat zoom_period;
+
+	/// Viewpoint rotation offset
+	GLfloat rotation_offset;
+
+	/// Viewpoint rotations in degrees per minute
+	GLfloat rotation_speed;
 
 	// view control
+
+	/**
+	 * \brief Rotates the sphere by changing the viewpoint rotation/elevation relatively
+	 *
+	 * \param relativeRotation Relative rotation factor (e.g. relative mouse movement)
+	 * \param relativeElevation Relative elevation factor (e.g. relative mouse movement)
+	 *
+	 * \see Starsphere::mouseMoveEvent()
+	 */
 	void rotateSphere(const int relativeRotation, const int relativeElevation);
+
+	/**
+	 * \brief Zooms the sphere by changing the viewpoint radius relatively
+	 *
+	 * \param relativeZoom Relative zoom factor (e.g. relative mouse movement)
+	 *
+	 * \see Starsphere::mouseMoveEvent()
+	 */
 	void zoomSphere(const int relativeZoom);
 };
 
-/* Constellation & star coordinates are in starlist.C */
+/// Constellation & star coordinates (starlist.C)
 extern float star_info[][2];
+
+/// Total number of stars
 extern int Nstars;
 
-/* Pulsar coordinates are in pulsar_list.C */
+/// Pulsar coordinates are (pulsar_list.C)
 extern float pulsar_info[][2];
+
+/// Total number of pulsars
 extern int Npulsars;
 
-/* SNR coordinates are in snr_list.C */
+/// SNR coordinates (snr_list.C)
 extern float SNR_info[][2];
+
+/// Total number of SNRs
 extern int NSNRs;
 
 /**

@@ -70,11 +70,6 @@ Starsphere::~Starsphere()
 	if(m_FontText) delete m_FontText;
 }
 
-/**
- * sphVertex3D() creates a GL vertex in 3D sky sphere coordinates
- * sphVertex() creates a GL vertex on the surface of the sky sphere.
- * Use either like glVertex().
- */
 void Starsphere::sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius)
 {
 	GLfloat x, y, z;
@@ -222,14 +217,6 @@ void Starsphere::make_constellations()
  * IFO corner positions are from Myers' personal GPS and are +/- 100m
  */
 
-/**
- * RAofZenith(time, longitude)
- *
- * Computes the Right Ascention of the zenith at a given time (from
- * the Unix epoch, in seconds) at a given Longitude (in degrees). From
- * 'The Cambridge Handbook of Physics Formulas', Graham Woan, 2003
- * edition, CUP.  (NOT the first edition), p177.
- */
 GLfloat Starsphere::RAofZenith(double T, GLfloat LONdeg)
 {
 
