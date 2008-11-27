@@ -18,7 +18,7 @@
  * \subsection sec_status Current Status
  *
  * The graphics application is currently in its beta stage and has still to be considered as work-in-progress.
- * This means that not all desired features are fully implemented yet and the code might still contain some bugs.
+ * This means that probably not all desired features are fully implemented yet and the code might still contain some bugs.
  * However, we think the application is stable enough to be used on a daily basis. You're invited to test and
  * discuss the current version at the Einstein\@Home
  * \htmlonly<a href="http://einstein.phys.uwm.edu/forum_forum.php?id=3">\endhtmlonly
@@ -26,44 +26,42 @@
  * \htmlonly</a>\endhtmlonly.
  *
  * The most important feature that's not fully supported right now is the persistent configuration of the graphics
- * application. It is intended to let users customize the application's options using the BOINC project preferences.
- * However, in order to do this we have to change our project's server setup and configuration web pages. This task
- * is still pending but is scheduled for August/September 2008. As soon as these changes are completed users will be
- * able to set the following options:
+ * application. It is intended to let users customize the application's options using the BOINC project preferences
+ * and/or other means. This task is still pending but is scheduled for the near future. As soon as these changes are
+ * completed users will be able to set the following options:
  *
- * - Common options:
+ * - Common options (already available):
  *   - Window width (default: 800 pixels)
  *   - Window height (default: 600 pixels)
  *   - Frame rate (default: 20 fps)
  *   - Quality (default: low / also available: medium, high)
- * - %Starsphere options:
+ * - %Starsphere options (still pending):
  *   - Enabled screen elements (see \ref sec_app_usage)
  *
  * Please note that we're using conservative default values (for the common options) to ensure that the graphics
  * applications runs with reasonable CPU consumption on most systems. This means that the visual improvements are
  * \b not activated and the graphics look more or less the same as before. If you have hardware accelerated 3D
- * support on your machine please feel free to increase the settings as soon as the web pages mentioned above become
- * available. For example: on a recent Linux PC the %Starsphere application consumes less than 10% CPU power when
- * running at typical desktop resolutions (e.g. 1280x1024), 30 frames per second and high quality.
+ * support on your machine please feel free to increase the settings. For example: on a recent Linux PC the
+ * %Starsphere application consumes less than 10% CPU power when running at typical desktop resolutions (e.g. 1280x1024),
+ * 30 frames per second and high quality.
  *
  * \subsection sec_platforms Supported Platforms
  *
  * The binary versions as well as the build script support the following platforms:
  * - Linux (Intel, 32 Bit)
- * - Windows (Intel, 32 Bit, cross compiled with MinGW)
  * - Mac OS X (Tiger/Leopard, Intel/PowerPC, 32 Bit)
+ * - Windows (Intel, 32 Bit, cross compiled with MinGW)
  *
  * \subsection sec_future The Future
  *
  * - Community involvement: build and share \b your \b own graphics application!
  * - Provide different backgrounds and search visualizations
  * - Full Linux screensaver support (X11, KDE, Gnome)
- * - True XML support (libxml2 integration)
  * - Help dialog (on screen display)
  *
  * \section sec_doc_user User Documentation
  *
- * \subsection cha_app Starsphere Graphics Application
+ * \subsection cha_app_S5 Starsphere Graphics Application - LSC/Virgo S5
  *
  * \subsubsection sec_app_overview Overview
  *
@@ -75,7 +73,6 @@
  * \n
  * With regard to features the following extensions have been made so far:
  * - The VIRGO interferometer is shown (in white) at 43°37'53"N and 10°30'18"E
- * - The celestial globe is displayed indicating latitude, longitude and the projected Greenwich Meridian
  * - The different screen elements can be toggled separately
  *
  * \subsubsection sec_app_usage Usage
@@ -110,6 +107,22 @@
  *
  * You don't have to install the graphics application yourself as it's distributed alongside
  * Einstein\@Home.
+ *
+ * \subsection cha_app_Radio Starsphere Graphics Application - Arecibo Binary Pulsar Search
+ *
+ * In addition to the well known Einstein\@Home application there's a second application that
+ * searches for tight binary pulsar systems in data recorded at the Arecibo telescope in Puerto
+ * Rico, USA. This search comes with a slightly different graphics application that displays specific
+ * search parameters and other real-time visualizations special to this data analysis method. The
+ * main differences are:
+ *
+ * - A real-time power-spectrum of the data being searched (candidates are shown as bright white lines!)
+ * - Additional search parameters showing orbital properties of the binary pulsar system being searched
+ * - The real-time location of the Arecibo telescope
+ * - Project subtitle: "International Year of Astronomy 2009"
+ *
+ * Details about this particular search application and how it's related to the search for
+ * gravitational waves will be published on the Einstein@Home website at the official launch.
  *
  * \section sec_doc_dev Developer Documentation
  *
@@ -177,7 +190,7 @@
  * \subsubsection sec_build_overview Overview
  *
  * The (very simple) build script tries to compile binaries for all supported platforms without depending
- * on any additional library being installed on the build machine. The only requirements are a properly
+ * on any extraordinary library being installed on the build machine. The only requirements are a properly
  * installed and configured build system based on the GNU Compiler Collection Version 4, a few common
  * library development packages and a working (direct) connection to the internet.
  * Everything else is subsequently downloaded, configured and compiled automatically by the script.
@@ -186,6 +199,7 @@
  *
  * - SDL - Simple DirectMedia Layer
  * - FreeType 2 - High-quality glyph images
+ * - libxml2 - Full XML support (DOM, SAX, XSLT, Validation)
  * - OGLFT - OpenGL-FreeType Library
  * - BOINC (Graphics/API)
  *
@@ -219,6 +233,7 @@
  *   - autoconf
  *   - m4
  *   - cmake
+ *   - pkg-config
  *   - wget
  *   - cvs
  *   - svn
@@ -233,10 +248,11 @@
  *
  * In order to use the script you just have to navigate to the \c graphics directory
  * in the Einstein\@Home source tree and run the script passing as an argument the desired target platform
- * (you'll find the compiled executable \c starsphere in the \c install/bin directory):
+ * (you'll find the compiled executables \c starsphere_EinsteinS5R3 and \c starsphere_Radio in the
+ * \c install/bin directory):
  *
  * - Linux build: \code build.sh --linux \endcode
- * - Mac OS X build: \code build.sh --mac \endcode
+ * - Mac OS X build: \code build.sh --mac-intel \endcode \code build.sh --mac-ppc \endcode
  * - Windows build (uses MinGW cross-compile with Linux as build system!): \code build.sh --win32 \endcode
  *
  * Additional tools are provided as follows:
