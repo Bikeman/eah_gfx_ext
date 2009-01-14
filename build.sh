@@ -462,8 +462,7 @@ build_starsphere()
 
 build_linux()
 {
-	export CC=/usr/local/gcc-4.0.3/bin/gcc-4.0.3
-	export CXX=/usr/local/gcc-4.0.3/bin/g++-4.0.3
+	echo "Important for an official build: let CC and CXX point to gcc/g++ 4.0.3!"
 	build_generic || failure
 	build_starsphere || failure
 
