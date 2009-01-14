@@ -24,6 +24,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <vector>
 
 #include <libxml/xmlreader.h>
 
