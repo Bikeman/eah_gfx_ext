@@ -1,5 +1,12 @@
+# folders
 build
 3rdparty
 install
 doc/html
+
+# patterns
 doc/*.tag
+
+# eclipse
+.project
+.cproject
