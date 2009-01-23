@@ -112,15 +112,18 @@ int main(int argc, char **argv)
 	graphics->initialize(window.windowWidth(), window.windowHeight(), fontResource);
 	graphics->refreshBOINCInformation();
 
-	// check optional command line parameter
+	// check optional command line parameters
 	if(argc == 2) {
 		string param(argv[1]);
 		if(param == "--fullscreen") {
+			// set non-interactive mode (must do this first on Apple)
+			window.setScreensaverMode(true);
+		}
+		if(param == "--fullscreen" || param == "--demo") {
 			// switch to fullscreen (on windoze: after init!)
-			window.setScreensaverMode(true);    // Must do this first on Apple
 			window.toggleFullscreen();
 #ifdef __APPLE__
-            SetMacSSLevel();
+			SetMacSSLevel();
 #endif
 		}
 	}

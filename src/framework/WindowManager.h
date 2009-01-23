@@ -164,7 +164,10 @@ public:
 	void toggleFullscreen();
 
 	/**
-	 * \brief Set the screensaver mode indicator
+	 * \brief Set the screensaver mode indicator.
+	 *
+	 * When enabled, all user input will cause the application to quit
+	 * (common screensaver behavior)
 	 *
 	 * \param enabled The new value for the screensaver mode indicator
 	 */
