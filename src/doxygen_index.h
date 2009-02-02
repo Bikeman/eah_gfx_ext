@@ -174,15 +174,20 @@
  *
  * \subsection cha_source Source Code Access
  *
- * Please use this \htmlonly<a href="http://einstein.phys.uwm.edu/graphics/src/graphics_framework_src_0.1.tar.gz">\endhtmlonly
- * link
+ * Downloads of the source code are available as tarball or zip-archive. Please visit the
+ * \htmlonly<a href="https://git.aei.uni-hannover.de/cgi-bin/gitweb.cgi?p=shared/einsteinathome/graphicsframework.git;a=summary" target="_blank">\endhtmlonly
+ * official repository
  * \htmlonly</a>\endhtmlonly
- * to download the source code distribution (tarball).
+ * and click on the "snapshot" download link
+ * next to the desired commit/version (see section "shortlog").
  *
- * You may also check out the source code from our CVS repository:
+ * You may also check out (clone) the source code from the
+ * \htmlonly<a href="http://git-scm.com" target="_blank">\endhtmlonly
+ * git
+ * \htmlonly</a>\endhtmlonly
+ * repository like this:
  * \code
- * cvs -d:pserver:anonymous@gravity.phys.uwm.edu:2402/usr/local/cvs/lscsoft login
- * cvs -z3 -d:pserver:anonymous@gravity.phys.uwm.edu:2402/usr/local/cvs/lscsoft co -P einsteinathome/graphics
+ * git clone git://git.aei.uni-hannover.de/shared/einsteinathome/graphicsframework.git
  * \endcode
  *
  * \subsection cha_build Build Script
@@ -237,6 +242,8 @@
  *   - wget
  *   - cvs
  *   - svn
+ *   - tar
+ *   - patch
  *   - ld
  *   - libtool
  *   - ar
