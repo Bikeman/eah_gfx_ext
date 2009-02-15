@@ -1,0 +1,53 @@
+--- x86-mingw32-build.sh
++++ x86-mingw32-build.sh.new	2009-02-15 00:22:14.000000000 +0100
+@@ -77,7 +77,7 @@
+       then
+         cd binutils*/build
+       else
+-	$RUN prepare binutils-$BINUTILS_VERSION
++	$RUN prepare binutils-$BINUTILS_VERSION "-mingw32-src"
+ 	$RUN setbuilddir binutils*
+ 	$RUN ../configure --prefix="$INSTALL_DIR" --target="$TARGET" \
+ 	  $GLOBAL_BASE_OPTIONS $BINUTILS_BASE_OPTIONS || die $? \
+@@ -126,9 +126,9 @@
+       cd "$WORKING_DIR"; test $LEAN_BUILD && rm -rf build-gcc
+       ;;
+ 
+-    headers | mingw-runtime | w32api)
+-      test -r mingw-runtime-*/configure || $RUN prepare mingw-runtime-$RUNTIME_VERSION
+-      test -r w32api-*/configure || $RUN prepare w32api-$W32API_VERSION
++    headers | mingwrt | w32api)
++      test -r mingwrt-*/configure || $RUN prepare mingwrt-$RUNTIME_VERSION "-mingw32-src"
++      test -r w32api-*/configure || $RUN prepare w32api-$W32API_VERSION "-mingw32-src"
+       case $COMPONENT in
+ 	headers)
+ 	  $RUN mkdir -p "$INSTALL_DIR/include"
+@@ -136,16 +136,16 @@
+ 	    $RUN cd "$INSTALL_DIR" && $RUN ln -s . usr )
+           test -e "$INSTALL_DIR/usr/local" || (
+ 	    $RUN cd "$INSTALL_DIR/usr" && $RUN ln -s . local )
+-	  $RUN cp -r mingw-runtime-*/include "$INSTALL_DIR" || die $? \
++	  $RUN cp -r mingwrt-*/include "$INSTALL_DIR" || die $? \
+             "$unrecoverable installing mingw-runtime headers"
+ 	  $RUN cp -r w32api-*/include "$INSTALL_DIR" || die $? \
+             "$unrecoverable installing w32api headers"
+ 	  ;;
+-	mingw-runtime)
++	mingwrt)
+           test -e w32api || $RUN ln -s w32api-* w32api
+ 	  ;;
+       esac
+-      case $COMPONENT in mingw-runtime | w32api)
++      case $COMPONENT in mingwrt | w32api)
+ 	setbuilddir ${COMPONENT}-*
+ 	$RUN ../configure --prefix="$INSTALL_DIR" --host="$TARGET" \
+           --build=${BUILD_PLATFORM=`../config.guess`} || die $? \
+@@ -160,7 +160,7 @@
+       ;;
+ 
+   esac; done
+-  cd "$WORKING_DIR"; test $LEAN_BUILD && $RUN rm -rf mingw-runtime-* w32api-*
++  cd "$WORKING_DIR"; test $LEAN_BUILD && $RUN rm -rf mingwrt-* w32api-*
+   BUILD_COMPONENTS=`case $BUILD_COMPONENTS in *gcc*) echo gcc ;; esac`
+ done
+ 

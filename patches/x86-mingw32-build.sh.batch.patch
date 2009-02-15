@@ -1,0 +1,45 @@
+--- x86-mingw32-build.sh.batch
++++ x86-mingw32-build.sh.batch.new	2009-02-15 01:51:59.000000000 +0100
+@@ -32,14 +32,14 @@
+   if isyes $ALLOW_DOWNLOADS
+   then
+     option GCC_VERSION "`enumerate $PACKAGE_DIR/gcc-core- -src.tar.gz`"
+-    option BINUTILS_VERSION "`enumerate $PACKAGE_DIR/binutils- -src.tar.gz`"
+-    option RUNTIME_VERSION "`enumerate $PACKAGE_DIR/mingw-runtime- -src.tar.gz`"
+-    option W32API_VERSION "`enumerate $PACKAGE_DIR/w32api- -src.tar.gz`"
++    option BINUTILS_VERSION "`enumerate $PACKAGE_DIR/binutils- -mingw32-src.tar.gz`"
++    option RUNTIME_VERSION "`enumerate $PACKAGE_DIR/mingwrt- -mingw32-src.tar.gz`"
++    option W32API_VERSION "`enumerate $PACKAGE_DIR/w32api- -mingw32-src.tar.gz`"
+   else
+     GCC_VERSION=`enumerate $PACKAGE_DIR/gcc-core- -src.tar.gz`
+-    BINUTILS_VERSION=`enumerate $PACKAGE_DIR/binutils- -src.tar.gz`
+-    RUNTIME_VERSION=`enumerate $PACKAGE_DIR/mingw-runtime- -src.tar.gz`
+-    W32API_VERSION=`enumerate $PACKAGE_DIR/w32api- -src.tar.gz`
++    BINUTILS_VERSION=`enumerate $PACKAGE_DIR/binutils- -mingw32-src.tar.gz`
++    RUNTIME_VERSION=`enumerate $PACKAGE_DIR/mingwrt- -mingw32-src.tar.gz`
++    W32API_VERSION=`enumerate $PACKAGE_DIR/w32api- -mingw32-src.tar.gz`
+   fi
+   GCC_VERSION=`newest $GCC_VERSION`
+   BINUTILS_VERSION=`newest $BINUTILS_VERSION`
+@@ -73,17 +73,17 @@
+ esac
+ case $BUILD_COMPONENTS in *binutils*)
+   test -n "$BINUTILS_VERSION" && \
+-    option DOWNLOAD binutils-$BINUTILS_VERSION-src.tar.gz
++    option DOWNLOAD binutils-$BINUTILS_VERSION-mingw32-src.tar.gz
+   option BINUTILS_BASE_OPTIONS "$BINUTILS_USER_OPTIONS" ;;
+ esac
+-case $BUILD_COMPONENTS in *mingw-runtime*)
++case $BUILD_COMPONENTS in *mingwrt*)
+   test -n "$RUNTIME_VERSION" && \
+-    option DOWNLOAD mingw-runtime-$RUNTIME_VERSION-src.tar.gz
++    option DOWNLOAD mingwrt-$RUNTIME_VERSION-mingw32-src.tar.gz
+   option RUNTIME_BASE_OPTIONS "$RUNTIME_USER_OPTIONS" ;;
+ esac
+ case $BUILD_COMPONENTS in *w32api*)
+   test -n "$W32API_VERSION" && \
+-    option DOWNLOAD w32api-$W32API_VERSION-src.tar.gz
++    option DOWNLOAD w32api-$W32API_VERSION-mingw32-src.tar.gz
+   option W32API_BASE_OPTIONS "$W32API_USER_OPTIONS" ;;
+ esac
+ 

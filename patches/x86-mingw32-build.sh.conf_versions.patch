@@ -1,0 +1,26 @@
+--- x86-mingw32-build.sh.conf
++++ x86-mingw32-build.sh.conf.new	2009-02-15 01:16:34.000000000 +0100
+@@ -48,10 +48,10 @@
+ #
+ # 4) Package versions, from which the compiler will be built.
+ #
+-     assume GCC_VERSION                   3.4.5-20060117-1
+-     assume BINUTILS_VERSION              2.18.50-20080109
+-     assume RUNTIME_VERSION               3.14
+-     assume W32API_VERSION                3.11
++     assume GCC_VERSION                   3.4.5-20060117-2
++     assume BINUTILS_VERSION              2.19.1
++     assume RUNTIME_VERSION               3.15.2
++     assume W32API_VERSION                3.13
+      assume GDC_VERSION                   0.24
+ #
+ # 5) Automatic patching of downloaded packages: if any appropriately
+@@ -80,7 +80,7 @@
+      option BUILD_COMPONENTS              headers
+      option BUILD_COMPONENTS              gcc
+      option BUILD_COMPONENTS              w32api
+-     option BUILD_COMPONENTS              mingw-runtime
++     option BUILD_COMPONENTS              mingwrt
+ #
+ # 7) GCC language options.  The compiler MUST be built to support
+ #    at least `C' language.
