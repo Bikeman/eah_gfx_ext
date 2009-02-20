@@ -219,6 +219,7 @@
  * - Libraries for Linux and Windows/MinGW (required by SDL):
  *   - libgl1-mesa-dev | nvidia-glx-dev
  *   - libglu1-mesa-dev
+ *   - libdirectfb-dev
  *   - libxt-dev
  *   - libxext-dev
  *   - libaudio-dev
