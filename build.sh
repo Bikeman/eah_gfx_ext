@@ -193,10 +193,7 @@ prepare_win32()
 	echo "Preparing MinGW build script..." | tee -a $LOGFILE
 	cd $ROOT/3rdparty/mingw/xscripts || failure
 	# note: svn has no force/overwrite switch. the file might not be updated when patched
-	patch x86-mingw32-build.sh < $ROOT/patches/x86-mingw32-build.sh.patch >> $LOGFILE || failure						# temporary workaround
-	patch x86-mingw32-build.sh.batch < $ROOT/patches/x86-mingw32-build.sh.batch.patch >> $LOGFILE || failure			# temporary workaround
 	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf.patch >> $LOGFILE || failure
-	patch x86-mingw32-build.sh.conf < $ROOT/patches/x86-mingw32-build.sh.conf_versions.patch >> $LOGFILE || failure		# temporary workaround
 	chmod +x x86-mingw32-build.sh >> $LOGFILE || failure
 
 	return 0

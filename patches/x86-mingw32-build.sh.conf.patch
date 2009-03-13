@@ -1,5 +1,5 @@
 --- x86-mingw32-build.sh.conf
-+++ x86-mingw32-build.sh.conf.new	2008-05-16 16:04:14.000000000 +0200
++++ x86-mingw32-build.sh.conf	2009-03-13 12:08:40.000000000 +0100
 @@ -35,16 +35,16 @@
  #    the `x86-mingw32-build.sh.hosts' file for the `mirror' field
  #    in the following URL, to establish a default download host.
@@ -21,18 +21,16 @@
  #
  # 4) Package versions, from which the compiler will be built.
  #
-@@ -93,12 +93,12 @@
+@@ -92,11 +92,11 @@
  #    the corresponding package is available in the PACKAGE_DIR, or
  #    if it is selected for download.
  #
 -     option GCC_LANGUAGE_OPTIONS          ada
 +#    option GCC_LANGUAGE_OPTIONS          ada
       option GCC_LANGUAGE_OPTIONS          c++
--     option GCC_LANGUAGE_OPTIONS          d
 -     option GCC_LANGUAGE_OPTIONS          f77
 -     option GCC_LANGUAGE_OPTIONS          java
 -     option GCC_LANGUAGE_OPTIONS          objc
-+#    option GCC_LANGUAGE_OPTIONS          d
 +#    option GCC_LANGUAGE_OPTIONS          f77
 +#    option GCC_LANGUAGE_OPTIONS          java
 +#    option GCC_LANGUAGE_OPTIONS          objc
