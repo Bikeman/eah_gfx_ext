@@ -383,6 +383,7 @@ build_generic_win32()
 	cp $ROOT/3rdparty/boinc/lib/boinc_win.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/3rdparty/boinc/lib/common_defs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/3rdparty/boinc/lib/diagnostics.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
+	cp $ROOT/3rdparty/boinc/lib/filesys.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/3rdparty/boinc/lib/hostinfo.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/3rdparty/boinc/lib/proxy_info.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
 	cp $ROOT/3rdparty/boinc/lib/prefs.h $ROOT/install/include/BOINC >> $LOGFILE 2>&1 || failure
