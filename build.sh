@@ -187,7 +187,6 @@ prepare_win32()
 	else
 		cd .. || failure
 		echo "Retrieving MinGW build script (this may take a while)..." | tee -a $LOGFILE
-		# the date tag used is meant as a temporary workaround! Remove when GCC build issue got fixed upstream!
 		cvs -z3 -d:pserver:anonymous@mingw.cvs.sourceforge.net:/cvsroot/mingw checkout -P xscripts >> $LOGFILE 2>&1 || failure
 	fi
 	
