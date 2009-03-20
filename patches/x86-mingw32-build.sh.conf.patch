@@ -14,7 +14,7 @@
  #
 -     assume WORKING_DIR                   $HOME/tmp/mingw-3.4.5
 -     assume PACKAGE_DIR                   $HOME/packages/mingw-3.4.5
--     assume INSTALL_DIR                   $HOME/mingw
+-     assume INSTALL_DIR                   $HOME/mingw32
 +     assume WORKING_DIR                   `pwd`/../../../build/mingw
 +     assume PACKAGE_DIR                   `pwd`/../packages
 +     assume INSTALL_DIR                   `pwd`/../../../install
