@@ -111,7 +111,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 		m_CurrentRightAscension = m_EinsteinAdapter.wuSkyPosRightAscension();
 		m_RefreshSearchMarker = true;
 		buffer.str("");
-		buffer << "Ascension: " << fixed << m_CurrentRightAscension << " deg" << ends;
+		buffer << "RA: " << fixed << m_CurrentRightAscension << " deg" << ends;
 		m_WUSkyPosRightAscension = buffer.str();
 	}
 
@@ -120,7 +120,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 		m_CurrentDeclination = m_EinsteinAdapter.wuSkyPosDeclination();
 		m_RefreshSearchMarker = true;
 		buffer.str("");
-		buffer << "Declination: " << fixed << m_CurrentDeclination << " deg" << ends;
+		buffer << "dec: " << fixed << m_CurrentDeclination << " deg" << ends;
 		m_WUSkyPosDeclination = buffer.str();
 	}
 
