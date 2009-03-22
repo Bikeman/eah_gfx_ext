@@ -32,7 +32,7 @@ Starsphere::Starsphere(string sharedMemoryAreaIdentifier) :
 	m_FontHeader = 0;
 	m_FontText = 0;
 
-	Axes=0, Stars=0, Constellations=0, Pulsars=0;
+	Axes=0, Stars=0, Constellations=0, Pulsars=0, Results=0; 
 	LLOmarker=0, LHOmarker=0, GEOmarker=0, VIRGOmarker=0;
 	sphGrid=0, SNRs=0, SearchMarker=0;
 
@@ -60,6 +60,8 @@ Starsphere::Starsphere(string sharedMemoryAreaIdentifier) :
 	m_CurrentRightAscension = -1.0;
 	m_CurrentDeclination = -1.0;
 	m_RefreshSearchMarker = true;
+
+	Nresults=0;
 }
 
 Starsphere::~Starsphere()
@@ -68,6 +70,7 @@ Starsphere::~Starsphere()
 	if(m_FontLogo2) delete m_FontLogo2;
 	if(m_FontHeader) delete m_FontHeader;
 	if(m_FontText) delete m_FontText;
+
 }
 
 void Starsphere::sphVertex3D(GLfloat RAdeg, GLfloat DEdeg, GLfloat radius)
@@ -98,6 +101,20 @@ void Starsphere::star_marker(float RAdeg, float DEdeg, float size)
 	glEnd();
 	return;
 }
+
+/**
+ * Star Marker:
+ * Makes a marker for one star at a given position, angular size and radius
+ */
+void Starsphere::star_marker3D(float RAdeg, float DEdeg, float radius, float size)
+{
+	glPointSize((GLfloat) size);
+	glBegin(GL_POINTS);
+	sphVertex3D((GLfloat) RAdeg, (GLfloat) DEdeg, (GLfloat) (radius*sphRadius));
+	glEnd();
+	return;
+}
+
 
 /**
  *  Create Stars: markers for each star
@@ -140,6 +157,55 @@ void Starsphere::make_stars()
 
 	glEndList();
 }
+
+void Starsphere::make_results() 
+{
+	GLfloat mag_size=2.0;
+	int i;
+	float r,g,b;
+	float min_r, max_r; 
+        // default values for max significance metric
+	resultMetricDefaults(min_r,max_r);
+
+	
+	// delete existing, create new (required for windoze)
+	if(Results) glDeleteLists(Results, 1);
+	Results = glGenLists(1);
+	glNewList(Results, GL_COMPILE);
+
+
+		for (i=0; i < Nresults; i++) {
+			float radius=result_info[i][2];
+			if (radius < min_r) {
+				min_r=radius;
+			}
+			if (radius > max_r) {
+				max_r=radius;		
+			}
+		}
+		
+		if (min_r==max_r) min_r=max_r-1.0; 
+ 			
+		for (i=0; i < Nresults; i++) {
+
+			float radius=result_info[i][2];
+
+			float norm_radius = (radius - min_r) / (max_r-min_r);
+			int   color_bin = (int) (255.0 * (1.0 - norm_radius));
+
+			if (color_bin < 0) color_bin=0;
+			if (color_bin > 255) color_bin = 255;
+
+			r = rainbow_colormap[color_bin][0];
+			g = rainbow_colormap[color_bin][1];
+			b = rainbow_colormap[color_bin][2];
+			glColor3f(r, g, b);
+			star_marker3D(result_info[i][0], result_info[i][1],norm_radius ,mag_size);
+		}
+	glEndList();
+}
+
+
 
 /**
  *  Pulsar Markers:
@@ -577,9 +643,22 @@ void Starsphere::make_globe()
 	glEndList();
 }
 
+
+/**
+ * result metric info
+ * can be overwritten 
+ */
+
+
+void Starsphere::resultMetricDefaults(float & min_default, float & max_default) {
+	min_default= 0.0;
+	max_default= 1.0;
+
+}
 /**
  * Window resize/remap
  */
+
 void Starsphere::resize(const int width, const int height)
 {
 	// store current settings
@@ -622,6 +701,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 		setFeature(STARS, true);
 		setFeature(CONSTELLATIONS, true);
 		setFeature(PULSARS, true);
+		setFeature(RESULTS, true);
 		setFeature(SNRS, true);
 		setFeature(OBSERVATORIES, true);
 		setFeature(SEARCHINFO, true);
@@ -727,6 +807,7 @@ void Starsphere::initialize(const int width, const int height, const Resource *f
 	make_stars();
 	make_constellations();
 	make_pulsars();
+	make_results();
 	make_snrs();
 	make_axes();
 	make_globe();
@@ -798,12 +879,13 @@ void Starsphere::render(const double timeOfDay)
 	glPushMatrix();
 	glRotatef(Zrot - rotation_offset, 0.0, 1.0, 0.0);
 
-	// stars, pulsars, supernovae, grid
+	// stars, pulsars, supernovae, grid, results
 	if (isFeature(STARS))			glCallList(Stars);
 	if (isFeature(PULSARS))			glCallList(Pulsars);
 	if (isFeature(SNRS))			glCallList(SNRs);
 	if (isFeature(CONSTELLATIONS))	glCallList(Constellations);
 	if (isFeature(GLOBE))			glCallList(sphGrid);
+	if (isFeature(RESULTS))			glCallList(Results);
 
 	// observatories move an extra 15 degrees/hr since they were drawn
 	if (isFeature(OBSERVATORIES)) {
@@ -823,10 +905,19 @@ void Starsphere::render(const double timeOfDay)
 		if(m_RefreshSearchMarker) {
 			make_search_marker(m_CurrentRightAscension, m_CurrentDeclination, 0.5);
 			m_RefreshSearchMarker = false;
+			m_RefreshResults=true;
 		}
 		else {
 			glCallList(SearchMarker);
 		}
+	}
+
+	if(isFeature(RESULTS)) {
+		if(m_RefreshResults) {
+			make_results();
+			m_RefreshResults=false;
+		}
+
 	}
 
 	glPopMatrix();
@@ -911,6 +1002,9 @@ void Starsphere::keyboardPressEvent(const AbstractGraphicsEngine::KeyBoardKey ke
 		case KeyP:
 			setFeature(PULSARS, isFeature(PULSARS) ? false : true);
 			break;
+		case KeyU:
+			setFeature(RESULTS, isFeature(RESULTS) ? false : true);
+			break;			
 		case KeyR:
 			setFeature(SNRS, isFeature(SNRS) ? false : true);
 			break;
@@ -998,3 +1092,261 @@ void Starsphere::refreshLocalBOINCInformation()
 	m_UserRACredit = buffer.str();
 	buffer.str("");
 }
+float Starsphere::rainbow_colormap [][3] = {
+{ 1.000000f , 0.000000f , 0.000000f }, 
+{ 1.000000f , 0.009804f , 0.000000f }, 
+{ 1.000000f , 0.019608f , 0.000000f }, 
+{ 1.000000f , 0.029412f , 0.000000f }, 
+{ 1.000000f , 0.039216f , 0.000000f }, 
+{ 1.000000f , 0.049020f , 0.000000f }, 
+{ 1.000000f , 0.058824f , 0.000000f }, 
+{ 1.000000f , 0.068627f , 0.000000f }, 
+{ 1.000000f , 0.078431f , 0.000000f }, 
+{ 1.000000f , 0.088235f , 0.000000f }, 
+{ 1.000000f , 0.098039f , 0.000000f }, 
+{ 1.000000f , 0.107843f , 0.000000f }, 
+{ 1.000000f , 0.117647f , 0.000000f }, 
+{ 1.000000f , 0.127451f , 0.000000f }, 
+{ 1.000000f , 0.137255f , 0.000000f }, 
+{ 1.000000f , 0.147059f , 0.000000f }, 
+{ 1.000000f , 0.156863f , 0.000000f }, 
+{ 1.000000f , 0.166667f , 0.000000f }, 
+{ 1.000000f , 0.176471f , 0.000000f }, 
+{ 1.000000f , 0.186275f , 0.000000f }, 
+{ 1.000000f , 0.196078f , 0.000000f }, 
+{ 1.000000f , 0.205882f , 0.000000f }, 
+{ 1.000000f , 0.215686f , 0.000000f }, 
+{ 1.000000f , 0.225490f , 0.000000f }, 
+{ 1.000000f , 0.235294f , 0.000000f }, 
+{ 1.000000f , 0.245098f , 0.000000f }, 
+{ 1.000000f , 0.254902f , 0.000000f }, 
+{ 1.000000f , 0.264706f , 0.000000f }, 
+{ 1.000000f , 0.274510f , 0.000000f }, 
+{ 1.000000f , 0.284314f , 0.000000f }, 
+{ 1.000000f , 0.294118f , 0.000000f }, 
+{ 1.000000f , 0.303922f , 0.000000f }, 
+{ 1.000000f , 0.313725f , 0.000000f }, 
+{ 1.000000f , 0.323529f , 0.000000f }, 
+{ 1.000000f , 0.333333f , 0.000000f }, 
+{ 1.000000f , 0.343137f , 0.000000f }, 
+{ 1.000000f , 0.352941f , 0.000000f }, 
+{ 1.000000f , 0.362745f , 0.000000f }, 
+{ 1.000000f , 0.372549f , 0.000000f }, 
+{ 1.000000f , 0.382353f , 0.000000f }, 
+{ 1.000000f , 0.392157f , 0.000000f }, 
+{ 1.000000f , 0.401961f , 0.000000f }, 
+{ 1.000000f , 0.411765f , 0.000000f }, 
+{ 1.000000f , 0.421569f , 0.000000f }, 
+{ 1.000000f , 0.431373f , 0.000000f }, 
+{ 1.000000f , 0.441176f , 0.000000f }, 
+{ 1.000000f , 0.450980f , 0.000000f }, 
+{ 1.000000f , 0.460784f , 0.000000f }, 
+{ 1.000000f , 0.470588f , 0.000000f }, 
+{ 1.000000f , 0.480392f , 0.000000f }, 
+{ 1.000000f , 0.490196f , 0.000000f }, 
+{ 1.000000f , 0.500000f , 0.000000f }, 
+{ 1.000000f , 0.509804f , 0.000000f }, 
+{ 1.000000f , 0.519608f , 0.000000f }, 
+{ 1.000000f , 0.529412f , 0.000000f }, 
+{ 1.000000f , 0.539216f , 0.000000f }, 
+{ 1.000000f , 0.549020f , 0.000000f }, 
+{ 1.000000f , 0.558824f , 0.000000f }, 
+{ 1.000000f , 0.568627f , 0.000000f }, 
+{ 1.000000f , 0.578431f , 0.000000f }, 
+{ 1.000000f , 0.588235f , 0.000000f }, 
+{ 1.000000f , 0.598039f , 0.000000f }, 
+{ 1.000000f , 0.607843f , 0.000000f }, 
+{ 1.000000f , 0.617647f , 0.000000f }, 
+{ 1.000000f , 0.627451f , 0.000000f }, 
+{ 1.000000f , 0.637255f , 0.000000f }, 
+{ 1.000000f , 0.647059f , 0.000000f }, 
+{ 1.000000f , 0.656863f , 0.000000f }, 
+{ 1.000000f , 0.666667f , 0.000000f }, 
+{ 1.000000f , 0.676471f , 0.000000f }, 
+{ 1.000000f , 0.686275f , 0.000000f }, 
+{ 1.000000f , 0.696078f , 0.000000f }, 
+{ 1.000000f , 0.705882f , 0.000000f }, 
+{ 1.000000f , 0.715686f , 0.000000f }, 
+{ 1.000000f , 0.725490f , 0.000000f }, 
+{ 1.000000f , 0.735294f , 0.000000f }, 
+{ 1.000000f , 0.745098f , 0.000000f }, 
+{ 1.000000f , 0.754902f , 0.000000f }, 
+{ 1.000000f , 0.764706f , 0.000000f }, 
+{ 1.000000f , 0.774510f , 0.000000f }, 
+{ 1.000000f , 0.784314f , 0.000000f }, 
+{ 1.000000f , 0.794118f , 0.000000f }, 
+{ 1.000000f , 0.803922f , 0.000000f }, 
+{ 1.000000f , 0.813725f , 0.000000f }, 
+{ 1.000000f , 0.823529f , 0.000000f }, 
+{ 1.000000f , 0.833333f , 0.000000f }, 
+{ 1.000000f , 0.843137f , 0.000000f }, 
+{ 1.000000f , 0.852941f , 0.000000f }, 
+{ 1.000000f , 0.862745f , 0.000000f }, 
+{ 1.000000f , 0.872549f , 0.000000f }, 
+{ 1.000000f , 0.882353f , 0.000000f }, 
+{ 1.000000f , 0.892157f , 0.000000f }, 
+{ 1.000000f , 0.901961f , 0.000000f }, 
+{ 1.000000f , 0.911765f , 0.000000f }, 
+{ 1.000000f , 0.921569f , 0.000000f }, 
+{ 1.000000f , 0.931373f , 0.000000f }, 
+{ 1.000000f , 0.941176f , 0.000000f }, 
+{ 1.000000f , 0.950980f , 0.000000f }, 
+{ 1.000000f , 0.960784f , 0.000000f }, 
+{ 1.000000f , 0.970588f , 0.000000f }, 
+{ 1.000000f , 0.980392f , 0.000000f }, 
+{ 1.000000f , 0.990196f , 0.000000f }, 
+{ 1.000000f , 1.000000f , 0.000000f }, 
+{ 0.980392f , 1.000000f , 0.000000f }, 
+{ 0.960784f , 1.000000f , 0.000000f }, 
+{ 0.941176f , 1.000000f , 0.000000f }, 
+{ 0.921569f , 1.000000f , 0.000000f }, 
+{ 0.901961f , 1.000000f , 0.000000f }, 
+{ 0.882353f , 1.000000f , 0.000000f }, 
+{ 0.862745f , 1.000000f , 0.000000f }, 
+{ 0.843137f , 1.000000f , 0.000000f }, 
+{ 0.823529f , 1.000000f , 0.000000f }, 
+{ 0.803922f , 1.000000f , 0.000000f }, 
+{ 0.784314f , 1.000000f , 0.000000f }, 
+{ 0.764706f , 1.000000f , 0.000000f }, 
+{ 0.745098f , 1.000000f , 0.000000f }, 
+{ 0.725490f , 1.000000f , 0.000000f }, 
+{ 0.705882f , 1.000000f , 0.000000f }, 
+{ 0.686275f , 1.000000f , 0.000000f }, 
+{ 0.666667f , 1.000000f , 0.000000f }, 
+{ 0.647059f , 1.000000f , 0.000000f }, 
+{ 0.627451f , 1.000000f , 0.000000f }, 
+{ 0.607843f , 1.000000f , 0.000000f }, 
+{ 0.588235f , 1.000000f , 0.000000f }, 
+{ 0.568627f , 1.000000f , 0.000000f }, 
+{ 0.549020f , 1.000000f , 0.000000f }, 
+{ 0.529412f , 1.000000f , 0.000000f }, 
+{ 0.509804f , 1.000000f , 0.000000f }, 
+{ 0.490196f , 1.000000f , 0.000000f }, 
+{ 0.470588f , 1.000000f , 0.000000f }, 
+{ 0.450980f , 1.000000f , 0.000000f }, 
+{ 0.431373f , 1.000000f , 0.000000f }, 
+{ 0.411765f , 1.000000f , 0.000000f }, 
+{ 0.392157f , 1.000000f , 0.000000f }, 
+{ 0.372549f , 1.000000f , 0.000000f }, 
+{ 0.352941f , 1.000000f , 0.000000f }, 
+{ 0.333333f , 1.000000f , 0.000000f }, 
+{ 0.313725f , 1.000000f , 0.000000f }, 
+{ 0.294118f , 1.000000f , 0.000000f }, 
+{ 0.274510f , 1.000000f , 0.000000f }, 
+{ 0.254902f , 1.000000f , 0.000000f }, 
+{ 0.235294f , 1.000000f , 0.000000f }, 
+{ 0.215686f , 1.000000f , 0.000000f }, 
+{ 0.196078f , 1.000000f , 0.000000f }, 
+{ 0.176471f , 1.000000f , 0.000000f }, 
+{ 0.156863f , 1.000000f , 0.000000f }, 
+{ 0.137255f , 1.000000f , 0.000000f }, 
+{ 0.117647f , 1.000000f , 0.000000f }, 
+{ 0.098039f , 1.000000f , 0.000000f }, 
+{ 0.078431f , 1.000000f , 0.000000f }, 
+{ 0.058824f , 1.000000f , 0.000000f }, 
+{ 0.039216f , 1.000000f , 0.000000f }, 
+{ 0.019608f , 1.000000f , 0.000000f }, 
+{ 0.000000f , 1.000000f , 0.000000f }, 
+{ 0.000000f , 0.980392f , 0.019608f }, 
+{ 0.000000f , 0.960784f , 0.039216f }, 
+{ 0.000000f , 0.941176f , 0.058824f }, 
+{ 0.000000f , 0.921569f , 0.078431f }, 
+{ 0.000000f , 0.901961f , 0.098039f }, 
+{ 0.000000f , 0.882353f , 0.117647f }, 
+{ 0.000000f , 0.862745f , 0.137255f }, 
+{ 0.000000f , 0.843137f , 0.156863f }, 
+{ 0.000000f , 0.823529f , 0.176471f }, 
+{ 0.000000f , 0.803922f , 0.196078f }, 
+{ 0.000000f , 0.784314f , 0.215686f }, 
+{ 0.000000f , 0.764706f , 0.235294f }, 
+{ 0.000000f , 0.745098f , 0.254902f }, 
+{ 0.000000f , 0.725490f , 0.274510f }, 
+{ 0.000000f , 0.705882f , 0.294118f }, 
+{ 0.000000f , 0.686275f , 0.313725f }, 
+{ 0.000000f , 0.666667f , 0.333333f }, 
+{ 0.000000f , 0.647059f , 0.352941f }, 
+{ 0.000000f , 0.627451f , 0.372549f }, 
+{ 0.000000f , 0.607843f , 0.392157f }, 
+{ 0.000000f , 0.588235f , 0.411765f }, 
+{ 0.000000f , 0.568627f , 0.431373f }, 
+{ 0.000000f , 0.549020f , 0.450980f }, 
+{ 0.000000f , 0.529412f , 0.470588f }, 
+{ 0.000000f , 0.509804f , 0.490196f }, 
+{ 0.000000f , 0.490196f , 0.509804f }, 
+{ 0.000000f , 0.470588f , 0.529412f }, 
+{ 0.000000f , 0.450980f , 0.549020f }, 
+{ 0.000000f , 0.431373f , 0.568627f }, 
+{ 0.000000f , 0.411765f , 0.588235f }, 
+{ 0.000000f , 0.392157f , 0.607843f }, 
+{ 0.000000f , 0.372549f , 0.627451f }, 
+{ 0.000000f , 0.352941f , 0.647059f }, 
+{ 0.000000f , 0.333333f , 0.666667f }, 
+{ 0.000000f , 0.313725f , 0.686275f }, 
+{ 0.000000f , 0.294118f , 0.705882f }, 
+{ 0.000000f , 0.274510f , 0.725490f }, 
+{ 0.000000f , 0.254902f , 0.745098f }, 
+{ 0.000000f , 0.235294f , 0.764706f }, 
+{ 0.000000f , 0.215686f , 0.784314f }, 
+{ 0.000000f , 0.196078f , 0.803922f }, 
+{ 0.000000f , 0.176471f , 0.823529f }, 
+{ 0.000000f , 0.156863f , 0.843137f }, 
+{ 0.000000f , 0.137255f , 0.862745f }, 
+{ 0.000000f , 0.117647f , 0.882353f }, 
+{ 0.000000f , 0.098039f , 0.901961f }, 
+{ 0.000000f , 0.078431f , 0.921569f }, 
+{ 0.000000f , 0.058824f , 0.941176f }, 
+{ 0.000000f , 0.039216f , 0.960784f }, 
+{ 0.000000f , 0.019608f , 0.980392f }, 
+{ 0.000000f , 0.000000f , 1.000000f }, 
+{ 0.013072f , 0.000000f , 1.000000f }, 
+{ 0.026144f , 0.000000f , 1.000000f }, 
+{ 0.039216f , 0.000000f , 1.000000f }, 
+{ 0.052288f , 0.000000f , 1.000000f }, 
+{ 0.065359f , 0.000000f , 1.000000f }, 
+{ 0.078431f , 0.000000f , 1.000000f }, 
+{ 0.091503f , 0.000000f , 1.000000f }, 
+{ 0.104575f , 0.000000f , 1.000000f }, 
+{ 0.117647f , 0.000000f , 1.000000f }, 
+{ 0.130719f , 0.000000f , 1.000000f }, 
+{ 0.143791f , 0.000000f , 1.000000f }, 
+{ 0.156863f , 0.000000f , 1.000000f }, 
+{ 0.169935f , 0.000000f , 1.000000f }, 
+{ 0.183007f , 0.000000f , 1.000000f }, 
+{ 0.196078f , 0.000000f , 1.000000f }, 
+{ 0.209150f , 0.000000f , 1.000000f }, 
+{ 0.222222f , 0.000000f , 1.000000f }, 
+{ 0.235294f , 0.000000f , 1.000000f }, 
+{ 0.248366f , 0.000000f , 1.000000f }, 
+{ 0.261438f , 0.000000f , 1.000000f }, 
+{ 0.274510f , 0.000000f , 1.000000f }, 
+{ 0.287582f , 0.000000f , 1.000000f }, 
+{ 0.300654f , 0.000000f , 1.000000f }, 
+{ 0.313725f , 0.000000f , 1.000000f }, 
+{ 0.326797f , 0.000000f , 1.000000f }, 
+{ 0.339869f , 0.000000f , 1.000000f }, 
+{ 0.352941f , 0.000000f , 1.000000f }, 
+{ 0.366013f , 0.000000f , 1.000000f }, 
+{ 0.379085f , 0.000000f , 1.000000f }, 
+{ 0.392157f , 0.000000f , 1.000000f }, 
+{ 0.405229f , 0.000000f , 1.000000f }, 
+{ 0.418301f , 0.000000f , 1.000000f }, 
+{ 0.431373f , 0.000000f , 1.000000f }, 
+{ 0.444444f , 0.000000f , 1.000000f }, 
+{ 0.457516f , 0.000000f , 1.000000f }, 
+{ 0.470588f , 0.000000f , 1.000000f }, 
+{ 0.483660f , 0.000000f , 1.000000f }, 
+{ 0.496732f , 0.000000f , 1.000000f }, 
+{ 0.509804f , 0.000000f , 1.000000f }, 
+{ 0.522876f , 0.000000f , 1.000000f }, 
+{ 0.535948f , 0.000000f , 1.000000f }, 
+{ 0.549020f , 0.000000f , 1.000000f }, 
+{ 0.562092f , 0.000000f , 1.000000f }, 
+{ 0.575163f , 0.000000f , 1.000000f }, 
+{ 0.588235f , 0.000000f , 1.000000f }, 
+{ 0.601307f , 0.000000f , 1.000000f }, 
+{ 0.614379f , 0.000000f , 1.000000f }, 
+{ 0.627451f , 0.000000f , 1.000000f }, 
+{ 0.640523f , 0.000000f , 1.000000f }, 
+{ 0.653595f , 0.000000f , 1.000000f }, 
+{ 0.666667f , 0.000000f , 1.000000f }
+};

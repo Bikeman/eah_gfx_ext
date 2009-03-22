@@ -56,6 +56,8 @@
 // needed to find OpenGL 1.4 prototypes in glext.h (alternatives?)
 #define GL_GLEXT_PROTOTYPES
 
+#define MAX_RESULT_COUNT 10000
+
 using namespace std;
 
 /**
@@ -109,11 +111,22 @@ public:
 	 */
 	virtual void resize(const int width, const int height);
 
+
+	/**
+	 * \brief This method is used to get an idea about the range of result metric values
+	 *
+	 * \param min_default (out) default minimum of result metric 
+	 * \param max_default (out) default maximum of result metric
+	 */
+	virtual void resultMetricDefaults(float & min_default, float & max_default);
+
+
 	/**
 	 * \brief This method renders one frame of the animation
 	 *
 	 * \param timeOfDay The current time (e.g. BOINC's dtime(), used for time-based rendering evolution)
 	 */
+
 	void render(const double timeOfDay);
 
 	/**
@@ -227,7 +240,8 @@ protected:
 		AXES = 128,
 		SEARCHINFO = 256,
 		LOGO = 512,
-		MARKER = 1024
+		MARKER = 1024,
+		RESULTS = 2048
 	};
 
 	/**
@@ -359,12 +373,25 @@ protected:
 	/// Refresh indicator when the search marker (gunsight) coordinates changed
 	bool m_RefreshSearchMarker;
 
+	/// Refresh Results
+	bool m_RefreshResults;
+
+
+	/// Result (Candiate) coordinates and 'score' 
+	float result_info[MAX_RESULT_COUNT][3];
+
+	/// nr of candidate results
+	int Nresults;
+
 private:
 	/// Generate OpenGL display list for stars
 	void make_stars();
 
 	/// Generate OpenGL display list for pulsars
 	void make_pulsars();
+
+	/// Generate OpenGL display list for results
+	void make_results();
 
 	/// Generate OpenGL display list for SNRs
 	void make_snrs();
@@ -396,9 +423,21 @@ private:
 	 */
 	void star_marker(float RAdeg, float DEdeg, float size);
 
+	/**
+	 * \brief Generate a single star vertex with radius
+	 *
+	 * \param RAdeg Right ascension in degrees
+	 * \param DEdeg Declination in degrees
+	 * \param radius radius as fraction of sphere radius
+	 * \param size Point size of the star
+	 */
+	void star_marker3D(float RAdeg, float DEdeg, float radius, float size);
+
+	/// rainbow-like color map (RGB)
+	static float rainbow_colormap [][3];
 
 	/// Feature display list ID's
-	GLuint Axes, Stars, Constellations, Pulsars, SNRs;
+	GLuint Axes, Stars, Constellations, Pulsars, SNRs, Results;
 
 	/// Feature display list ID's
 	GLuint LLOmarker, LHOmarker, GEOmarker, VIRGOmarker;
@@ -463,6 +502,9 @@ private:
 	 * \see Starsphere::mouseMoveEvent()
 	 */
 	void zoomSphere(const int relativeZoom);
+
+
+
 };
 
 /// Constellation & star coordinates (starlist.C)
@@ -482,6 +524,7 @@ extern float SNR_info[][2];
 
 /// Total number of SNRs
 extern int NSNRs;
+
 
 /**
  * @}

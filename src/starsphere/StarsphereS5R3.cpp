@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "StarsphereS5R3.h"
-
 #include <time.h>
 
 StarsphereS5R3::StarsphereS5R3() :
@@ -81,6 +80,12 @@ void StarsphereS5R3::initialize(const int width, const int height, const Resourc
 	generateObservatories(1.0);
 }
 
+
+void StarsphereS5R3::resultMetricDefaults(float & min_default, float & max_default) {
+	min_default= -0.5;
+	max_default= 1.25;
+}
+
 void StarsphereS5R3::resize(const int width, const int height)
 {
 	Starsphere::resize(width, height);
@@ -92,6 +97,7 @@ void StarsphereS5R3::resize(const int width, const int height)
 
 void StarsphereS5R3::refreshBOINCInformation()
 {
+	bool refresh_results = false;
 	// call base class implementation
 	Starsphere::refreshLocalBOINCInformation();
 
@@ -113,6 +119,7 @@ void StarsphereS5R3::refreshBOINCInformation()
 		buffer.str("");
 		buffer << "RA: " << fixed << m_CurrentRightAscension << " deg" << ends;
 		m_WUSkyPosRightAscension = buffer.str();
+		refresh_results=true;
 	}
 
 	if(m_CurrentDeclination != m_EinsteinAdapter.wuSkyPosDeclination()) {
@@ -122,6 +129,11 @@ void StarsphereS5R3::refreshBOINCInformation()
 		buffer.str("");
 		buffer << "dec: " << fixed << m_CurrentDeclination << " deg" << ends;
 		m_WUSkyPosDeclination = buffer.str();
+		refresh_results=true;
+	}
+
+	if(refresh_results) {
+		Nresults=m_EinsteinAdapter.copyCandidates(result_info, MAX_RESULT_COUNT);
 	}
 
 	buffer.str("");

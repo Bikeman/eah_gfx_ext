@@ -19,8 +19,16 @@
  ***************************************************************************/
 
 #include "EinsteinS5R3Adapter.h"
+#include <cstdio>
+#include <stdint.h>
+#include <dirent.h>
+#include "filesys.h" 
+
 
 const string EinsteinS5R3Adapter::SharedMemoryIdentifier = "EinsteinHS";
+
+const long EinsteinS5R3Adapter::MAX_RESULT_COUNT = 10000;
+
 
 EinsteinS5R3Adapter::EinsteinS5R3Adapter(BOINCClientAdapter *boincClient)
 {
@@ -28,18 +36,37 @@ EinsteinS5R3Adapter::EinsteinS5R3Adapter(BOINCClientAdapter *boincClient)
 
 	m_WUSkyPosRightAscension = 0.0;
 	m_WUSkyPosDeclination = 0.0;
+	m_last_RA = 0.0;
+	m_last_dec = 0.0;
 	m_WUFractionDone = 0.0;
 	m_WUCPUTime = 0.0;
+	m_last_WUCPUTime = 0.0;
+	m_Nresults= 0;
+	m_results = new EinsteinS5R3Result[MAX_RESULT_COUNT];
 }
 
 EinsteinS5R3Adapter::~EinsteinS5R3Adapter()
 {
+	delete [] m_results;
 }
 
 void EinsteinS5R3Adapter::refresh()
 {
+
 	boincClient->refresh();
 	parseApplicationInformation();
+
+	// check that some time has past since last checkpoint file loading	
+	// if data is not loaded yet or marker position has changed
+	// try to load checkpoint_file
+	if( m_Nresults == 0 ||
+		  (m_WUCPUTime - m_last_WUCPUTime) >  60.0  &&  
+                    (m_last_RA != wuSkyPosRightAscension() || m_last_dec != wuSkyPosDeclination())) { 
+			loadCheckpointFile();
+			m_last_WUCPUTime = m_WUCPUTime;
+			m_last_RA = wuSkyPosRightAscension();
+			m_last_dec = wuSkyPosDeclination();
+	}
 }
 
 void EinsteinS5R3Adapter::parseApplicationInformation()
@@ -72,6 +99,49 @@ void EinsteinS5R3Adapter::parseApplicationInformation()
 	}
 }
 
+void EinsteinS5R3Adapter::loadCheckpointFile() {
+	UINT4 counter;
+	int res;
+	string fname("");
+	// look for *.cpt file
+
+	// directory traversal, not entirely portable, tho.
+	DIR *pdir;
+ 	struct dirent *pent;
+
+ 	pdir=opendir("."); //"." refers to the current dir
+	if (!pdir){
+ 		cerr << "opendir() failure;" << endl;
+		closedir(pdir);
+		return;
+ 	}
+
+ 	while ((pent=readdir(pdir))){
+		fname =  pent->d_name;
+		
+		string::size_type pos1 = fname.find("h1_");
+		string::size_type pos2 = fname.rfind(".cpt");
+
+		if(pos1 == 0 && pos2 == fname.length() -4) {			
+			break;
+		} 
+ 	}
+ 	closedir(pdir);
+	
+
+	if(fname != "") {
+		boinc_copy(fname.c_str(),"temp.cpt");
+	}
+	// try copying checkpoint file to tmp file
+	
+
+	// open tmp file and read candidates
+	// plus normalize data 	
+	// and set the current buffer and result nr..
+	res=read_hfs_checkpoint("temp.cpt", &counter);
+	// no error handling, we can't do anything about it anyways
+}
+
 double EinsteinS5R3Adapter::wuSkyPosRightAscension() const
 {
 	return m_WUSkyPosRightAscension;
@@ -91,3 +161,116 @@ double EinsteinS5R3Adapter::wuCPUTime() const
 {
 	return m_WUCPUTime;
 }
+
+long EinsteinS5R3Adapter::copyCandidates(float res [][3] , long n) const 
+{
+	long nr = m_Nresults;
+ 
+	if(n < m_Nresults) {
+	     nr = n;				
+	}
+
+	for (int i=0 ;  i < nr ; i++) {
+		res[i][0]= m_results[i].ra;
+		res[i][1]= m_results[i].dec;
+		res[i][2]= m_results[i].meansig;
+	}
+	return nr;
+}
+
+
+
+int EinsteinS5R3Adapter::read_hfs_checkpoint(const char*filename, UINT4*counter) {
+  FILE*fp;
+  UINT4 len;
+  UINT4 checksum;
+  UINT4 tl_elems;
+  HoughFStatOutputEntry buffer[MAX_RESULT_COUNT];  
+  /* counter should be 0 if we couldn't read a checkpoint */
+  *counter = 0;
+
+  /* try to open file */
+  fp = fopen(filename, "rb");
+  if(!fp) {
+      cerr << "Checkpoint "<< filename << " couldn't be opened\n";
+      return(-1);
+  }
+
+  /* read number of elements */
+  len = fread(&(tl_elems), sizeof(tl_elems), 1, fp);
+  
+
+  if(len != 1) {
+    cerr << "Couldn't read elems from " <<  filename << endl;
+    cerr << "fread() returned " << len << " , length was 1\n";
+    if(fclose(fp))
+      cerr << "In addition: couldn't close "<< filename << endl;
+    return(-1);
+  }
+  /* sanity check */
+  if (tl_elems > MAX_RESULT_COUNT) {
+    cerr << "Number of elements read larger than max length of checkpoint data: " << tl_elems  << " > " << MAX_RESULT_COUNT <<"\n";
+    if(fclose(fp))
+      cerr << "In addition: couldn't close\n";
+    return(-2);
+  }
+
+  /* read data */
+  len = fread(buffer, sizeof(HoughFStatOutputEntry), tl_elems, fp);
+  if(len != tl_elems) {
+    cerr << "Couldn't read data from " << filename << endl;
+    if(fclose(fp))
+      cerr << "In addition: couldn't close " << filename << endl;
+    return(-1);
+  }
+
+  /* read counter */
+  len = fread(counter, sizeof(*counter), 1, fp);
+  if(len != 1) {
+    cerr << "Couldn't read counter from " << filename << endl;
+    cerr << "fread() returned "<< len << ", length was 1\n";
+    if(fclose(fp))
+      cerr << "In addition: couldn't close " <<  filename << endl;
+    return(-1);
+  }
+
+  /* read checksum */
+  len = fread(&checksum, sizeof(checksum), 1, fp);
+  if(len != 1) {
+    cerr << "Couldn't read checksum to " <<  filename << endl;
+    cerr << "fread() returned "<< len << ", length was 1\n";
+    if(fclose(fp))
+      cerr << "In addition: couldn't close "<< filename << endl;
+    return(-1);
+  }
+
+  /* close file */
+  if(fclose(fp)) {
+    cerr << "Couldn't close " <<  filename << endl;
+    return(-1);
+  }
+
+  /* verify checksum */
+  for(len = 0; len < sizeof(tl_elems); len++)
+    checksum -= *(((char*)&(tl_elems)) + len);
+  for(len = 0; len < (tl_elems * sizeof(HoughFStatOutputEntry)); len++)
+    checksum -= *(((char*)buffer) + len);
+  for(len = 0; len < sizeof(*counter); len++)
+    checksum -= *(((char*)counter) + len);
+  if(checksum) {
+    cerr << "Checksum error: "<< checksum << endl;
+    return(-2);
+  }
+
+
+  for(UINT4 i=0 ; i < tl_elems ; i++) {
+	m_results[i].ra = buffer[i].Alpha / PI * 180.0;
+	m_results[i].dec= buffer[i].Delta / PI * 180.0;
+	m_results[i].maxsig = buffer[i].HoughFStat;
+	m_results[i].meansig = (buffer[i].MeanSig) > 0.0 ? buffer[i].MeanSig : 0.0 ; 
+  }
+  m_Nresults= tl_elems;		
+  /* all went well */
+  return(0);
+}
+

@@ -26,6 +26,8 @@
 #include "Starsphere.h"
 #include "EinsteinS5R3Adapter.h"
 
+
+
 using namespace std;
 
 /**
@@ -79,6 +81,18 @@ public:
 	 * \param height The new height of the display surface
 	 */
 	void resize(const int width, const int height);
+
+	/**
+	 * \brief This method is called to get a default range for the result metric
+	 *
+	 * this method overrides its parent's implementation,
+	 *
+	 * \param width The new width of the display surface
+	 * \param height The new height of the display surface
+	 */
+
+	virtual void resultMetricDefaults(float & min_default, float & max_default);
+
 
 	/**
 	 * \brief This method is called when the BOINC client information should be updated
